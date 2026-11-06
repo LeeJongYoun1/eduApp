@@ -40,8 +40,9 @@
 ### Task 1: DB 스키마와 접근 규칙
 
 **Files:**
-- Create: `supabase/migrations/20261106000001_programs.sql`
-- Create: `supabase/tests/supabase_stub.sql` (로컬 전용: `anon`, `authenticated`, `service_role` 역할과 `auth.uid()` 흉내)
+- Use: `supabase/schema.sql` (전체 스키마, 이미 작성·검증됨 — `supabase/tests/schema_check.sql`)
+- Create: `supabase/migrations/20261106000001_init.sql` (= `schema.sql` 복사, 운영 DB 적용용)
+- Use: `supabase/tests/supabase_stub.sql` (로컬 전용 Supabase 흉내)
 - Create: `batch/tests/conftest.py`
 - Create: `batch/tests/test_schema.py`
 - Create: `batch/pyproject.toml` (의존성: psycopg[binary], httpx, beautifulsoup4, pytest)
@@ -50,7 +51,8 @@
 - Produces:
   - 테이블 `institutions(id bigint identity pk, key text unique not null, name text not null, sido text not null check (sido in ('서울','경기')), sigungu text, homepage_url text not null)`
   - 테이블 `programs(id bigint identity pk, institution_id bigint not null references institutions, source_id text not null, title text not null, description text, url text not null, grade_min int check 1..6, grade_max int check 1..6 and >= grade_min, starts_on date, ends_on date, apply_starts_at timestamptz, apply_ends_at timestamptz, fee text, collected_at timestamptz not null default now(), unique (institution_id, source_id))`
-  - 테이블 `collect_runs(id bigint identity pk, institution_key text not null, started_at timestamptz not null default now(), ok boolean not null, program_count int, error text)`
+  - 테이블 `collect_runs(id bigint identity pk, target text not null, started_at timestamptz not null default now(), ok boolean not null, item_count int, error text)`
+  - `institutions.sido`는 enum `sido`('서울','경기'). 나머지 전체 테이블은 `schema.sql` 참고
   - 뷰 `upcoming_programs`: `programs` join `institutions`, `coalesce(ends_on, starts_on) >= current_date` 또는 둘 다 NULL이면 `apply_ends_at >= now()`.
   - RLS: `institutions`, `programs`는 anon·authenticated `select` 허용, 쓰기 정책 없음. `collect_runs`는 정책 없음(앱 접근 불가).
   - pytest 픽스처 `db` (psycopg 연결, 테스트마다 새 DB에 stub+마이그레이션 적용). 환경변수 `TEST_PG_ADMIN_URL` (기본 `postgresql://postgres@localhost:5432/postgres`).
@@ -61,13 +63,13 @@
 
 - [ ] **Step 2: 실패하는 테스트 작성** (`batch/tests/test_schema.py`)
   - `test_upcoming_view_hides_ended`: 종료일 어제 1건, 내일 1건 insert → 뷰 결과 제목이 내일 것 1건.
-  - `test_sido_rejects_other_region`: `sido='부산'` insert → `psycopg.errors.CheckViolation`.
+  - `test_sido_rejects_other_region`: `sido='부산'` insert → `psycopg.errors.InvalidTextRepresentation`.
   - `test_anon_can_read_but_not_write`: `set role anon` 후 `select` 성공, `insert into programs` → `InsufficientPrivilege` 또는 RLS 위반.
   - `test_grade_range_check`: `grade_min=5, grade_max=3` → `CheckViolation`.
 
 - [ ] **Step 3: 실패 확인** — Run: `cd batch && pytest tests/test_schema.py -v` / Expected: FAIL (테이블 없음)
 
-- [ ] **Step 4: stub, 마이그레이션, conftest 작성**
+- [ ] **Step 4: conftest 작성** (stub + `schema.sql` 적용), 마이그레이션 파일 복사
 
 - [ ] **Step 5: 통과 확인** — Run: `cd batch && pytest tests/test_schema.py -v` / Expected: 4 passed
 
@@ -110,7 +112,7 @@
   - `@dataclass(frozen=True) class Institution: key: str; name: str; sido: str; sigungu: str | None; homepage_url: str`
   - `ensure_institution(conn, inst: Institution) -> int` (id 반환, 있으면 갱신)
   - `upsert_programs(conn, institution_id: int, programs: list[Program]) -> int` (`on conflict (institution_id, source_id) do update`, 반환값 = 처리 건수)
-  - `record_run(conn, institution_key: str, ok: bool, program_count: int | None, error: str | None) -> None`
+  - `record_run(conn, target: str, ok: bool, item_count: int | None, error: str | None) -> None`
 
 - [ ] **Step 1: 실패하는 테스트**
   - `test_upsert_is_idempotent`: 같은 2건을 두 번 upsert → `programs` 2행, 두 번째에 바꾼 제목이 반영.

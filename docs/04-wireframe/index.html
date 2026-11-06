@@ -1,0 +1,219 @@
+<title>eduApp 와이어프레임</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&display=swap">
+<style>
+/* 레이아웃: 시나리오 순서대로 휴대폰 화면을 격자로 나열. 토큰은 docs/09-style-guide.md 그대로 */
+:root{
+  --primary:#2F6B4F;--on-primary:#FFFFFF;--accent:#E8A13A;--surface:#FAF8F4;--card:#FFFFFF;
+  --text:#1E2420;--muted:#5D665F;--border:#E3E0D8;--info:#3B6EA8;--warning:#B7791F;--danger:#B3412F;
+  --page:#EFECE5;--tint:rgba(47,107,79,.08);
+  --font:"Pretendard","Noto Sans KR",system-ui,-apple-system,sans-serif;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --primary:#7FC4A0;--on-primary:#0F2A1E;--accent:#F2BC6B;--surface:#161816;--card:#1F221F;
+  --text:#ECEFEC;--muted:#A3ABA5;--border:#2E322E;--info:#8AB4E0;--warning:#E0B060;--danger:#E8806E;
+  --page:#0E100E;--tint:rgba(127,196,160,.12);color-scheme:dark}}
+:root[data-theme="dark"]{
+  --primary:#7FC4A0;--on-primary:#0F2A1E;--accent:#F2BC6B;--surface:#161816;--card:#1F221F;
+  --text:#ECEFEC;--muted:#A3ABA5;--border:#2E322E;--info:#8AB4E0;--warning:#E0B060;--danger:#E8806E;
+  --page:#0E100E;--tint:rgba(127,196,160,.12);color-scheme:dark}
+body{background:var(--page);color:var(--text);font-family:var(--font);font-size:16px;line-height:1.5;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:32px 48px}
+header.top{max-width:1180px;margin:0 auto 28px;display:grid;gap:6px}
+header.top h1{font-size:26px;margin:0;text-wrap:balance}
+header.top p{margin:0;color:var(--muted);max-width:62ch}
+.grid{max-width:1180px;margin:0 auto;display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:28px 24px}
+figure{margin:0;display:grid;gap:10px;align-content:start;min-width:0}
+figcaption{display:grid;gap:2px}
+figcaption b{font-size:15px}
+figcaption span{font-size:13px;color:var(--muted)}
+.phone{background:var(--surface);border:1px solid var(--border);border-radius:28px;overflow:hidden;
+  display:flex;flex-direction:column;height:600px;max-width:100%}
+.bar{display:flex;align-items:center;gap:8px;padding:14px 16px 10px;font-weight:700;font-size:18px}
+.bar .sp{flex:1}
+.bar small{font-weight:500;font-size:13px;color:var(--muted)}
+.body{flex:1;overflow:hidden;padding:4px 16px 16px;display:flex;flex-direction:column;gap:12px}
+.tabs{display:grid;grid-template-columns:repeat(4,1fr);border-top:1px solid var(--border);background:var(--card)}
+.tabs div{text-align:center;font-size:12px;padding:8px 0 10px;color:var(--muted)}
+.tabs div i{display:block;font-style:normal;font-size:16px}
+.tabs .on{color:var(--primary);font-weight:700}
+.card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:12px;display:grid;gap:6px}
+.cap{font-size:13px;color:var(--muted)}
+.h{font-size:16px;font-weight:700}
+.lbl{font-size:14px}
+.row{display:flex;gap:6px;flex-wrap:wrap;align-items:center}
+.chip{font-size:12px;font-weight:500;padding:2px 10px;border-radius:999px;border:1px solid currentColor;white-space:nowrap}
+.chip.info{color:var(--info)}.chip.warn{color:var(--warning)}.chip.danger{color:var(--danger)}
+.chip.sel{background:var(--primary);color:var(--on-primary);border-color:var(--primary)}
+.chip.off{color:var(--muted)}
+.star{margin-left:auto;color:var(--accent);font-size:18px}
+.btn{display:block;text-align:center;border-radius:10px;padding:12px;font-weight:700;font-size:15px}
+.btn.pri{background:var(--primary);color:var(--on-primary)}
+.btn.sec{border:1px solid var(--border);color:var(--text)}
+.input{border:1px solid var(--border);border-radius:10px;padding:10px 12px;background:var(--card);color:var(--muted);font-size:14px}
+.read{background:var(--tint);border-radius:10px;padding:10px 12px;font-size:14px;display:grid;gap:4px}
+.q{font-size:18px;font-weight:700;line-height:1.45}
+.notice{border:1px dashed var(--warning);color:var(--warning);border-radius:10px;padding:8px 12px;font-size:13px}
+.kv{display:grid;grid-template-columns:72px 1fr;gap:4px 8px;font-size:14px}
+.kv dt{color:var(--muted)}.kv dd{margin:0}
+.list{display:grid;gap:0;border:1px solid var(--border);border-radius:12px;background:var(--card)}
+.list>div{display:flex;align-items:center;gap:8px;padding:10px 12px;border-top:1px solid var(--border);font-size:14px}
+.list>div:first-child{border-top:0}
+.list .pub{margin-left:auto;color:var(--muted)}
+ol.steps{margin:0;padding-left:20px;font-size:14px;display:grid;gap:4px}
+.sec-t{font-size:13px;font-weight:700;color:var(--muted);letter-spacing:.02em}
+.legend{max-width:1180px;margin:36px auto 0;color:var(--muted);font-size:13px}
+</style>
+
+<header class="top">
+  <h1>eduApp 와이어프레임 v1</h1>
+  <p>학부모용 시범 운영 화면 8개. 시나리오(S1~S7) 순서로 놓았고, 색과 글자는 스타일 가이드를 따랐어요. 프로그램과 책 이름은 예시예요.</p>
+</header>
+
+<main class="grid">
+
+<figure>
+  <figcaption><b>1. 자녀 등록</b><span>S1 · 학교 이름 검색, 학년 선택, 여러 명 가능</span></figcaption>
+  <div class="phone">
+    <div class="bar">자녀 추가</div>
+    <div class="body">
+      <div class="cap">별명</div><div class="input">서준</div>
+      <div class="cap">학교</div><div class="input">분당 ▾</div>
+      <div class="list"><div>○○초등학교 <span class="pub">경기 성남시</span></div><div>△△초등학교 <span class="pub">경기 성남시</span></div></div>
+      <div class="cap">학년</div>
+      <div class="row"><span class="chip off">1</span><span class="chip off">2</span><span class="chip off">3</span><span class="chip sel">4</span><span class="chip off">5</span><span class="chip off">6</span></div>
+      <div class="cap">관심 지역 (여러 곳)</div>
+      <div class="row"><span class="chip sel">성남시</span><span class="chip sel">과천시</span><span class="chip sel">서울 용산구</span><span class="chip off">+ 추가</span></div>
+      <div style="flex:1"></div>
+      <span class="btn pri">저장하기</span>
+    </div>
+  </div>
+</figure>
+
+<figure>
+  <figcaption><b>2. 홈</b><span>S1·S5 · 교과서 확인 안내, 예상 진도, 오늘의 질문, 추천</span></figcaption>
+  <div class="phone">
+    <div class="bar">서준 ▾ <span class="sp"></span><small>4학년 · ○○초</small></div>
+    <div class="body">
+      <div class="notice">○○초 교과서를 확인하고 있어요. 내일 아침까지 알려드릴게요.</div>
+      <div class="card"><div class="row"><span class="sec-t">이번 주</span><span class="chip warn">예상 진도</span></div>
+        <div class="h">과학 · 지층이 쌓이는 과정</div><div class="cap">[4과05-01] 여러 가지 지층을 관찰하고…</div></div>
+      <div class="card"><span class="sec-t">오늘의 질문</span>
+        <div class="q">모래와 진흙이 쌓인 곳을 아주 오래 두면 어떻게 될까?</div>
+        <span class="lbl" style="color:var(--primary);font-weight:500">힌트 보기 ▾</span></div>
+      <div class="card"><span class="sec-t">이번 주말 추천</span>
+        <div class="cap">국립과천과학관</div><div class="h">화석 탐험대</div>
+        <div class="row"><span class="chip info">4학년 과학 지층과 화석</span></div></div>
+    </div>
+    <div class="tabs"><div class="on"><i>⌂</i>홈</div><div><i>◎</i>체험</div><div><i>▤</i>우리 학교</div><div><i>✧</i>집 실험</div></div>
+  </div>
+</figure>
+
+<figure>
+  <figcaption><b>3. 체험 목록</b><span>S2·S3 · 자녀·날짜·쉬는 날 필터, 연결 단원, 관심 표시</span></figcaption>
+  <div class="phone">
+    <div class="bar">체험</div>
+    <div class="body">
+      <div class="row"><span class="chip sel">서준 4학년</span><span class="chip sel">이번 주말</span><span class="chip off">우리 학교 쉬는 날</span></div>
+      <div class="card"><div class="row"><span class="cap">국립과천과학관 · 과천</span><span class="star">★</span></div>
+        <div class="h">화석 탐험대</div><div class="lbl">11/8(토)~11/9(일) · 초3~6 · 무료</div>
+        <div class="row"><span class="chip info">과학 지층과 화석</span></div></div>
+      <div class="card"><div class="row"><span class="cap">국립중앙박물관 · 용산</span><span class="star">☆</span></div>
+        <div class="h">어린이 토기 만들기</div><div class="lbl">11/9(일) · 초1~4 · 5,000원</div>
+        <div class="row"><span class="chip info">사회 옛날 사람들의 생활</span><span class="chip danger">마감 임박</span></div></div>
+      <div class="card"><div class="row"><span class="cap">성남시청소년수련관 · 성남</span><span class="star">☆</span></div>
+        <div class="h">별자리 관측 교실</div><div class="lbl">11/8(토) 19:00 · 초3~6</div></div>
+    </div>
+    <div class="tabs"><div><i>⌂</i>홈</div><div class="on"><i>◎</i>체험</div><div><i>▤</i>우리 학교</div><div><i>✧</i>집 실험</div></div>
+  </div>
+</figure>
+
+<figure>
+  <figcaption><b>4. 체험 상세</b><span>S2 · 연결 이유, 가기 전에 읽어요, 신청 기간, 기관 바로가기</span></figcaption>
+  <div class="phone">
+    <div class="bar">‹ <span class="sp"></span><span style="color:var(--accent)">★ 관심</span></div>
+    <div class="body">
+      <div class="cap">국립과천과학관</div><div class="h" style="font-size:20px">화석 탐험대</div>
+      <dl class="kv"><dt>기간</dt><dd>11/8(토)~11/9(일)</dd><dt>대상</dt><dd>초3~6</dd><dt>신청</dt><dd>11/10(월) 10:00 시작</dd><dt>비용</dt><dd>무료</dd></dl>
+      <div class="card"><div class="row"><span class="chip info">4학년 과학 지층과 화석</span></div>
+        <div class="lbl">진짜 화석을 만지며 지층이 쌓이는 순서를 확인해요. 이번 주 학교 진도와 이어져요.</div></div>
+      <div class="read"><b>📖 가기 전에 읽어요 · 『땅속 시간 여행』</b>
+        <span>화석이 어떻게 생기는지 미리 알면, 전시에서 아이가 먼저 질문하게 돼요.</span></div>
+      <div class="cap">신청 1일 전, 1시간 전에 알려드려요.</div>
+      <div style="flex:1"></div>
+      <span class="btn pri">기관 페이지에서 신청</span>
+    </div>
+  </div>
+</figure>
+
+<figure>
+  <figcaption><b>5. 우리 학교</b><span>S4 · 교과별 교과서, 확인 중 표시, 출판사 고치기</span></figcaption>
+  <div class="phone">
+    <div class="bar">우리 학교 <span class="sp"></span><small>○○초 4학년</small></div>
+    <div class="body">
+      <div class="list">
+        <div>국어 <span class="pub">국정</span></div>
+        <div>수학 <span class="pub">미래엔</span></div>
+        <div>과학 <span class="chip warn">확인 중</span><span class="pub">천재교과서 ›</span></div>
+        <div>사회 <span class="pub">비상교육</span></div>
+        <div>영어 <span class="pub">동아출판</span></div>
+      </div>
+      <div class="card"><div class="h">과학 출판사 고치기</div>
+        <div class="row"><span class="chip off">천재교과서</span><span class="chip sel">비상교육</span><span class="chip off">미래엔</span><span class="chip off">아이스크림</span></div>
+        <div class="cap">가정통신문이나 교과서 표지를 보고 골라 주세요. 같은 학교 학부모에게도 반영돼요.</div>
+        <span class="btn sec">저장하기</span></div>
+      <div class="cap">학사일정: 11/21(금) 재량휴업일</div>
+    </div>
+    <div class="tabs"><div><i>⌂</i>홈</div><div><i>◎</i>체험</div><div class="on"><i>▤</i>우리 학교</div><div><i>✧</i>집 실험</div></div>
+  </div>
+</figure>
+
+<figure>
+  <figcaption><b>6. 집 실험</b><span>S6 · 재료, 순서, 안전 메모 (승인된 것만)</span></figcaption>
+  <div class="phone">
+    <div class="bar">집 실험</div>
+    <div class="body">
+      <div class="row"><span class="chip info">과학 지층과 화석</span><span class="cap">20분</span></div>
+      <div class="h" style="font-size:20px">모래·자갈로 지층 만들기</div>
+      <div class="card"><span class="sec-t">준비물</span><div class="lbl">투명 플라스틱 컵, 모래, 자갈, 흙, 물</div></div>
+      <div class="card"><span class="sec-t">순서</span>
+        <ol class="steps"><li>컵에 자갈을 한 층 깔아요.</li><li>모래, 흙을 차례로 쌓아요.</li><li>물을 천천히 부어요.</li><li>옆에서 보며 층을 그려요.</li></ol></div>
+      <div class="notice">유리컵 대신 플라스틱 컵을 써요.</div>
+    </div>
+    <div class="tabs"><div><i>⌂</i>홈</div><div><i>◎</i>체험</div><div><i>▤</i>우리 학교</div><div class="on"><i>✧</i>집 실험</div></div>
+  </div>
+</figure>
+
+<figure>
+  <figcaption><b>7. 알림</b><span>S1·S2 · 신청 시작, 교과서 준비 완료</span></figcaption>
+  <div class="phone">
+    <div class="bar">알림</div>
+    <div class="body">
+      <div class="card"><div class="row"><span class="cap">오늘 09:00</span><span class="chip danger">1시간 전</span></div>
+        <div class="lbl"><b>화석 탐험대</b> 신청이 10:00에 시작돼요.</div></div>
+      <div class="card"><div class="row"><span class="cap">어제 10:00</span><span class="chip off">내일 시작</span></div>
+        <div class="lbl"><b>화석 탐험대</b> 신청이 내일 10:00에 시작돼요.</div></div>
+      <div class="card"><div class="row"><span class="cap">11/7(금) 06:30</span></div>
+        <div class="lbl">○○초 교과서 정보가 준비됐어요.</div></div>
+    </div>
+  </div>
+</figure>
+
+<figure>
+  <figcaption><b>8. 운영자 승인</b><span>S7 · 운영자 계정에서만 보임</span></figcaption>
+  <div class="phone">
+    <div class="bar">승인 대기 <span class="sp"></span><small>12건</small></div>
+    <div class="body">
+      <div class="card"><div class="row"><span class="chip info">과학 화산과 지진</span></div>
+        <div class="h">식초와 베이킹소다 화산</div><div class="cap">준비물: 식초, 베이킹소다, 종이컵, 쟁반</div>
+        <div class="row"><span class="btn pri" style="flex:1">승인</span><span class="btn sec" style="flex:1">거절</span></div></div>
+      <div class="card"><div class="row"><span class="chip info">과학 열의 이동</span><span class="chip danger">불 사용</span></div>
+        <div class="h">양초로 보는 대류</div><div class="cap">준비물: 양초, 라이터, 알루미늄 접시</div>
+        <div class="row"><span class="btn pri" style="flex:1">승인</span><span class="btn sec" style="flex:1">거절</span></div></div>
+    </div>
+  </div>
+</figure>
+
+</main>
+<p class="legend">꼬리표 색: 파랑 = 연결 단원 · 노랑 = 확인 중·예상 · 빨강 = 마감 임박·위험. 색과 함께 글자로도 표시해요.</p>
