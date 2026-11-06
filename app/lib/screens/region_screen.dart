@@ -19,23 +19,34 @@ class RegionScreen extends StatefulWidget {
 class _RegionScreenState extends State<RegionScreen> {
   Set<Region>? _selected; // null = 불러오는 중
   bool _busy = false;
+  bool _loadError = false; // 실패를 빈 선택으로 보이면 저장 시 기존 지역을 덮어쓴다
 
   @override
   void initState() {
     super.initState();
-    widget.repo.regions().then((r) => setState(() => _selected = r), onError: (_) => setState(() => _selected = {}));
+    _load();
+  }
+
+  Future<void> _load() async {
+    setState(() => _loadError = false);
+    try {
+      final r = await widget.repo.regions();
+      if (mounted) setState(() => _selected = r);
+    } catch (_) {
+      if (mounted) setState(() => _loadError = true);
+    }
   }
 
   void _toggle(Region r) => setState(() {
-        final s = _selected!;
-        if (s.remove(r)) return;
-        if (r.sigungu.isEmpty) {
-          s.removeWhere((x) => x.sido == r.sido); // 시도 전체가 개별 선택을 대신한다
-        } else {
-          s.remove(Region(r.sido, ''));
-        }
-        s.add(r);
-      });
+    final s = _selected!;
+    if (s.remove(r)) return;
+    if (r.sigungu.isEmpty) {
+      s.removeWhere((x) => x.sido == r.sido); // 시도 전체가 개별 선택을 대신한다
+    } else {
+      s.remove(Region(r.sido, ''));
+    }
+    s.add(r);
+  });
 
   Future<void> _save() async {
     setState(() => _busy = true);
@@ -59,10 +70,11 @@ class _RegionScreenState extends State<RegionScreen> {
     return ListView(
       padding: const EdgeInsets.all(16),
       children: [
-        Wrap(spacing: 8, runSpacing: 8, children: [
-          chip('$sido 전체', Region(sido, '')),
-          for (final g in kSigungu[sido]!) chip(g, Region(sido, g)),
-        ]),
+        Wrap(
+          spacing: 8,
+          runSpacing: 8,
+          children: [chip('$sido 전체', Region(sido, '')), for (final g in kSigungu[sido]!) chip(g, Region(sido, g))],
+        ),
       ],
     );
   }
@@ -75,9 +87,25 @@ class _RegionScreenState extends State<RegionScreen> {
       child: Scaffold(
         appBar: AppBar(
           title: const Text('관심 지역'),
-          bottom: const TabBar(tabs: [Tab(text: '서울'), Tab(text: '경기')]),
+          bottom: const TabBar(
+            tabs: [
+              Tab(text: '서울'),
+              Tab(text: '경기'),
+            ],
+          ),
         ),
-        body: selected == null
+        body: _loadError
+            ? Center(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    const Text('지역 정보를 불러오지 못했어요'),
+                    const SizedBox(height: 16),
+                    OutlinedButton(onPressed: _load, child: const Text('다시 시도')),
+                  ],
+                ),
+              )
+            : selected == null
             ? const Center(child: CircularProgressIndicator())
             : TabBarView(children: [_chips('서울'), _chips('경기')]),
         bottomNavigationBar: SafeArea(

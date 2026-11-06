@@ -74,4 +74,16 @@ void main() {
     expect(t.widget<FilterChip>(f).selected, isTrue);
     expect(saveButton(t).onPressed, isNotNull);
   });
+
+  testWidgets('load error shows retry and blocks save', (t) async {
+    final repo = FakeRepository(signedIn: true, regions: {const Region('서울', '용산구')})..failWith = Exception('net');
+    await open(t, repo);
+    expect(find.text('지역 정보를 불러오지 못했어요'), findsOneWidget);
+    expect(saveButton(t).onPressed, isNull);
+    await t.tap(find.text('다시 시도'));
+    await t.pumpAndSettle();
+    final f = find.widgetWithText(FilterChip, '용산구');
+    await t.ensureVisible(f);
+    expect(t.widget<FilterChip>(f).selected, isTrue);
+  });
 }

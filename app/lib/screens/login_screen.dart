@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:supabase_flutter/supabase_flutter.dart' show AuthException;
 
 import '../data/repository.dart';
 
@@ -47,9 +48,15 @@ class _LoginScreenState extends State<LoginScreen> {
         await widget.repo.signIn(email, _password.text);
         widget.onSignedIn();
       }
-    } catch (_) {
-      setState(() => _message =
-          signUp ? '가입하지 못했어요. 이미 가입한 이메일인지 확인해요.' : '로그인하지 못했어요. 이메일과 비밀번호를 확인해요.');
+    } catch (e) {
+      final unconfirmed = !signUp && e is AuthException && e.code == 'email_not_confirmed';
+      setState(
+        () => _message = unconfirmed
+            ? '가입 확인 메일의 링크를 먼저 눌러요.'
+            : signUp
+            ? '가입하지 못했어요. 이미 가입한 이메일인지 확인해요.'
+            : '로그인하지 못했어요. 이메일과 비밀번호를 확인해요.',
+      );
     } finally {
       if (mounted) setState(() => _busy = false);
     }

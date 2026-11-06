@@ -2,6 +2,7 @@ import 'package:eduapp/screens/login_screen.dart';
 import 'package:eduapp/theme.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:supabase_flutter/supabase_flutter.dart' show AuthException;
 
 import 'fake_repository.dart';
 
@@ -56,5 +57,14 @@ void main() {
     await t.pumpAndSettle();
     expect(repo.calls, ['signUp(a@b.kr)']);
     expect(find.text('가입 확인 메일을 보냈어요. 메일의 링크를 누른 뒤 로그인해요.'), findsOneWidget);
+  });
+
+  testWidgets('unconfirmed email gets its own message', (t) async {
+    final repo = FakeRepository()..failWith = const AuthException('Email not confirmed', code: 'email_not_confirmed');
+    await open(t, repo);
+    await fill(t, 'a@b.kr', '123456');
+    await t.tap(find.text('로그인'));
+    await t.pumpAndSettle();
+    expect(find.text('가입 확인 메일의 링크를 먼저 눌러요.'), findsOneWidget);
   });
 }
