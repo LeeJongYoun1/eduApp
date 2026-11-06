@@ -4,7 +4,7 @@ Claude 예약 작업이 매일 새벽(KST) 새 세션에서 이 문서를 따른
 
 ## 전제
 - 환경 네트워크 접근: Full
-- 환경 시크릿 `DATABASE_URL`: Supabase DB 연결 문자열
+- 환경 변수 `SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY`: 배치는 Supabase REST(HTTPS)로 저장한다 (이 클라우드 환경에서는 DB 직접 연결이 막혀 있음)
 
 ## 순서
 1. `cd batch && pip install -q -e .`

@@ -11,21 +11,21 @@ import psycopg
 
 from .collectors import COLLECTORS, Collector
 from .parse import KST
-from .store import ensure_institution, record_run, upsert_programs
+from .store import PgStore, RestStore
 
 
-def run(conn, collectors: dict[str, Collector], fetch: Callable[[str], str], today: date) -> dict[str, int | str]:
+def run(store, collectors: dict[str, Collector], fetch: Callable[[str], str], today: date) -> dict[str, int | str]:
     result: dict[str, int | str] = {}
     for key, c in collectors.items():
         try:
-            with conn.transaction():  # 기관마다 따로 커밋: 한 곳 실패가 다른 곳을 되돌리지 않게
-                programs = c.collect(fetch, today)
-                count = upsert_programs(conn, ensure_institution(conn, c.institution), programs)
-            record_run(conn, key, True, count, None)
+            with store.transaction():  # 기관마다 따로 커밋: 한 곳 실패가 다른 곳을 되돌리지 않게
+                programs = list({p.source_id: p for p in c.collect(fetch, today)}.values())  # 여러 달 목록 중복 제거
+                count = store.upsert_programs(store.ensure_institution(c.institution), programs)
+            store.record_run(key, True, count, None)
             result[key] = count
         except Exception as e:  # noqa: BLE001 — 실패는 기록하고 다음 기관으로
             msg = f"{type(e).__name__}: {e}"
-            record_run(conn, key, False, None, msg)
+            store.record_run(key, False, None, msg)
             result[key] = msg
     return result
 
@@ -43,8 +43,13 @@ def _fetch(url: str, tries: int = 3) -> str:
 
 
 def main() -> int:
-    with psycopg.connect(os.environ["DATABASE_URL"], autocommit=True) as conn:
-        result = run(conn, COLLECTORS, _fetch, datetime.now(KST).date())
+    today = datetime.now(KST).date()
+    if os.environ.get("SUPABASE_URL"):
+        result = run(RestStore(os.environ["SUPABASE_URL"], os.environ["SUPABASE_SERVICE_ROLE_KEY"]),
+                     COLLECTORS, _fetch, today)
+    else:
+        with psycopg.connect(os.environ["DATABASE_URL"], autocommit=True) as conn:
+            result = run(PgStore(conn), COLLECTORS, _fetch, today)
     print(json.dumps(result, ensure_ascii=False))
     return 1 if result and all(isinstance(v, str) for v in result.values()) else 0
 
