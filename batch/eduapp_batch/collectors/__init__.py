@@ -13,3 +13,7 @@ class Collector(Protocol):
 
 
 COLLECTORS: dict[str, Collector] = {}
+
+from .gwacheon_science import GwacheonScience  # noqa: E402
+
+COLLECTORS["gwacheon_science"] = GwacheonScience()
