@@ -75,3 +75,20 @@ def test_parse_grades_real_world(text, expected):
 @pytest.mark.parametrize("text", ["2.30", "2026.13.01", "2026. 2. 30."])
 def test_parse_date_invalid_is_none(text):
     assert parse_date(text, TODAY) is None
+
+
+def test_parse_grades_ignores_head_counts():
+    assert parse_grades("초등학생 포함 가족 5팀") == (1, 6)
+    assert parse_grades("초등 3~4학년 20명") == (3, 4)
+
+
+def test_age_grades():
+    from eduapp_batch.parse import age_grades
+    assert age_grades("8~10세(2017~2019년생)") == (1, 3)          # 한국 나이 8세 = 초1 (기본)
+    assert age_grades("만 7~9세") == (1, 3)                      # 만 나이는 늘 N-6
+    assert age_grades("5세 이상") == (1, 6)
+    assert age_grades("만 4~6세 이상") == (1, 6)                 # 범위 뒤 "이상"
+    assert age_grades("6세~10세", first_grade_age=7) == (1, 4)  # 기관이 7세 = 초1로 쓰는 경우
+    assert age_grades("6-7세") is None                           # 미취학만
+    assert age_grades("28 - 48개월") is None
+    assert age_grades("성인") is None

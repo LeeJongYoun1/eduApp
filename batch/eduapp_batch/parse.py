@@ -44,8 +44,11 @@ def parse_datetime(text: str, today: date) -> datetime | None:
     return datetime(d.year, d.month, d.day, int(t[1]), int(t[2]), tzinfo=KST)
 
 
+_HEAD_COUNT = re.compile(r"\d+\s*(?:팀|명|인|가족)")  # "가족 5팀"의 5는 학년이 아니다
+
+
 def parse_grades(text: str) -> tuple[int, int] | None:
-    t = text.replace(" ", "")
+    t = _HEAD_COUNT.sub("", text).replace(" ", "")
     i = t.find("초")
     if i < 0:  # 초등 언급 없음: 중·고·유아 대상
         return (1, 6) if t == "전학년" else None
@@ -59,3 +62,24 @@ def parse_grades(text: str) -> tuple[int, int] | None:
     if "이상" in t or len(parts) > 1:  # "초등 5학년 이상", "초등 4학년~중등 2학년"
         hi = 6
     return lo, hi
+
+
+_AGE_RANGE = re.compile(r"(만\s*)?(\d{1,2})\s*(?:세\s*)?[~\-]\s*(?:만\s*)?(\d{1,2})\s*세\s*(이상)?")
+_AGE_ONE = re.compile(r"(만\s*)?(\d{1,2})\s*세\s*(이상)?")
+
+
+def age_grades(text: str, first_grade_age: int = 8) -> tuple[int, int] | None:
+    """나이 표기("8~10세", "만 7세", "5세 이상")를 초등 학년 범위로. 초등 해당 없으면 None.
+
+    first_grade_age: 그 기관이 '만'없이 쓰는 나이에서 초1이 몇 세인지 (한국 나이 8, 만 나이 7).
+    "만 N세"는 항상 N-6.
+    """
+    ages = [(m[1], int(m[2]), 99 if m[4] else int(m[3])) for m in _AGE_RANGE.finditer(text)]
+    ages += [(m[1], int(m[2]), 99 if m[3] else int(m[2])) for m in _AGE_ONE.finditer(_AGE_RANGE.sub(" ", text))]
+    found = []
+    for man, lo, hi in ages:
+        off = 6 if man else first_grade_age - 1
+        g = (max(1, lo - off), min(6, hi - off))
+        if g[0] <= g[1]:
+            found.append(g)
+    return (min(g[0] for g in found), max(g[1] for g in found)) if found else None

@@ -5,28 +5,18 @@ from datetime import date
 from bs4 import BeautifulSoup
 
 from ..models import Institution, Program
-from ..parse import parse_date, parse_grades
+from ..parse import age_grades, parse_date, parse_grades
 
 BASE = "https://www.seoulchildrensmuseum.org/education"
-_RANGE = re.compile(r"(만\s*)?(\d+)\s*(?:세\s*)?[-~]\s*(\d+)\s*세")
-_OVER = re.compile(r"(만\s*)?(\d+)\s*세\s*이상")
 
 
-def age_grades(text: str) -> tuple[int, int] | None:
-    """대상 나이("5세 이상", "8~10세")를 학년으로. 이 기관은 연 나이 표기(8세 = 초1, "8~10세(2017~2019년생)")."""
+def target_grades(text: str) -> tuple[int, int] | None:
+    """대상("5세 이상", "8~10세", "누구나")을 학년으로. 이 기관은 한국 나이(8세 = 초1, "8~10세(2017~2019년생)")."""
     if "초" in text:
         return parse_grades(text)
     if text.strip() == "누구나":
         return 1, 6
-    if m := _RANGE.search(text):
-        lo, hi = int(m[2]), int(m[3])
-    elif m := _OVER.search(text):
-        lo, hi = int(m[2]), 99
-    else:  # "28 - 48개월", "성인"
-        return None
-    off = 6 if m[1] else 7  # 만 7세 = 초1
-    lo, hi = max(1, lo - off), min(6, hi - off)
-    return (lo, hi) if lo <= hi else None
+    return age_grades(text)
 
 
 def parse_list(html: str) -> dict[str, tuple[int, int]]:
@@ -36,7 +26,7 @@ def parse_list(html: str) -> dict[str, tuple[int, int]]:
         a, cond, age = li.select_one("a[href*='educationView.do?id=']"), li.select_one(".condition"), li.select_one(".age")
         if not a or not cond or cond.get_text(strip=True) != "신청가능":
             continue
-        if grades := age_grades(age.get_text(strip=True) if age else ""):
+        if grades := target_grades(age.get_text(strip=True) if age else ""):
             out[a["href"].rsplit("=", 1)[1]] = grades
     return out
 

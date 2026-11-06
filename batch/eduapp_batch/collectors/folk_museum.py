@@ -6,24 +6,14 @@ from datetime import date, datetime, time
 from bs4 import BeautifulSoup
 
 from ..models import Institution, Program
-from ..parse import KST, parse_date_range, parse_grades
+from ..parse import KST, age_grades, parse_date_range, parse_grades
 
 BASE = "https://www.nfm.go.kr/user/eduPlan/home/85"
 STATES = ("1", "2")  # 접수중, 접수예정
-_AGES = re.compile(r"(\d{1,2})\s*(?:~\s*(\d{1,2})\s*)?세")
 
 
 def list_url(state: str) -> str:
     return f"{BASE}/dataList.do?searchStatus={state}&row=48"
-
-
-def age_grades(text: str) -> tuple[int, int] | None:
-    # "6세~10세", "6세 이상": 연 나이로 보고 7세 = 초1. 어린이박물관 교육은 학년 대신 나이를 쓴다.
-    ages = [int(n) for m in _AGES.findall(text) for n in m if n]
-    if not ages:
-        return None
-    lo, hi = max(min(ages) - 6, 1), 6 if "이상" in text else min(max(ages) - 6, 6)
-    return (lo, hi) if lo <= hi else None
 
 
 def parse_list(html: str, today: date) -> list[Program]:
@@ -38,7 +28,7 @@ def parse_list(html: str, today: date) -> list[Program]:
             continue
         if re.search("단체|기관", target) and not re.search("개인|가족", target):
             continue
-        grades = parse_grades(target) or age_grades(target)
+        grades = parse_grades(target) or age_grades(target, first_grade_age=7)  # 7세 = 초1로 표기
         if not grades:
             continue
         idx = re.search(r"'(\d+)'", li.select_one("a[onclick]")["onclick"])[1]

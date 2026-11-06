@@ -2,7 +2,7 @@ from datetime import date
 from pathlib import Path
 
 from eduapp_batch.collectors import COLLECTORS
-from eduapp_batch.collectors.seoul_childrens_museum import (SeoulChildrensMuseum, age_grades, parse_detail,
+from eduapp_batch.collectors.seoul_childrens_museum import (SeoulChildrensMuseum, parse_detail, target_grades,
                                                             parse_list)
 
 FX = Path(__file__).parent / "fixtures"
@@ -17,13 +17,13 @@ def test_parse_list_keeps_open_programs_for_school_age():
                                 "2692": (1, 6), "2699": (1, 6), "2676": (1, 6)}
 
 
-def test_age_grades():
-    assert age_grades("5세 이상 어린이") == (1, 6)
-    assert age_grades("8~10세 어린이(2017~2019년생)") == (1, 3)
-    assert age_grades("초1~2학년") == (1, 2)
-    assert age_grades("누구나") == (1, 6)
+def test_target_grades():
+    assert target_grades("5세 이상 어린이") == (1, 6)
+    assert target_grades("8~10세 어린이(2017~2019년생)") == (1, 3)
+    assert target_grades("초1~2학년") == (1, 2)
+    assert target_grades("누구나") == (1, 6)
     for t in ("6 - 7세 어린이", "28 - 48개월", "36개월미만", "성인", "만 3-5세 포함 서울 거주 가족(최대 4인)"):
-        assert age_grades(t) is None, t
+        assert target_grades(t) is None, t
 
 
 def test_parse_detail_fields():
