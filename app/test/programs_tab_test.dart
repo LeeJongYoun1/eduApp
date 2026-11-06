@@ -1,4 +1,5 @@
 import 'package:eduapp/data/models.dart';
+import 'package:eduapp/screens/program_detail_screen.dart';
 import 'package:eduapp/screens/programs_tab.dart';
 import 'package:eduapp/theme.dart';
 import 'package:flutter/material.dart';
@@ -108,5 +109,13 @@ void main() {
         programs: [prog(1, title: '가' * 40, applyEndsAt: DateTime(2026, 11, 8, 18))]);
     await open(t, repo, scale: 2.0);
     expect(t.takeException(), isNull);
+  });
+
+  testWidgets('tap card opens detail', (t) async {
+    final repo = FakeRepository(signedIn: true, children: [seojun], programs: [prog(1, title: '하나')]);
+    await open(t, repo);
+    await t.tap(find.text('하나'));
+    await t.pumpAndSettle();
+    expect(find.byType(ProgramDetailScreen), findsOneWidget);
   });
 }

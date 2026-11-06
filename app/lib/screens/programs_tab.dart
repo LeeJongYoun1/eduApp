@@ -4,6 +4,7 @@ import '../data/models.dart';
 import '../data/repository.dart';
 import '../format.dart';
 import '../widgets/program_card.dart';
+import 'program_detail_screen.dart';
 import 'region_screen.dart';
 
 enum _Dates { all, weekend, custom }
@@ -96,6 +97,13 @@ class _ProgramsTabState extends State<ProgramsTab> {
     }
   }
 
+  Future<void> _openDetail(ProgramItem p) async {
+    final fav = await Navigator.of(context).push<bool>(MaterialPageRoute(
+        builder: (_) => ProgramDetailScreen(
+            repo: widget.repo, program: p, favorite: _favorites.contains(p.id), now: widget.now)));
+    if (fav != null && mounted) setState(() => fav ? _favorites.add(p.id) : _favorites.remove(p.id));
+  }
+
   Future<void> _changeRegions() async {
     final saved = await Navigator.of(context)
         .push<bool>(MaterialPageRoute(builder: (_) => RegionScreen(repo: widget.repo)));
@@ -150,6 +158,7 @@ class _ProgramsTabState extends State<ProgramsTab> {
         favorite: _favorites.contains(list[i].id),
         onFavorite: () => _toggleFavorite(list[i].id),
         now: now,
+        onTap: () => _openDetail(list[i]),
       ),
     );
   }
