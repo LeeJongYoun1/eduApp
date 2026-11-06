@@ -7,7 +7,7 @@ import pytest
 
 ROOT = Path(__file__).resolve().parents[2]
 ADMIN_URL = os.environ.get("TEST_PG_ADMIN_URL", "postgresql://postgres@localhost:5432/postgres")
-SQL = [ROOT / "supabase/tests/supabase_stub.sql", ROOT / "supabase/schema.sql"]
+SQL = [ROOT / "supabase/tests/supabase_stub.sql", *sorted((ROOT / "supabase/migrations").glob("*.sql"))]
 
 
 @pytest.fixture
