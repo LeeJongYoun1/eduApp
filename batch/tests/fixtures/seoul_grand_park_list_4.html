@@ -1,0 +1,477 @@
+<html><body>
+<!-- content -->
+<div class="content">
+	
+	
+	
+	<div class="container">
+		<div class="row">
+			<div class="col-12">
+				<div class="jumbotron edu-program-box">
+					<h4 class="h5">서울대공원 교육프로그램 신청 안내</h4>
+					<ul class="list-type-bullet">
+						<li>모든 교육프로그램은 <a class="link-point" href="https://yeyak.seoul.go.kr/" target="_blank" title="새창열림 - 서울시 공공서비스 예약사이트">서울시 공공서비스 예약사이트 <i class="icon-link"></i></a> 에서 인터넷 접수만 받습니다.</li>
+						<li>프로그램은 사정에 따라 변동, 추가, 폐지될 수 있습니다. </li>
+					</ul>
+					<div class="mo_edu_pro_txt mo_edu_pro_txt_bg1">
+						<a href="javascript:goList('C_1');">연간 교육프로그램 안내</a>
+					</div>
+					<div class="edu_pro_link">
+						<a href="javascript:goList('C_1');">
+							<div class="edu_pro_link1 edu_pro_link_bg">
+								<div></div>
+							</div>
+							<div class="edu_pro_link_txt">
+								<p>연간 교육</p>
+								<p>프로그램 안내</p>
+							</div>
+						</a>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	
+	<section class="container tabpanel" id="tabCalendar" role="tabpanel">
+
+		<div class="container">
+			<div class="tabs board-category row">
+				<a href="/edu/program/list/ko/S001005001002.do" class="col-4 active">전체</a>
+				<a href="/edu/program/list/ko/S001005001002.do?sch_type=A" class="col-4 ">동물교실</a>
+				<a href="/edu/program/list/ko/S001005001002.do?sch_type=E" class="col-4 ">식물교실</a>
+				
+				<a href="/edu/program/list/ko/S001005001002.do?sch_type=D" class="col-4 ">산림치유</a>
+			</div>
+		</div>
+
+		<div class="container">
+			<div class="row">
+				<div class="col-12">
+				<form id="searchVo" action="/edu/program/list/ko/S001005001002.do" method="get">
+					
+					
+					
+					
+					<div class="board-search">
+						<div class="search-inner">
+							<div class="search-select-box">
+								<select id="searchKey" title="검색 구분 선택">
+									<option value="" selected>전체</option>
+									<option value="sch_nm" >교육명</option>
+									<option value="sch_info" >내용</option>
+								</select>
+							</div>
+							<div class="search-input-box">
+								<label for="searchKeyword" class="blind">검색어 입력</label>
+								<input type="text" id="searchKeyword" value="" placeholder="검색하고자 하는 키워드를 입력하세요">
+								<button type="button" onclick="checkSubmit();" class="button black search-button"><i class="icon-search"><span class="blind">검색</span></i></button>
+							</div>
+						</div>
+					</div>
+				</form>
+				</div>
+				
+			</div>
+		</div>
+
+		<!--
+			동물교실 	.text-orange
+			단체교실 	.text-skyblue
+			숲해설 		.text-cyan
+			산림치유 	.text-green
+		-->
+
+		<div class="container">
+			<div class="board-list thumbnail-type">
+				
+				
+				
+					<div class="list-box ">
+						
+							<a href="javascript:void(0);" onclick="viewPage('339');" class="imgLk"><img src="/upload/edu/program/d8a2086f2a7349b08e32db65967ce05c.jpg" alt="겨울을 녹이는 남미관 이야기" onerror="this.src='/asset/images/img_noimage.png'"/></a>
+						
+						<p class="list-category">
+							<span class="category text-orange">동물교실</span>
+							
+							
+							
+						</p>
+						<a href="javascript:void(0);" onclick="viewPage('339');">
+						<span class="list-title">겨울을 녹이는 남미관 이야기</span>
+						<span class="list-contents">남미 동물의 특별한 생태 특징 및 기후변화로 인해 위협받는 아마존 열대우림, 동물 보전 교육</span></a>
+						<ul class="list-bottom list-type-bullet">
+							<li><strong>운영기간</strong>2026-01-05 ~ 2026-02-07</li>
+							<li><strong>문의처</strong>02-500-7782</li>
+							<li><strong>대상</strong>어린이, 청소년, 성인 등 누구나 참여가능</li>
+							<li>
+								<strong>접수상태</strong>
+								
+								
+								
+									<span class="list-state end"><span class="blind">마감</span></span>
+								
+							</li>
+						</ul>
+						
+							
+							
+								<a href="javascript:void(0);" class="button large endgray">신청마감</a>
+							
+							
+						
+					</div>
+				
+					<div class="list-box ">
+						
+							<a href="javascript:void(0);" onclick="viewPage('338');" class="imgLk"><img src="/upload/edu/program/7d809849ddfc4d8fb7554ab58e6cbe54.PNG" alt="숲속의 수호자 유인원" onerror="this.src='/asset/images/img_noimage.png'"/></a>
+						
+						<p class="list-category">
+							<span class="category text-orange">동물교실</span>
+							
+							
+							
+						</p>
+						<a href="javascript:void(0);" onclick="viewPage('338');">
+						<span class="list-title">숲속의 수호자 유인원</span>
+						<span class="list-contents">고릴라, 오랑우탄, 침팬지 등 멸종위기 유인원이 살고 있는 유인원관에서 동물해설사와 함께 재미있는 생태와 멸종위기종 보전에 대한 교육행사를 진행합니다.</span></a>
+						<ul class="list-bottom list-type-bullet">
+							<li><strong>운영기간</strong>2025-11-08 ~ 2025-12-06</li>
+							<li><strong>문의처</strong>02-500-7177</li>
+							<li><strong>대상</strong>어린이와 함께하는 가족, 청소년, 성인 등 누구나 참여 가능</li>
+							<li>
+								<strong>접수상태</strong>
+								
+								
+								
+									<span class="list-state end"><span class="blind">마감</span></span>
+								
+							</li>
+						</ul>
+						
+							
+							
+								<a href="javascript:void(0);" class="button large endgray">신청마감</a>
+							
+							
+						
+					</div>
+				
+					<div class="list-box ">
+						
+							<a href="javascript:void(0);" onclick="viewPage('336');" class="imgLk"><img src="/upload/edu/program/81e592bcdc4a495fa296c51fd33edef9.PNG" alt="신비한 아마존, 남미관 속으로" onerror="this.src='/asset/images/img_noimage.png'"/></a>
+						
+						<p class="list-category">
+							<span class="category text-orange">동물교실</span>
+							
+							
+							
+						</p>
+						<a href="javascript:void(0);" onclick="viewPage('336');">
+						<span class="list-title">신비한 아마존, 남미관 속으로</span>
+						<span class="list-contents">동물해설사와 남미관 생태 해설 투어</span></a>
+						<ul class="list-bottom list-type-bullet">
+							<li><strong>운영기간</strong>2025-11-08 ~ 2025-12-06</li>
+							<li><strong>문의처</strong>동물기획과 / 02-500-7782</li>
+							<li><strong>대상</strong>어린이와 함께하는 가족, 청소년, 성인 등 누구나 참여 가능</li>
+							<li>
+								<strong>접수상태</strong>
+								
+								
+								
+									<span class="list-state end"><span class="blind">마감</span></span>
+								
+							</li>
+						</ul>
+						
+							
+							
+								<a href="javascript:void(0);" class="button large endgray">신청마감</a>
+							
+							
+						
+					</div>
+				
+					<div class="list-box ">
+						
+							<a href="javascript:void(0);" onclick="viewPage('337');" class="imgLk"><img src="/upload/edu/program/6b4b4e6777cf46efb08e8910f554cf8c.PNG" alt="동양관 속 멸종위기 동물이야기" onerror="this.src='/asset/images/img_noimage.png'"/></a>
+						
+						<p class="list-category">
+							<span class="category text-orange">동물교실</span>
+							
+							
+							
+						</p>
+						<a href="javascript:void(0);" onclick="viewPage('337');">
+						<span class="list-title">동양관 속 멸종위기 동물이야기</span>
+						<span class="list-contents">동물해설사가 알려주는 동양관의 악어, 뱀, 소형유인원 생태탐구, 보전학습</span></a>
+						<ul class="list-bottom list-type-bullet">
+							<li><strong>운영기간</strong>2025-11-08 ~ 2025-12-06</li>
+							<li><strong>문의처</strong>02-500-7177</li>
+							<li><strong>대상</strong>어린이와 함께하는 가족, 청소년, 성인 등 누구나 참여 가능</li>
+							<li>
+								<strong>접수상태</strong>
+								
+								
+								
+									<span class="list-state end"><span class="blind">마감</span></span>
+								
+							</li>
+						</ul>
+						
+							
+							
+								<a href="javascript:void(0);" class="button large endgray">신청마감</a>
+							
+							
+						
+					</div>
+				
+					<div class="list-box ">
+						
+							<a href="javascript:void(0);" onclick="viewPage('335');" class="imgLk"><img src="/upload/edu/program/2640e3ffbaa64ab4b71a83c6702aeb6d.PNG" alt="동물원 속 작은 남미" onerror="this.src='/asset/images/img_noimage.png'"/></a>
+						
+						<p class="list-category">
+							<span class="category text-orange">동물교실</span>
+							
+							
+							
+						</p>
+						<a href="javascript:void(0);" onclick="viewPage('335');">
+						<span class="list-title">동물원 속 작은 남미</span>
+						<span class="list-contents">사육사와 함께하는 동물원 심화교육</span></a>
+						<ul class="list-bottom list-type-bullet">
+							<li><strong>운영기간</strong>2025-11-08 ~ 2025-11-29</li>
+							<li><strong>문의처</strong>02-500-7782</li>
+							<li><strong>대상</strong>초등학교 3~6학년</li>
+							<li>
+								<strong>접수상태</strong>
+								
+								
+								
+									<span class="list-state end"><span class="blind">마감</span></span>
+								
+							</li>
+						</ul>
+						
+							
+							
+								<a href="javascript:void(0);" class="button large endgray">신청마감</a>
+							
+							
+						
+					</div>
+				
+					<div class="list-box ">
+						
+							<a href="javascript:void(0);" onclick="viewPage('330');" class="imgLk"><img src="/upload/edu/program/56a89dfe57e44526ba295b01970359ac.png" alt="(현장교육) 서울동물원 멸종위기종보전 교육 &#034;토종동물 이어가기&#034;" onerror="this.src='/asset/images/img_noimage.png'"/></a>
+						
+						<p class="list-category">
+							<span class="category text-orange">동물교실</span>
+							
+							
+							
+						</p>
+						<a href="javascript:void(0);" onclick="viewPage('330');">
+						<span class="list-title">(현장교육) 서울동물원 멸종위기종보전 교육 &#034;토종동물 이어가기&#034;</span>
+						<span class="list-contents">한국 토종동물 보호와 동물원의 종보전 역할에 대해 알아보는 멸종위기종 보전 교육</span></a>
+						<ul class="list-bottom list-type-bullet">
+							<li><strong>운영기간</strong>2025-10-02 ~ 2025-10-04</li>
+							<li><strong>문의처</strong>02-500-7782</li>
+							<li><strong>대상</strong>동물원 관람객</li>
+							<li>
+								<strong>접수상태</strong>
+								
+								
+								
+									<span class="list-state end"><span class="blind">마감</span></span>
+								
+							</li>
+						</ul>
+						
+					</div>
+				
+					<div class="list-box ">
+						
+							<a href="javascript:void(0);" onclick="viewPage('331');" class="imgLk"><img src="/upload/edu/program/fe0de990b9da4a54bdf1df88e1d4329a.jpg" alt="2025 사육사와 함께하는 동물원 심화교육 &#039;기린과 친구들&#039;" onerror="this.src='/asset/images/img_noimage.png'"/></a>
+						
+						<p class="list-category">
+							<span class="category text-orange">동물교실</span>
+							
+							
+							
+						</p>
+						<a href="javascript:void(0);" onclick="viewPage('331');">
+						<span class="list-title">2025 사육사와 함께하는 동물원 심화교육 &#039;기린과 친구들&#039;</span>
+						<span class="list-contents">사육사와 함께 기린 및 제1아프리카관 동물의 생태와 멸종위기 관련 교육</span></a>
+						<ul class="list-bottom list-type-bullet">
+							<li><strong>운영기간</strong>2025-10-18 ~ 2025-11-01</li>
+							<li><strong>문의처</strong>02-500-7733</li>
+							<li><strong>대상</strong>초등 1~3학년</li>
+							<li>
+								<strong>접수상태</strong>
+								
+								
+								
+									<span class="list-state end"><span class="blind">마감</span></span>
+								
+							</li>
+						</ul>
+						
+							
+							
+								<a href="javascript:void(0);" class="button large endgray">신청마감</a>
+							
+							
+						
+					</div>
+				
+					<div class="list-box ">
+						
+							<a href="javascript:void(0);" onclick="viewPage('329');" class="imgLk"><img src="/upload/edu/program/f55ca5f72e0f4df8b1d41ca24778057b.png" alt="(온라인강의) 서울동물원 멸종위기종보전 교육 &#034;토종동물 이어가기&#034;" onerror="this.src='/asset/images/img_noimage.png'"/></a>
+						
+						<p class="list-category">
+							<span class="category text-orange">동물교실</span>
+							
+							
+							
+						</p>
+						<a href="javascript:void(0);" onclick="viewPage('329');">
+						<span class="list-title">(온라인강의) 서울동물원 멸종위기종보전 교육 &#034;토종동물 이어가기&#034;</span>
+						<span class="list-contents">대만 타이베이동물원과 함께하는 멸종위기종보전 교육</span></a>
+						<ul class="list-bottom list-type-bullet">
+							<li><strong>운영기간</strong>2025-09-19 ~ 2025-10-24</li>
+							<li><strong>문의처</strong>02-500-7782</li>
+							<li><strong>대상</strong>청소년(중고등학생)</li>
+							<li>
+								<strong>접수상태</strong>
+								
+								
+								
+									<span class="list-state end"><span class="blind">마감</span></span>
+								
+							</li>
+						</ul>
+						
+							
+							
+								<a href="javascript:void(0);" class="button large endgray">신청마감</a>
+							
+							
+						
+					</div>
+				
+					<div class="list-box ">
+						
+							<a href="javascript:void(0);" onclick="viewPage('328');" class="imgLk"><img src="/upload/edu/program/1ca746f0e875484882fdbbfd60b3163c.png" alt="사육사와 함께하는 동물원 심화교육 &#039;코끼리 가족 이야기&#039;" onerror="this.src='/asset/images/img_noimage.png'"/></a>
+						
+						<p class="list-category">
+							<span class="category text-orange">동물교실</span>
+							
+							
+							
+						</p>
+						<a href="javascript:void(0);" onclick="viewPage('328');">
+						<span class="list-title">사육사와 함께하는 동물원 심화교육 &#039;코끼리 가족 이야기&#039;</span>
+						<span class="list-contents">동물원 사육사와 함께하는 코끼리 가족 이야기</span></a>
+						<ul class="list-bottom list-type-bullet">
+							<li><strong>운영기간</strong>2025-09-06 ~ 2025-09-20</li>
+							<li><strong>문의처</strong>02-500-7733</li>
+							<li><strong>대상</strong>초등 3~6학년</li>
+							<li>
+								<strong>접수상태</strong>
+								
+								
+								
+									<span class="list-state end"><span class="blind">마감</span></span>
+								
+							</li>
+						</ul>
+						
+							
+							
+								<a href="javascript:void(0);" class="button large endgray">신청마감</a>
+							
+							
+						
+					</div>
+				
+					<div class="list-box ">
+						
+							<a href="javascript:void(0);" onclick="viewPage('318');" class="imgLk"><img src="/upload/edu/program/34fa8c8b274041fe96e50322cc9cba2e.png" alt="2025년 지구의 날·생물다양성의 날 기념 멸종위기 동물 보전 및 환경보호 교육" onerror="this.src='/asset/images/img_noimage.png'"/></a>
+						
+						<p class="list-category">
+							<span class="category text-orange">동물교실</span>
+							
+							
+							
+						</p>
+						<a href="javascript:void(0);" onclick="viewPage('318');">
+						<span class="list-title">2025년 지구의 날·생물다양성의 날 기념 멸종위기 동물 보전 및 환경보호 교육</span>
+						<span class="list-contents">동물해설사의 해설을 통해 국제자연보전연맹(IUCN)에서 분류한 멸종위기동물에 대해 배워 보아요</span></a>
+						<ul class="list-bottom list-type-bullet">
+							<li><strong>운영기간</strong>2025-04-19 ~ 2025-05-03</li>
+							<li><strong>문의처</strong>02-500-7177</li>
+							<li><strong>대상</strong>동물원 관람객</li>
+							<li>
+								<strong>접수상태</strong>
+								
+								
+								
+									<span class="list-state end"><span class="blind">마감</span></span>
+								
+							</li>
+						</ul>
+						
+					</div>
+				
+				
+			</div>
+		</div>
+
+		<div class="container">
+			<div class="row">
+				<div class="col-12">
+					<div class="pagelist">
+						<div class="pagelist-wrap">
+							<button class="btn-first" onclick="javascript:paginate(1)"><i class="icon-chevron-first"><span class="blind">처음으로</span></i></button><button class="btn-prev" onclick="javascript:paginate(1)"><i class="icon-chevron-left"><span class="blind">이전으로</span></i></button><ul class="pagelist-number"><li><a class="javascript:;" href="javascript:paginate(1)">1</a><li><a class="javascript:;" href="javascript:paginate(2)">2</a><li><a class="javascript:;" href="javascript:paginate(3)">3</a><li class="active"><a class="javascript:;" title="선택됨">4</a><li><a class="javascript:;" href="javascript:paginate(5)">5</a><li><a class="javascript:;" href="javascript:paginate(6)">6</a><li><a class="javascript:;" href="javascript:paginate(7)">7</a><li><a class="javascript:;" href="javascript:paginate(8)">8</a><li><a class="javascript:;" href="javascript:paginate(9)">9</a><li><a class="javascript:;" href="javascript:paginate(10)">10</a></ul><button class="btn-next" onclick="javascript:paginate(11)"><i class="icon-chevron-right"><span class="blind">다음으로</span></i></button><button class="btn-last" onclick="javascript:paginate(11)"><i class="icon-chevron-last"><span class="blind">마지막으로</span></i></button>
+
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</section>
+	
+	
+	<div class="container btm-common-box">
+		
+
+
+
+
+
+
+
+
+	</div>
+</div>
+<!-- //content -->
+
+			<!-- //content -->
+		</div>
+		<!-- //container -->
+
+		<!-- footer -->
+		
+
+
+</div>
+<script src="//weblog.eseoul.go.kr/wlo/js/install.js"></script>
+
+
+<!-- section_07 -->
+<div class="section fp-auto-height">
+    <!-- footer -->
+    <script src="//weblog.eseoul.go.kr/wlo/js/install.js"></script>
+    <!-- footer -->
+</body></html>

@@ -23,3 +23,6 @@ COLLECTORS["museum_korea"] = MuseumKorea()
 from .korea_job_world import KoreaJobWorld  # noqa: E402
 
 COLLECTORS["korea_job_world"] = KoreaJobWorld()
+from .seoul_grand_park import SeoulGrandPark  # noqa: E402
+
+COLLECTORS["seoul_grand_park"] = SeoulGrandPark()
