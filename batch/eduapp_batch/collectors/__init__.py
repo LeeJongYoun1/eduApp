@@ -38,9 +38,8 @@ COLLECTORS["korea_job_world"] = KoreaJobWorld()
 from .seoul_grand_park import SeoulGrandPark  # noqa: E402
 
 COLLECTORS["seoul_grand_park"] = SeoulGrandPark()
-from .seoul_history_museum import SeoulHistoryMuseum  # noqa: E402
-
-COLLECTORS["seoul_history_museum"] = SeoulHistoryMuseum()
+# 서울역사박물관(seoul_history_museum.py)은 등록하지 않는다: 사이트가 Python HTTP 클라이언트 접속을
+# 끊는다(curl은 됨, 2026-11-06). 자동 접속 차단을 우회하지 않고, 기관이 허용하면 다시 등록한다.
 from .folk_museum import FolkMuseum  # noqa: E402
 
 COLLECTORS["folk_museum"] = FolkMuseum()

@@ -54,5 +54,5 @@ def test_collect_fetches_lists_then_details():
     assert [p.source_id for p in progs] == ["20261021153443848"]
 
 
-def test_registered():
-    assert COLLECTORS["seoul_history_museum"].institution.sigungu == "종로구"
+def test_not_registered_while_site_blocks_python():
+    assert "seoul_history_museum" not in COLLECTORS  # 사이트가 자동 접속을 끊어 등록 보류 (collectors/__init__.py)
