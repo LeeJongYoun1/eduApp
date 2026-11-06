@@ -20,3 +20,6 @@ COLLECTORS["gwacheon_science"] = GwacheonScience()
 from .museum_korea import MuseumKorea  # noqa: E402
 
 COLLECTORS["museum_korea"] = MuseumKorea()
+from .korea_job_world import KoreaJobWorld  # noqa: E402
+
+COLLECTORS["korea_job_world"] = KoreaJobWorld()
