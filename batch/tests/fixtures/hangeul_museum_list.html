@@ -1,0 +1,1233 @@
+
+<!DOCTYPE html>
+<!--[if IE 9]><html lang="ko" class="ie9"><![endif]-->
+<!--[if !IE]><!-->
+<html lang="ko"><!--<![endif]-->
+<head>
+    <meta charset="utf-8">
+    <meta name="theme-color" content="#0036ba">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="shortcut icon" href="/v1/images/favicon.ico" type="image/x-icon">
+    <title>교육 신청 | 교육·문화행사 | 국립한글박물관</title>
+ 	<!-- Common css -->
+<link rel="stylesheet" type="text/css" href="/v1/css/libs/swiper-8.4.5.min.css">
+<link rel="stylesheet" type="text/css" href="/v1/css/reset.css">
+<link rel="preload" type="text/css" href="/v1/css/NotoSansKR.css" as="style" onload="this.rel='stylesheet'">
+<link rel="preload" type="text/css" href="/v1/css/NanumBarunGothicYetHangul.css" as="style" onload="this.rel='stylesheet'">
+<link rel="stylesheet" type="text/css" href="/css/common/jquery-ui.css"/>
+<link rel="stylesheet" type="text/css" href="/v1/css/common.css?260427">
+<link rel="stylesheet" type="text/css" href="/v1/css/buttons.css">
+<link rel="stylesheet" type="text/css" href="/v1/css/header.css?260427">
+<link rel="stylesheet" type="text/css" href="/v1/css/footer.css">
+<link rel="stylesheet" type="text/css" href="/v1/css/main.css?250918">
+<link rel="stylesheet" type="text/css" href="/v1/css/sub.css?250827_2">
+<link rel="stylesheet" type="text/css" href="/v1/css/mediaQuery.css?250916">
+<link rel="stylesheet" type="text/css" href="/v1/css/mediaPrint.css" media="print">
+    <!-- Common js -->
+    <!-- 20251218 구글통계태그 -->
+    <!-- Global site tag (gtag.js) - Google Analytics -->
+    <meta property="og:url" content="https://www.hangeul.go.kr/">
+    <meta property="og:title" content="교육 신청 | 교육·문화행사 | 국립한글박물관">
+    <meta property="og:image" content="/v1/images/common/logo.svg">
+    <meta property="og:description" content="국립한글박물관의 교육 신청 신청 목록 화면">
+    <meta name="keywords" content="교육·문화행사, 교육 신청, 특별 강연, 행사">
+    <meta name="description" content="국립한글박물관의 교육 신청 신청 목록 화면">
+    <link rel="canonical" href="https://www.hangeul.go.kr/education?page=1&target=0&showGubun=0&curr_menu_cd=0103010000">
+</head>
+<body class="">
+<div class="wrapper">
+    <!-- Header -->
+<div class="sr-only">스킵네비게이션</div>
+<p id="skipNav">
+    <a href="#gnb">주메뉴 바로가기</a> 
+    <!--<a href="#total_search_text">통합검색 바로가기</a> -->
+    <a href="#container">본문바로가기</a>
+</p>
+<!-- //바로가기 링크 -->
+<iframe title="공통파일다운로드" name="hiddenFrame" id="hiddenFrame"
+    style="display: none"></iframe>
+<header class="header">
+    <!--<div class="header-top" style="background: #335fc8;padding: 20px 0">
+    <p style="text-align: center;color: #fff"><a href="https://www.hangeul.go.kr/en" target="_blank" title="새창">새로운 영문 누리집<span style="color:#335fc8">　</span>I<span style="color:#335fc8">　</span>New English Website</a></p>
+</div>-->
+ <div id="for_bg" style="background: var(--secondary-pale);">
+  <div class="header-top">
+    <div class="toggle-head">
+      <div class="inner">
+          <p class="nuri-txt"><img src="/v1/images/common/header_flag.png" alt="">이 누리집은 대한민국 공식 전자정부 누리집입니다.</p>
+          <!--<button class="toggle-btn ico-arr-down" id="top_flag" onclick="fntopFlag();">공식 누리집 확인방법<span>열기</span></button>-->
+      </div>
+    </div>
+    <div class="toggle-body" style="display:none;" id="chk_nuri">
+      <div class="inner">
+          <strong>공식 누리집 주소 확인하기</strong>
+          <p>go.kr 주소를 사용하는 누리집은 대한민국 정부기관이 관리하는 누리집입니다. <br>
+            이 밖에 or.kr 또는 .kr등 다른 도메인 주소를 사용하고 있다면 아래 URL에서 도메인 주소를 확인해 보세요. <br>
+            <a href="https://uiux.egovframe.go.kr/search.do" target="_blank" title="새 창열림">운영중인 공식 누리집보기</a>
+          </p>
+      </div>
+    </div>
+  </div>
+  </div>
+  <div id="add_area1">
+        <!-- // 전자정부표시 -->
+        <div id="add_area">
+            <div class="logo">
+                <a href="/"><img src="/v1/images/common/logo.svg" alt="문화체육관광부 국립한글박물관"></a>
+            </div>
+            <!-- resize -->
+            <div class="head-search">
+                <form name="frm_top" id="frm_top" action="/user/search/list.do;jsessionid=9F9DFBA137F4B0B6C9D7C076ECCF8956"
+                    method="get" onsubmit="return fnSearchTop();">
+                    <fieldset>
+                        <legend>통합검색</legend>
+                        <label for="total_search_text" class="sr-only">검색어 입력</label> <input
+                            type="text" name="keyword" id="total_search_text"
+                            class="ui-input" aria-label="검색어" placeholder="검색어를 입력해주세요"
+                            required title="검색어를 입력하세요.">
+                       <!-- <button type="button" class="old-cha-link"
+                            onclick="fnOldHangeulPopup(); return false;" title="새창으로 이동">옛한글
+                            입력기</button> -->
+                        <button type="submit" class="btn-head-search">검색 버튼</button>
+                    </fieldset>
+                </form>
+            </div>
+            <div class="krds-drop-wrap krds-resize drop-right" data-adjust="scale">
+              <button type="button" class="krds-btn small text drop-btn">화면크기 <img src="/v1/images/common/ico_angle.svg" alt="" /></button>
+              <div class="drop-menu">
+                <div class="drop-in">
+                  <ul class="drop-list">
+                    <li><button type="button" class="item-link sm" data-adjust-scale="sm">작게</button></li>
+                    <li><button type="button" class="item-link md active" data-adjust-scale="md">보통</button></li>
+                    <li><button type="button" class="item-link lg" data-adjust-scale="lg">조금 크게</button></li>
+                    <li><button type="button" class="item-link xlg" data-adjust-scale="xlg">크게</button></li>
+                    <li><button type="button" class="item-link xxlg" data-adjust-scale="xxlg">가장크게</button></li>
+                  </ul>
+                  <div class="drop-bottom">
+                    <button type="button" class="krds-btn medium text" data-adjust-scale="md"> <img src="/v1/images/common/ico_reset.svg" alt="" /> 초기화</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <!-- //resize -->
+            <div class="lang">
+                <button type="button" class="btn-lang" title="다국어 사이트 목록 펼치기 - 한국어, English, 日本語, 中文">Language
+                </button>
+                <ul class="lang-list">
+                    <li><a title="국립한글박물관 일문 사이트로 이동 - 새 창 열림" href="https://www.hangeul.go.kr/en" target="_blank">English</a></li>
+                    <li><a title="국립한글박물관 일문 사이트로 이동 - 새 창 열림" href="https://www.hangeul.go.kr/lang/jp/main.do" target="_blank">日本語</a></li>
+                    <li><a title="국립한글박물관 중문 사이트로 이동 - 새 창 열림" href="https://www.hangeul.go.kr/lang/ch/main.do" target="_blank">中文</a></li>
+                </ul>
+            </div>
+        </div>
+        </div>
+        <!-- Navigation -->
+        <nav class="head-nav">
+            <p class="sr-only">주메뉴 영역</p>
+            <ul id="gnb">
+                <!-- :: li class="is-active" -->
+                        <li>
+                            <a href="javascript:void(0);" onclick="onTopGnb('gnb-0101000000'); return false;">관람안내</a>
+<ul id="gnb-0101000000" class="submenu" style="display: none; opacity: 1;">
+        <li>
+            <a href="javascript:void(0);" onclick="onTopMenu('0101010000', '/info/watchGuide.do', 'N'); return false;">
+                관람 및 해설 안내
+            </a>
+        </li>
+        <li>
+            <a href="javascript:void(0);" onclick="onTopMenu('0101020000', '/viewing/reservIndex.do', 'N'); return false;">
+                예약 및 취소
+            </a>
+        </li>
+        <li>
+            <a href="javascript:void(0);" onclick="onTopMenu('0101030000', '/info/floorGuide.do', 'N'); return false;">
+                층별안내
+            </a>
+        </li>
+        <li>
+            <a href="javascript:void(0);" onclick="onTopMenu('0101050000', '/info/locationGuide.do', 'N'); return false;">
+                오시는 길
+            </a>
+        </li>
+</ul>
+                        </li>
+                        <li>
+                            <a href="javascript:void(0);" onclick="onTopGnb('gnb-0102000000'); return false;">전시·체험</a>
+<ul id="gnb-0102000000" class="submenu" style="display: none; opacity: 1;">
+        <li>
+            <a href="javascript:void(0);" onclick="onTopMenu('0102010000', '/exhi/dailyExhibition.do', 'N'); return false;">
+                상설 전시
+            </a>
+        </li>
+        <li>
+            <a href="javascript:void(0);" onclick="onTopMenu('0102020000', '/exhibition', 'N'); return false;">
+                기획 전시
+            </a>
+        </li>
+        <li>
+            <a href="javascript:void(0);" onclick="onTopMenu('0102040000', '/exhi/playground/exhibitionGuide.do', 'N'); return false;">
+                한글놀이터
+            </a>
+        </li>
+</ul>
+                        </li>
+                        <li>
+                            <a href="javascript:void(0);" onclick="onTopGnb('gnb-0103000000'); return false;">교육·문화행사</a>
+<ul id="gnb-0103000000" class="submenu" style="display: none; opacity: 1;">
+        <li>
+            <a href="javascript:void(0);" onclick="onTopMenu('0103010000', '/education?page=1&target=0&showGubun=0&curr_menu_cd=0103010000&searchKeyword=', 'N'); return false;">
+                교육 신청
+            </a>
+        </li>
+        <li>
+            <a href="javascript:void(0);" onclick="onTopMenu('0103020000', '/education?target=8&curr_menu_cd=0103020200', 'N'); return false;">
+                특별 강연
+            </a>
+        </li>
+        <li>
+            <a href="javascript:void(0);" onclick="onTopMenu('0103030000', '/eduCul/event/reservList.do?page=1&eventType=1&showGubun=0&curr_menu_cd=0103030100&searchKeyword=', 'N'); return false;">
+                행사
+            </a>
+        </li>
+</ul>
+                        </li>
+                        <li>
+                            <a href="javascript:void(0);" onclick="onTopGnb('gnb-0104000000'); return false;">학술·연구</a>
+<ul id="gnb-0104000000" class="submenu" style="display: none; opacity: 1;">
+        <li>
+            <a href="javascript:void(0);" onclick="onTopMenu('0104010000', '/published-data/collectionEdition', 'N'); return false;">
+                소장자료 연구
+            </a>
+        </li>
+        <li>
+            <a href="javascript:void(0);" onclick="onTopMenu('0104020000', '/published-data/academicArchives', 'N'); return false;">
+                전시도록/교육자료
+            </a>
+        </li>
+        <li>
+            <a href="javascript:void(0);" onclick="onTopMenu('0104030000', '/published-data/etcResearch', 'N'); return false;">
+                연구조사 자료집
+            </a>
+        </li>
+</ul>
+                        </li>
+                        <li>
+                            <a href="javascript:void(0);" onclick="onTopGnb('gnb-0105000000'); return false;">소장자료</a>
+<ul id="gnb-0105000000" class="submenu" style="display: none; opacity: 1;">
+        <li>
+            <a href="javascript:void(0);" onclick="onTopMenu('0105010000', '/collect/donation/donationGuide.do', 'N'); return false;">
+                기증/구입
+            </a>
+        </li>
+        <li>
+            <a href="javascript:void(0);" onclick="onTopMenu('0105030000', '/relic', 'N'); return false;">
+                주요 문화유산
+            </a>
+        </li>
+        <li>
+            <a href="javascript:void(0);" onclick="onTopMenu('0105040000', '/collect/preservation/preservationPaper.do', 'N'); return false;">
+                보존처리
+            </a>
+        </li>
+        <li>
+            <a href="javascript:void(0);" onclick="onTopMenu('0105050000', 'https://www.hangeul.go.kr/library/', 'Y'); return false;">
+                한글도서관(새창)
+            </a>
+        </li>
+        <li>
+            <a href="javascript:void(0);" onclick="onTopMenu('0105060000', '/published-data', 'N'); return false;">
+                발간자료
+            </a>
+        </li>
+</ul>
+                        </li>
+                        <li>
+                            <a href="javascript:void(0);" onclick="onTopGnb('gnb-0106000000'); return false;">소식</a>
+<ul id="gnb-0106000000" class="submenu" style="display: none; opacity: 1;">
+        <li>
+            <a href="javascript:void(0);" onclick="onTopMenu('0106010000', '/news/newsList.do?bbs_id=1', 'N'); return false;">
+                새소식
+            </a>
+        </li>
+        <li>
+            <a href="javascript:void(0);" onclick="onTopMenu('0106020000', '/news/newsApplication.do', 'N'); return false;">
+                촬영 신청
+            </a>
+        </li>
+        <li>
+            <a href="javascript:void(0);" onclick="onTopMenu('0106030000', '/news/newsLetterList.do', 'N'); return false;">
+                소식지 한박웃음
+            </a>
+        </li>
+        <li>
+            <a href="javascript:void(0);" onclick="onTopMenu('0106040000', '/news/volunteerWork/volunteerWork.do', 'N'); return false;">
+                자원봉사
+            </a>
+        </li>
+        <li>
+            <a href="javascript:void(0);" onclick="onTopMenu('0106050000', '/news/infoOpen/infoOpenSystem.do?curr_menu_cd=0106050100', 'N'); return false;">
+                정보공개
+            </a>
+        </li>
+        <li>
+            <a href="javascript:void(0);" onclick="onTopMenu('0106060000', '/news/publicdata.do', 'N'); return false;">
+                공공데이터 개방
+            </a>
+        </li>
+        <li>
+            <a href="javascript:void(0);" onclick="onTopMenu('0106070000', '/news/civilService.do', 'N'); return false;">
+                전자민원
+            </a>
+        </li>
+</ul>
+                        </li>
+                        <li>
+                            <a href="javascript:void(0);" onclick="onTopGnb('gnb-0107000000'); return false;">소개</a>
+<ul id="gnb-0107000000" class="submenu" style="display: none; opacity: 1;">
+        <li>
+            <a href="javascript:void(0);" onclick="onTopMenu('0107010000', '/about/greeting.do', 'N'); return false;">
+                인사말
+            </a>
+        </li>
+        <li>
+            <a href="javascript:void(0);" onclick="onTopMenu('0107020000', '/info/organization.do', 'N'); return false;">
+                조직 및 업무
+            </a>
+        </li>
+        <li>
+            <a href="javascript:void(0);" onclick="onTopMenu('0107030000', '/info/building.do', 'N'); return false;">
+                건축물 소개
+            </a>
+        </li>
+        <li>
+            <a href="javascript:void(0);" onclick="onTopMenu('0107040000', '/info/history.do', 'N'); return false;">
+                연혁
+            </a>
+        </li>
+        <li>
+            <a href="javascript:void(0);" onclick="onTopMenu('0107050000', 'https://www.fnhm.or.kr', 'Y'); return false;">
+                박물관 후원회(새창)
+            </a>
+        </li>
+</ul>
+                        </li>
+            </ul>
+            <ul class="new-row">
+                <li><a href="https://www.hangeul.go.kr/library/"
+                    target="_blank" title="한글도서관 바로가기(새창)"> <span>한글도서관</span>
+                </a></li>
+                <li><a href="https://hanfont.hangeul.go.kr/" target="_blank"
+                    title="한글꼴큰사전 바로가기(새창)"> <span>한글꼴큰사전</span>
+                </a></li>
+                <li><a href="https://archives.hangeul.go.kr/" target="_blank"
+                    title="국립한글박물관 아카이브 바로가기(새창)"> <span>한글박물관<br>아카이브
+                    </span>
+                </a></li>
+            </ul>
+            <!-- <p class="sr-only">관련 링크</p>
+        <div class="head-links">
+            <ul class="social">
+                <li>
+                    <a href="https://www.facebook.com/Hangeul.Museum" target="_blank" title="페이스북 바로가기 - 새 창 열림"><img src="/v1/images/common/ico_social_facebook.png" alt="페이스북 로고"></a>
+                </li>
+                <li>
+                    <a href="https://www.instagram.com/hangeul_m" target="_blank" title="인스타그램 바로가기 - 새 창 열림"><img src="/v1/images/common/ico_social_instagram.png" alt="인스타그램 로고"></a>
+                </li>
+                <li>
+                    <a href="https://blog.naver.com/hangeul_m" target="_blank" title="네이버블로그 바로가기 - 새 창 열림"><img src="/v1/images/common/ico_social_nblog.png" alt="네이버블로그 로고"></a>
+                </li>
+                <li>
+                    <a href="https://www.youtube.com/channel/UCkhi9ZGyfs-G1-6FFLWS1LA" target="_blank" title="유튜브채널 바로가기 - 새 창 열림"><img src="/v1/images/common/ico_social_youtube.png" alt="유튜브채널 로고"></a>
+                </li>
+            </ul>
+            <ul class="related">
+                <li>
+                    <a href="https://hanfont.hangeul.go.kr/main/index.do" target="_blank" title="한글꼴큰사전 바로가기 - 새 창 열림">한글꼴큰사전</a>
+                </li>
+                <li>
+                    <a href="https://archives.hangeul.go.kr/" target="_blank" title="디지털한글박물관 바로가기 - 새 창 열림">디지털한글박물관</a>
+                </li>
+            </ul>
+        </div> -->
+        </nav>
+        <div class="submenu-bg"></div>
+        <!-- Total search -->
+        <!--<div class="head-search">
+        <form name="frm_top" id="frm_top">
+            <fieldset>
+                <legend>통합검색</legend>
+                <label for="total_search_text" class="sr-only">검색어 입력</label>
+                <input type="text" name="keyword" id="total_search_text" class="ui-input" aria-label="검색어" placeholder="검색어를 입력해주세요" onkeyUp="fnEnterTop()">
+                <button type="button" class="old-cha-link" onclick="fnOldHangeulPopup(); return false;" title="새창으로 이동">옛한글 입력기</button>
+                <button type="button" class="btn-head-search" onclick="fnSearchTop();">검색 버튼</button>
+            </fieldset>
+        </form>
+    </div>-->
+        <!-- Languages -->
+        <!--<div class="lang">
+        <button type="button" class="btn-lang" aria-label="다국어 사이트 목록보기 - 한국어, English, 日本語, 中文">
+            한국어
+        </button>
+        <ul class="lang-list">
+            <li><a title="국립한글박물관 일문 사이트로 이동 - 새 창 열림" href="https://www.hangeul.go.kr/en" target="_blank">English</a></li>
+            <li><a title="국립한글박물관 일문 사이트로 이동 - 새 창 열림" href="https://www.hangeul.go.kr/lang/jp/main.do" target="_blank">日本語</a></li>
+            <li><a title="국립한글박물관 중문 사이트로 이동 - 새 창 열림" href="https://www.hangeul.go.kr/lang/ch/main.do" target="_blank">中文</a></li>
+        </ul>
+    </div>-->
+        <!-- FOR MOBILE -->
+        <button type="button" class="btn-mobile-menu">
+            모바일 메뉴 버튼 <i class="icon"></i>
+        </button>
+        <div id="mobile-menu-wrap">
+            <div class="mobile-menu">
+                <div class="mo-logo">
+                    <!-- ... -->
+                </div>
+                <nav class="mo-nav">
+                    <ul id="mo_gnb">
+                        <!-- :: li class="is-active" -->
+                                <li>
+                                    <a href="javascript:void(0);">관람안내</a>
+<ul class="submenu" style="display: none; opacity: 1;">
+        <li>
+            <a href="javascript:void(0);" onclick="onTopMenu('0101010000', '/info/watchGuide.do', 'N'); return false;">
+                관람 및 해설 안내
+            </a>
+        </li>
+        <li>
+            <a href="javascript:void(0);" onclick="onTopMenu('0101020000', '/viewing/reservIndex.do', 'N'); return false;">
+                예약 및 취소
+            </a>
+        </li>
+        <li>
+            <a href="javascript:void(0);" onclick="onTopMenu('0101030000', '/info/floorGuide.do', 'N'); return false;">
+                층별안내
+            </a>
+        </li>
+        <li>
+            <a href="javascript:void(0);" onclick="onTopMenu('0101050000', '/info/locationGuide.do', 'N'); return false;">
+                오시는 길
+            </a>
+        </li>
+</ul>
+                                </li>
+                                <li>
+                                    <a href="javascript:void(0);">전시·체험</a>
+<ul class="submenu" style="display: none; opacity: 1;">
+        <li>
+            <a href="javascript:void(0);" onclick="onTopMenu('0102010000', '/exhi/dailyExhibition.do', 'N'); return false;">
+                상설 전시
+            </a>
+        </li>
+        <li>
+            <a href="javascript:void(0);" onclick="onTopMenu('0102020000', '/exhibition', 'N'); return false;">
+                기획 전시
+            </a>
+        </li>
+        <li>
+            <a href="javascript:void(0);" onclick="onTopMenu('0102040000', '/exhi/playground/exhibitionGuide.do', 'N'); return false;">
+                한글놀이터
+            </a>
+        </li>
+</ul>
+                                </li>
+                                <li>
+                                    <a href="javascript:void(0);">교육·문화행사</a>
+<ul class="submenu" style="display: none; opacity: 1;">
+        <li>
+            <a href="javascript:void(0);" onclick="onTopMenu('0103010000', '/education?page=1&target=0&showGubun=0&curr_menu_cd=0103010000&searchKeyword=', 'N'); return false;">
+                교육 신청
+            </a>
+        </li>
+        <li>
+            <a href="javascript:void(0);" onclick="onTopMenu('0103020000', '/education?target=8&curr_menu_cd=0103020200', 'N'); return false;">
+                특별 강연
+            </a>
+        </li>
+        <li>
+            <a href="javascript:void(0);" onclick="onTopMenu('0103030000', '/eduCul/event/reservList.do?page=1&eventType=1&showGubun=0&curr_menu_cd=0103030100&searchKeyword=', 'N'); return false;">
+                행사
+            </a>
+        </li>
+</ul>
+                                </li>
+                                <li>
+                                    <a href="javascript:void(0);">학술·연구</a>
+<ul class="submenu" style="display: none; opacity: 1;">
+        <li>
+            <a href="javascript:void(0);" onclick="onTopMenu('0104010000', '/published-data/collectionEdition', 'N'); return false;">
+                소장자료 연구
+            </a>
+        </li>
+        <li>
+            <a href="javascript:void(0);" onclick="onTopMenu('0104020000', '/published-data/academicArchives', 'N'); return false;">
+                전시도록/교육자료
+            </a>
+        </li>
+        <li>
+            <a href="javascript:void(0);" onclick="onTopMenu('0104030000', '/published-data/etcResearch', 'N'); return false;">
+                연구조사 자료집
+            </a>
+        </li>
+</ul>
+                                </li>
+                                <li>
+                                    <a href="javascript:void(0);">소장자료</a>
+<ul class="submenu" style="display: none; opacity: 1;">
+        <li>
+            <a href="javascript:void(0);" onclick="onTopMenu('0105010000', '/collect/donation/donationGuide.do', 'N'); return false;">
+                기증/구입
+            </a>
+        </li>
+        <li>
+            <a href="javascript:void(0);" onclick="onTopMenu('0105030000', '/relic', 'N'); return false;">
+                주요 문화유산
+            </a>
+        </li>
+        <li>
+            <a href="javascript:void(0);" onclick="onTopMenu('0105040000', '/collect/preservation/preservationPaper.do', 'N'); return false;">
+                보존처리
+            </a>
+        </li>
+        <li>
+            <a href="javascript:void(0);" onclick="onTopMenu('0105050000', 'https://www.hangeul.go.kr/library/', 'Y'); return false;">
+                한글도서관(새창)
+            </a>
+        </li>
+        <li>
+            <a href="javascript:void(0);" onclick="onTopMenu('0105060000', '/published-data', 'N'); return false;">
+                발간자료
+            </a>
+        </li>
+</ul>
+                                </li>
+                                <li>
+                                    <a href="javascript:void(0);">소식</a>
+<ul class="submenu" style="display: none; opacity: 1;">
+        <li>
+            <a href="javascript:void(0);" onclick="onTopMenu('0106010000', '/news/newsList.do?bbs_id=1', 'N'); return false;">
+                새소식
+            </a>
+        </li>
+        <li>
+            <a href="javascript:void(0);" onclick="onTopMenu('0106020000', '/news/newsApplication.do', 'N'); return false;">
+                촬영 신청
+            </a>
+        </li>
+        <li>
+            <a href="javascript:void(0);" onclick="onTopMenu('0106030000', '/news/newsLetterList.do', 'N'); return false;">
+                소식지 한박웃음
+            </a>
+        </li>
+        <li>
+            <a href="javascript:void(0);" onclick="onTopMenu('0106040000', '/news/volunteerWork/volunteerWork.do', 'N'); return false;">
+                자원봉사
+            </a>
+        </li>
+        <li>
+            <a href="javascript:void(0);" onclick="onTopMenu('0106050000', '/news/infoOpen/infoOpenSystem.do?curr_menu_cd=0106050100', 'N'); return false;">
+                정보공개
+            </a>
+        </li>
+        <li>
+            <a href="javascript:void(0);" onclick="onTopMenu('0106060000', '/news/publicdata.do', 'N'); return false;">
+                공공데이터 개방
+            </a>
+        </li>
+        <li>
+            <a href="javascript:void(0);" onclick="onTopMenu('0106070000', '/news/civilService.do', 'N'); return false;">
+                전자민원
+            </a>
+        </li>
+</ul>
+                                </li>
+                                <li>
+                                    <a href="javascript:void(0);">소개</a>
+<ul class="submenu" style="display: none; opacity: 1;">
+        <li>
+            <a href="javascript:void(0);" onclick="onTopMenu('0107010000', '/about/greeting.do', 'N'); return false;">
+                인사말
+            </a>
+        </li>
+        <li>
+            <a href="javascript:void(0);" onclick="onTopMenu('0107020000', '/info/organization.do', 'N'); return false;">
+                조직 및 업무
+            </a>
+        </li>
+        <li>
+            <a href="javascript:void(0);" onclick="onTopMenu('0107030000', '/info/building.do', 'N'); return false;">
+                건축물 소개
+            </a>
+        </li>
+        <li>
+            <a href="javascript:void(0);" onclick="onTopMenu('0107040000', '/info/history.do', 'N'); return false;">
+                연혁
+            </a>
+        </li>
+        <li>
+            <a href="javascript:void(0);" onclick="onTopMenu('0107050000', 'https://www.fnhm.or.kr', 'Y'); return false;">
+                박물관 후원회(새창)
+            </a>
+        </li>
+</ul>
+                                </li>
+                    </ul>
+                    <div class="mo-links">
+                        <!-- ... -->
+                    </div>
+                    <div class="mo-lang">
+                        <!-- ... -->
+                    </div>
+                </nav>
+            </div>
+        </div>
+        <button type="button" class="btn-mobile-search" aria-label="모바일 통합검색 열기">모바일 통합 검색 버튼</button>
+        <div class="mo-head-search">
+            <form name="m_frm_top" id="m_frm_top" action="/user/search/list.do;jsessionid=9F9DFBA137F4B0B6C9D7C076ECCF8956"
+                method="get" onsubmit="return fnSearchTop('m');">
+                <fieldset>
+                    <legend>통합검색</legend>
+                    <label for="m_total_search_text" class="sr-only">검색어 입력</label> <input
+                        type="text" name="keyword" id="m_total_search_text"
+                        class="ui-input" aria-label="검색어" placeholder="검색어를 입력해주세요"
+                        required title="검색어를 입력하세요.">
+                    <button type="submit" class="btn-head-search">검색 버튼</button>
+                </fieldset>
+            </form>
+        </div>
+</header>
+    <!-- // Header -->
+    <!-- Page Content -->
+    <div id="container" class="container">
+        <div class="sub-cont">
+                <!-- path menu -->
+                <aside class="drop-menu">
+                    <div class="contain">
+                        <div class="home">
+							<a href="/main.do">
+                                <img src="/v1/images/common/ico_home.png" alt="">
+                                <span class="sr-only">홈</span>
+                            </a>
+                        </div>
+                        <div class="path"> <!-- class : on -->
+                            <button type="button" id="depth1-name">대메뉴</button>
+                            <ul>
+                                    <li class="depth1" data-menu-cd="0101000000">
+                                        <a href="javascript:void(0);" onclick="onTopGnb('gnb-0101000000'); return false;">관람안내</a>
+                                    </li>
+                                    <li class="depth1" data-menu-cd="0102000000">
+                                        <a href="javascript:void(0);" onclick="onTopGnb('gnb-0102000000'); return false;">전시·체험</a>
+                                    </li>
+                                    <li class="depth1" data-menu-cd="0103000000">
+                                        <a href="javascript:void(0);" onclick="onTopGnb('gnb-0103000000'); return false;">교육·문화행사</a>
+                                    </li>
+                                    <li class="depth1" data-menu-cd="0104000000">
+                                        <a href="javascript:void(0);" onclick="onTopGnb('gnb-0104000000'); return false;">학술·연구</a>
+                                    </li>
+                                    <li class="depth1" data-menu-cd="0105000000">
+                                        <a href="javascript:void(0);" onclick="onTopGnb('gnb-0105000000'); return false;">소장자료</a>
+                                    </li>
+                                    <li class="depth1" data-menu-cd="0106000000">
+                                        <a href="javascript:void(0);" onclick="onTopGnb('gnb-0106000000'); return false;">소식</a>
+                                    </li>
+                                    <li class="depth1" data-menu-cd="0107000000">
+                                        <a href="javascript:void(0);" onclick="onTopGnb('gnb-0107000000'); return false;">소개</a>
+                                    </li>
+                            </ul>
+                        </div>
+                        <div class="path">
+                            <button type="button" id="depth2-name">소메뉴</button>
+                            <ul id="depth2-list">
+                            </ul>
+                        </div>
+                    </div>
+                </aside>
+                <!-- share area -->
+                <div class="share-area">
+                    <ul>
+                        <li><a href="javascript:void(0);" onclick="goSns('twitter','소식지')" title="새 창 열림" class="twitter">트위터로
+                            공유하기</a>
+                        </li>
+                        <li><a href="javascript:void(0);" onclick="goSns('facebook','소식지')" title="새 창 열림" class="facebook">페이스북으로
+                            공유하기</a></li>
+                        <li><a href="javascript:void(0);" onclick="copyCurUrl()" title="새 창 열림" class="clipboard">주소 클립보드 복사</a></li>
+                    </ul>
+                </div>
+<!-- sub title -->
+<div class="sub-title">
+    <h1>교육 신청</h1>
+</div>
+<!-- sub contents -->
+<section class="cont-area">
+    <div class="directory-tabs">
+<ul>
+        <li class="is-active">
+            <a href="javascript:void(0);" onclick="onTopMenu('0103010000', '/education?page=1&target=0&showGubun=0&curr_menu_cd=0103010000&searchKeyword=', 'N'); return false;">
+                교육 신청
+            </a>
+        </li>
+        <li>
+            <a href="javascript:void(0);" onclick="onTopMenu('0103020000', '/education?target=8&curr_menu_cd=0103020200', 'N'); return false;">
+                특별 강연
+            </a>
+        </li>
+        <li>
+            <a href="javascript:void(0);" onclick="onTopMenu('0103030000', '/eduCul/event/reservList.do?page=1&eventType=1&showGubun=0&curr_menu_cd=0103030100&searchKeyword=', 'N'); return false;">
+                행사
+            </a>
+        </li>
+</ul>
+    </div>
+    <div class="sub-tabs row-7">
+<div class="swiper-menu">
+    <ul class="swiper-wrapper">
+            <li class="swiper-slide is-active">
+                <a href="javascript:void(0);" onclick="onTopMenu('0103010100', '/education?page=1&target=0&showGubun=0&curr_menu_cd=0103010000&searchKeyword=', 'N'); return false;">
+                        전체
+                </a>
+            </li>
+            <li>
+                <a href="javascript:void(0);" onclick="onTopMenu('0103010200', '/education?page=1&target=1&showGubun=0&curr_menu_cd=0103010200&searchKeyword=', 'N'); return false;">
+                        유아
+                </a>
+            </li>
+            <li>
+                <a href="javascript:void(0);" onclick="onTopMenu('0103010300', '/education?target=2', 'N'); return false;">
+                        초등
+                </a>
+            </li>
+            <li>
+                <a href="javascript:void(0);" onclick="onTopMenu('0103010400', '/education?target=3', 'N'); return false;">
+                        중고등
+                </a>
+            </li>
+            <li>
+                <a href="javascript:void(0);" onclick="onTopMenu('0103010500', '/education?target=4', 'N'); return false;">
+                        성인
+                </a>
+            </li>
+            <li>
+                <a href="javascript:void(0);" onclick="onTopMenu('0103010600', '/education?target=5', 'N'); return false;">
+                        외국인
+                </a>
+            </li>
+            <li>
+                <a href="javascript:void(0);" onclick="onTopMenu('0103010700', '/education?target=10', 'N'); return false;">
+                        희망계층(장애인)
+                </a>
+            </li>
+    </ul>
+</div>
+    </div>
+    <form name="frm" action="/education" method="get">
+        <input type="hidden" name="page" value="2">
+        <input type="hidden" name="target" value="0">
+        <input type="hidden" name="showGubun" value="0">
+        <input type="hidden" name="curr_menu_cd" value="0103010000">
+<div class="fourth-tabs">
+    <div class="swiper-menu">
+        <ul class="swiper-wrapper">
+            <li class="swiper-slide go-page is-active"
+                data-page="1" data-show-gubun="0">
+                <button type="button">전체</button>
+            </li>
+            <li class="swiper-slide go-page "
+                data-page="1" data-show-gubun="1">
+                <button type="button">접수중</button>
+            </li>
+            <li class="swiper-slide go-page "
+                data-page="1" data-show-gubun="2">
+                <button type="button">접수예정</button>
+            </li>
+            <li class="swiper-slide go-page "
+                data-page="1" data-show-gubun="3">
+                <button type="button">접수마감</button>
+            </li>
+        </ul>
+    </div>
+</div>
+<div class="board-search">
+    <div class="total-cnt">총 <strong>26</strong>건</div>
+    <div class="search">
+        <span>교육명</span>
+        <div class="ui-input-wrap">
+            <label class="sr-only" for="searchKeyword">검색어</label>
+            <input type="text" id="searchKeyword" name="searchKeyword" class="ui-input" area-label="검색어 입력">
+            <button type="submit" class="btn-search">검색하기</button>
+        </div>
+    </div>
+</div>
+<div class="apply-list">
+    <ul>
+            <li>
+                <div class="status-box primary">
+                        접수마감
+                </div>
+                <div class="text-box">
+                    <div class="head">
+                        <span class="label">초등</span>
+                        <span class="label">단체</span>
+                        <span class="label">온라인 접수</span>
+                        <span class="label">선착순</span>
+                            <span class="label">원격 교육</span>
+                    </div>
+                    <!--/eduCul/edu/onlineReservDetail.do-->
+                    <a href="javascript:void(0);" class="go-view-page" data-program-no="859" data-target="2">
+                        <h3>[교육 활동지] 또박또박 한글</h3>
+                    </a>
+                    <div class="foot">
+                        <dl>
+                            <dt>교육 대상</dt>
+                            <dd>초등학교 1-2학년 학급 단체</dd>
+                        </dl>
+                        <dl>
+                            <dt>신청 기간</dt>
+                            <dd>
+                                2026.08.25.(화) ~ 2026.09.18.(금)
+                            </dd>
+                        </dl>
+                        <dl>
+                            <dt>교육 기간</dt>
+                            <dd>
+                                2026.09.08.(화) ~ 2026.09.18.(금)
+                            </dd>
+                        </dl>
+                    </div>
+                </div>
+            </li>
+            <li>
+                <div class="status-box primary">
+                        접수마감
+                </div>
+                <div class="text-box">
+                    <div class="head">
+                        <span class="label">유아</span>
+                        <span class="label">단체</span>
+                        <span class="label">온라인 접수</span>
+                        <span class="label">선착순</span>
+                            <span class="label">원격 교육</span>
+                    </div>
+                    <!--/eduCul/edu/onlineReservDetail.do-->
+                    <a href="javascript:void(0);" class="go-view-page" data-program-no="860" data-target="1">
+                        <h3>[교육 활동지] 동글뾰족한글얼굴</h3>
+                    </a>
+                    <div class="foot">
+                        <dl>
+                            <dt>교육 대상</dt>
+                            <dd>유아단체(만 3~5세)</dd>
+                        </dl>
+                        <dl>
+                            <dt>신청 기간</dt>
+                            <dd>
+                                2026.08.25.(화) ~ 2026.09.18.(금)
+                            </dd>
+                        </dl>
+                        <dl>
+                            <dt>교육 기간</dt>
+                            <dd>
+                                2026.09.03.(목) ~ 2026.09.28.(월)
+                            </dd>
+                        </dl>
+                    </div>
+                </div>
+            </li>
+            <li>
+                <div class="status-box primary">
+                        접수마감
+                </div>
+                <div class="text-box">
+                    <div class="head">
+                        <span class="label">초등</span>
+                        <span class="label">개별</span>
+                        <span class="label">온라인 접수</span>
+                        <span class="label">선착순</span>
+                            <span class="label">현장 교육</span>
+                    </div>
+                    <!--/eduCul/edu/onlineReservDetail.do-->
+                    <a href="javascript:void(0);" class="go-view-page" data-program-no="848" data-target="2">
+                        <h3>[여름방학 현장교육] 한글 고전 탐험대</h3>
+                    </a>
+                    <div class="foot">
+                        <dl>
+                            <dt>교육 대상</dt>
+                            <dd>초등 동반 가족(1~2학년)</dd>
+                        </dl>
+                        <dl>
+                            <dt>신청 기간</dt>
+                            <dd>
+                                2026.07.14.(화) ~ 2026.08.13.(목)
+                            </dd>
+                        </dl>
+                        <dl>
+                            <dt>교육 기간</dt>
+                            <dd>
+                                2026.08.04.(화) ~ 2026.08.13.(목)
+                            </dd>
+                        </dl>
+                    </div>
+                </div>
+            </li>
+            <li>
+                <div class="status-box primary">
+                        접수마감
+                </div>
+                <div class="text-box">
+                    <div class="head">
+                        <span class="label">유아</span>
+                        <span class="label">단체</span>
+                        <span class="label">온라인 접수</span>
+                        <span class="label">선착순</span>
+                            <span class="label">원격 교육</span>
+                    </div>
+                    <!--/eduCul/edu/onlineReservDetail.do-->
+                    <a href="javascript:void(0);" class="go-view-page" data-program-no="845" data-target="1">
+                        <h3>[원격 교육] 한글 나와라 뚝딱</h3>
+                    </a>
+                    <div class="foot">
+                        <dl>
+                            <dt>교육 대상</dt>
+                            <dd>유아 단체(만 3~5세)</dd>
+                        </dl>
+                        <dl>
+                            <dt>신청 기간</dt>
+                            <dd>
+                                2026.06.29.(월) ~ 2026.08.28.(금)
+                            </dd>
+                        </dl>
+                        <dl>
+                            <dt>교육 기간</dt>
+                            <dd>
+                                2026.07.13.(월) ~ 2026.08.31.(월)
+                            </dd>
+                        </dl>
+                    </div>
+                </div>
+            </li>
+            <li>
+                <div class="status-box primary">
+                        접수마감
+                </div>
+                <div class="text-box">
+                    <div class="head">
+                        <span class="label">유아</span>
+                        <span class="label">단체</span>
+                        <span class="label">온라인 접수</span>
+                        <span class="label">선착순</span>
+                            <span class="label">현장 교육</span>
+                    </div>
+                    <!--/eduCul/edu/onlineReservDetail.do-->
+                    <a href="javascript:void(0);" class="go-view-page" data-program-no="847" data-target="1">
+                        <h3>[여름방학 현장 교육] 말랑통통 한글 탐정</h3>
+                    </a>
+                    <div class="foot">
+                        <dl>
+                            <dt>교육 대상</dt>
+                            <dd>유아단체(만 3~5세)</dd>
+                        </dl>
+                        <dl>
+                            <dt>신청 기간</dt>
+                            <dd>
+                                2026.06.15.(월) ~ 2026.08.24.(월)
+                            </dd>
+                        </dl>
+                        <dl>
+                            <dt>교육 기간</dt>
+                            <dd>
+                                2026.07.09.(목) ~ 2026.08.27.(목)
+                            </dd>
+                        </dl>
+                    </div>
+                </div>
+            </li>
+            <li>
+                <div class="status-box primary">
+                        접수마감
+                </div>
+                <div class="text-box">
+                    <div class="head">
+                        <span class="label">초등</span>
+                        <span class="label">단체</span>
+                        <span class="label">온라인 접수</span>
+                        <span class="label">선착순</span>
+                            <span class="label">원격 교육</span>
+                    </div>
+                    <!--/eduCul/edu/onlineReservDetail.do-->
+                    <a href="javascript:void(0);" class="go-view-page" data-program-no="839" data-target="2">
+                        <h3>[원격 교육] 전설의 이야기꾼</h3>
+                    </a>
+                    <div class="foot">
+                        <dl>
+                            <dt>교육 대상</dt>
+                            <dd>초등학교 2~3학년 학급 단체(1학급)</dd>
+                        </dl>
+                        <dl>
+                            <dt>신청 기간</dt>
+                            <dd>
+                                2026.03.30.(월) ~ 2026.06.23.(화)
+                            </dd>
+                        </dl>
+                        <dl>
+                            <dt>교육 기간</dt>
+                            <dd>
+                                2026.04.14.(화) ~ 2026.06.30.(화)
+                            </dd>
+                        </dl>
+                    </div>
+                </div>
+            </li>
+            <li>
+                <div class="status-box primary">
+                        접수마감
+                </div>
+                <div class="text-box">
+                    <div class="head">
+                        <span class="label">초등</span>
+                        <span class="label">단체</span>
+                        <span class="label">온라인 접수</span>
+                        <span class="label">선착순</span>
+                            <span class="label">원격 교육</span>
+                    </div>
+                    <!--/eduCul/edu/onlineReservDetail.do-->
+                    <a href="javascript:void(0);" class="go-view-page" data-program-no="840" data-target="2">
+                        <h3>[원격 교육] 한글이 보이는 라디오</h3>
+                    </a>
+                    <div class="foot">
+                        <dl>
+                            <dt>교육 대상</dt>
+                            <dd>초등학교 4~6학년 학급 단체(1학급)</dd>
+                        </dl>
+                        <dl>
+                            <dt>신청 기간</dt>
+                            <dd>
+                                2026.03.30.(월) ~ 2026.06.29.(월)
+                            </dd>
+                        </dl>
+                        <dl>
+                            <dt>교육 기간</dt>
+                            <dd>
+                                2026.04.13.(월) ~ 2026.07.06.(월)
+                            </dd>
+                        </dl>
+                    </div>
+                </div>
+            </li>
+            <li>
+                <div class="status-box primary">
+                        접수마감
+                </div>
+                <div class="text-box">
+                    <div class="head">
+                        <span class="label">초등</span>
+                        <span class="label">단체</span>
+                        <span class="label">온라인 접수</span>
+                        <span class="label">선착순</span>
+                            <span class="label">원격 교육</span>
+                    </div>
+                    <!--/eduCul/edu/onlineReservDetail.do-->
+                    <a href="javascript:void(0);" class="go-view-page" data-program-no="843" data-target="2">
+                        <h3>[원격 교육] 말모이 대작전</h3>
+                    </a>
+                    <div class="foot">
+                        <dl>
+                            <dt>교육 대상</dt>
+                            <dd>초등학교 4~6학년 학급 단체(1학급)</dd>
+                        </dl>
+                        <dl>
+                            <dt>신청 기간</dt>
+                            <dd>
+                                2026.03.30.(월) ~ 2026.06.24.(수)
+                            </dd>
+                        </dl>
+                        <dl>
+                            <dt>교육 기간</dt>
+                            <dd>
+                                2026.04.22.(수) ~ 2026.07.01.(수)
+                            </dd>
+                        </dl>
+                    </div>
+                </div>
+            </li>
+            <li>
+                <div class="status-box primary">
+                        접수마감
+                </div>
+                <div class="text-box">
+                    <div class="head">
+                        <span class="label">희망계층(장애인)</span>
+                        <span class="label">단체</span>
+                        <span class="label">온라인 접수</span>
+                        <span class="label">선착순</span>
+                            <span class="label">현장 교육</span>
+                    </div>
+                    <!--/eduCul/edu/onlineReservDetail.do-->
+                    <a href="javascript:void(0);" class="go-view-page" data-program-no="841" data-target="10">
+                        <h3>[현장 교육] 세종, 꿈을 이루다</h3>
+                    </a>
+                    <div class="foot">
+                        <dl>
+                            <dt>교육 대상</dt>
+                            <dd>중ㆍ고등 특수학급</dd>
+                        </dl>
+                        <dl>
+                            <dt>신청 기간</dt>
+                            <dd>
+                                2026.03.25.(수) ~ 2026.06.15.(월)
+                            </dd>
+                        </dl>
+                        <dl>
+                            <dt>교육 기간</dt>
+                            <dd>
+                                2026.04.22.(수) ~ 2026.06.26.(금)
+                            </dd>
+                        </dl>
+                    </div>
+                </div>
+            </li>
+            <li>
+                <div class="status-box primary">
+                        접수마감
+                </div>
+                <div class="text-box">
+                    <div class="head">
+                        <span class="label">중고등</span>
+                        <span class="label">단체</span>
+                        <span class="label">온라인 접수</span>
+                        <span class="label">선착순</span>
+                            <span class="label">현장 교육</span>
+                    </div>
+                    <!--/eduCul/edu/onlineReservDetail.do-->
+                    <a href="javascript:void(0);" class="go-view-page" data-program-no="834" data-target="3">
+                        <h3>[교육 영상∙활동지] 창 내고자 창을 내고자</h3>
+                    </a>
+                    <div class="foot">
+                        <dl>
+                            <dt>교육 대상</dt>
+                            <dd>중고등학생 학급 단체</dd>
+                        </dl>
+                        <dl>
+                            <dt>신청 기간</dt>
+                            <dd>
+                                2026.03.16.(월) ~ 2026.06.19.(금)
+                            </dd>
+                        </dl>
+                        <dl>
+                            <dt>교육 기간</dt>
+                            <dd>
+                                2026.06.26.(금) ~ 2026.06.26.(금)
+                            </dd>
+                        </dl>
+                    </div>
+                </div>
+            </li>
+    </ul>
+</div>
+    <nav class="pagination" role="navigation" aria-label="Pagination Navigation">
+            <button type="button" class="page-link direction prev go-page" data-page="1"
+                    aria-label="이전 페이지로"><span>이전 페이지</span></button>
+        <!---->
+                    <button type="button" class="page-link pagemove go-page" data-page="1"
+                            aria-label="Goto Page 1">1</button>
+                    <button type="button" class="page-link pagemove on"
+                            aria-label="Goto Page 2" aria-current="true">2</button>
+                    <button type="button" class="page-link pagemove go-page" data-page="3"
+                            aria-label="Goto Page 3">3</button>
+        <!---->
+            <button type="button" class="page-link direction next go-page" data-page="3"
+                    aria-label="다음 페이지로"><span>다음 페이지</span></button>
+    </nav>
+    </form>
+</section>
+<!-- MODALPOPUP 대기신청 -->
+<div class="modal-popup-wrap" id="watingConfirm-popup"> <!-- is-open -->
+    <div class="modal-popup alert">
+        <!-- modal-contents -->
+        <div class="modal-popup-body">
+            <p>신청이 마감되었습니다. <br>
+                대기 접수를 진행하시겠습니까?
+            </p>
+        </div>
+        <div class="modal-popup-footer buttons">
+            <button type="button" class="btn lrg flex btn-reject btn-popup-close" data-popup-id="watingConfirm-popup">취소</button>
+            <button type="button" class="btn lrg flex btn-accept btn-popup-open" data-popup-id="wating-popup">확인</button>
+        </div>
+        <!-- modal-contents end -->
+    </div>
+    <div class="modal-popup-mask"></div>
+</div>
+<div class="modal-popup-wrap" id="wating-popup"> <!-- is-open -->
+    <div class="modal-popup alert">
+        <!-- modal-contents -->
+        <div class="modal-popup-body">
+            <p>대기 접수 신청이 완료되었습니다.</p>
+        </div>
+        <div class="modal-popup-footer buttons">
+            <button type="button" class="btn lrg flex btn-reject btn-popup-close" data-popup-id="wating-popup">닫기</button>
+            <a href="/viewing/reservationReservConfirm.do?curr_menu_cd=" class="btn lrg flex btn-accept" data-popup-id="wating-popup">신청 내역 확인</a>
+        </div>
+    </div>
+    <div class="modal-popup-mask"></div>
+</div>
+        </div>
+    </div>
+    <!-- // Page Content -->
+    <!-- Footer -->
+<p class="sr-only">하단메뉴 영역</p>
+<footer class="footer">
+    <div class="contain">
+        <div class="footer-cont">
+            <div class="logo">
+                <a href="/"><img src="/v1/images/common/logo_wh.svg" alt="문화체육관광부 국립한글박물관"></a>
+            </div>
+            <div class="info">
+                <ul class="link-list">
+                    <li><a href="/sitemap">누리집 안내 지도</a></li>
+                    <li><a href="/html/nurizip/personalInfoProcessPolicy.do?curr_menu_cd=0108010000" class="point">개인정보 처리방침</a></li>
+                    <li><a href="/html/nurizip/copyrightPolicy.do">저작권 정책</a></li>
+                    <li><a href="/html/nurizip/imageInformation.do?curr_menu_cd=0108080000">영상정보처리기기 운영·관리 규정</a></li>
+                    <li><a href="/html/nurizip/terms.do?curr_menu_cd=0108020000">이용 약관</a></li>
+                    <li><a href="/html/nurizip/keeperRoom.do?curr_menu_cd=0108030000">청백리 지킴이 방</a></li>
+                    <li><a href="/info/locationGuide.do?curr_menu_cd=0101050000">찾아오시는 길</a></li>
+                    <!-- <li><a href="/html/nurizip/rssService.do?curr_menu_cd=0108050000" title="RSS서비스">RSS서비스</a></li> -->
+                    <li><a href="/html/nurizip/faqList.do?bbs_id=6&curr_menu_cd=0108060000">자주하는 질문</a></li>
+                    <li><a href="/news/infoOpen/infoOpenPublishedList.do?bbs_id=7&curr_menu_cd=0106050300" class="point">사전정보공표</a></li>
+                </ul>
+                <address>
+                    <span>04383 서울시 용산구 서빙고로 139 국립한글박물관</span>
+                    <span>대표전화 02-2124-6200</span>
+                </address>
+                <!-- 2026.02.19 사무실 주소 추가 -->
+                <address>
+                    <span>사무실 주소 : 04387 서울 용산구 서빙고로 17 센트럴파크타워 25층</span>
+                </address>
+                <p class="copyright">Copyright © National Hangeul Museum. All rights reserved.</p>
+            </div>
+            <ul class="cert-list">
+                <li>
+                  <a href="http://www.webwatch.or.kr/Situation/WA_Situation.html?MenuCD=110" target="_blank" title="WA 품질인증 마크, 웹와치(WebWatch) 2026.05.27. ~ 2027.05.26 - a new window">
+                    <img src="/v1/images/common/logo_wa.png" alt="과학기술정보통신부 WA(WEB접근성) 품질인증 마크, 웹와치(WebWatch) 2026.05.27. ~ 2027.05.26">
+                  </a>
+                </li>
+                <li><a href="http://www.kogl.or.kr/" target="_blank" title="공공누리 사이트 바로가기 - 새 창 열림"><img src="/v1/images/common/logo_kogl.png" alt="open 공공누리, 공공저작물 자유이용허락"></a></li>
+            </ul>
+        </div>
+    </div>
+</footer>
+<!-- reserv button -->
+        <a href="/viewing/reservIndex.do?curr_menu_cd=0101020000" class="btn-quick-reserv" >
+            <img src="/v1/images/common/ico_reserv.png" alt="">
+            <span>예약하기</span>
+        </a>
+<!-- sns buttons -->
+<div class="quick-social">
+    <a href="https://www.facebook.com/Hangeul.Museum" target="_blank" title="새 창 열림"><img src="/v1/images/common/ico_social_facebook.png" alt="페이스북"></a>
+    <a href="https://www.instagram.com/hangeul_m" target="_blank" title="새 창 열림"><img src="/v1/images/common/ico_social_instagram.png" alt="인스타그램"></a>
+    <a href="https://blog.naver.com/hangeul_m" target="_blank" title="새 창 열림"><img src="/v1/images/common/ico_social_nblog.png" alt="네이버블로그"></a>
+    <a href="https://www.youtube.com/channel/UCkhi9ZGyfs-G1-6FFLWS1LA" target="_blank" title="새 창 열림"><img src="/v1/images/common/ico_social_youtube.png" alt="유튜브채널"></a>
+</div>
+<!-- top button -->
+<button class="btn-top"><img src="/v1/images/common/btn_top.png" alt="TOP">맨 위로</button>
+    <!-- // Footer -->
+</div>
+</body>
+</html>
