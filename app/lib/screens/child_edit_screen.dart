@@ -7,9 +7,12 @@ import '../data/repository.dart';
 
 /// 자녀 추가·수정. 저장·삭제하면 pop(true).
 class ChildEditScreen extends StatefulWidget {
-  const ChildEditScreen({super.key, required this.repo, this.child});
+  const ChildEditScreen({super.key, required this.repo, this.child, this.onDone});
   final EduRepository repo;
   final Child? child;
+
+  /// 있으면 저장 후 pop 대신 호출 (첫 실행 흐름에서 루트 화면으로 쓸 때).
+  final VoidCallback? onDone;
 
   @override
   State<ChildEditScreen> createState() => _ChildEditScreenState();
@@ -59,7 +62,9 @@ class _ChildEditScreenState extends State<ChildEditScreen> {
     setState(() => _busy = true);
     try {
       await action();
-      if (mounted) Navigator.of(context).pop(true);
+      if (!mounted) return;
+      final done = widget.onDone;
+      done != null ? done() : Navigator.of(context).pop(true);
     } catch (_) {
       if (mounted) {
         ScaffoldMessenger.of(context)

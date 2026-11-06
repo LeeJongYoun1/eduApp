@@ -6,8 +6,11 @@ import '../regions.dart';
 
 /// 관심 지역(서울·경기 시군구 복수 선택). 저장하면 pop(true).
 class RegionScreen extends StatefulWidget {
-  const RegionScreen({super.key, required this.repo});
+  const RegionScreen({super.key, required this.repo, this.onDone});
   final EduRepository repo;
+
+  /// 있으면 저장 후 pop 대신 호출 (첫 실행 흐름에서 루트 화면으로 쓸 때).
+  final VoidCallback? onDone;
 
   @override
   State<RegionScreen> createState() => _RegionScreenState();
@@ -38,7 +41,9 @@ class _RegionScreenState extends State<RegionScreen> {
     setState(() => _busy = true);
     try {
       await widget.repo.saveRegions(_selected!);
-      if (mounted) Navigator.of(context).pop(true);
+      if (!mounted) return;
+      final done = widget.onDone;
+      done != null ? done() : Navigator.of(context).pop(true);
     } catch (_) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('저장하지 못했어요. 다시 시도해 주세요')));
