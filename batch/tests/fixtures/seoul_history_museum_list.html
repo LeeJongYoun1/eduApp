@@ -1,0 +1,1171 @@
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+	
+	
+	
+	
+		
+
+
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="ko" lang="ko">
+<head>
+<title>목록</title>
+
+	<script src="/resources/spi/jquery/jquery.highlight.js"></script>
+	<script src="/resources/spi/jquery/cluetip/jquery.cluetip.js"></script>
+	<script src="/resources/spi/jquery/jquery.bgiframe.js"></script>
+	<script src="/resources/solutions/board/js/web.board.basic.js"></script>
+
+	<!-- 사용자 스크립트 시작  -->
+	<script>
+//<![CDATA[
+	// 카테고리 저장용
+	bbsCtgAry = new Array();
+
+	$().ready( function() {
+
+		//게시판 설정값들을 초기화 합니다.
+		if (typeof OpenWorks == "undefined") {OpenWorks = {};}
+		OpenWorks.pageType		= "LIST";
+		OpenWorks.boardNm		= "교육예약";
+		OpenWorks.boardType		= "1001";
+		OpenWorks.useCategory	= "Y";
+		OpenWorks.fileYn		= "Y";
+		OpenWorks.fileExts		= "hwp|doc|pdf|jpg|gif";
+		OpenWorks.captchaYn		= "N";
+		OpenWorks.bbsNm			= "교육예약";
+		OpenWorks.bbsCd			= "1005";
+		OpenWorks.searchVal		= "";
+		OpenWorks.searchKey		= "";
+		OpenWorks.sortName		= "";
+		OpenWorks.sortOrder		= "";
+		OpenWorks.startDt		= "";
+		OpenWorks.endDt			= "";
+		OpenWorks.showSummaryYn = "";
+		OpenWorks.loginGrade	= "0";
+		OpenWorks.webYn			= "Y";
+		OpenWorks.serverNm		= "http://" + "museum.seoul.go.kr" +"/www"+ "/board/NR_convertAction.do";
+
+		onReadyEventFunctions();
+
+		/*
+		// 검색 날짜 입력
+		var buttonImage = "/resources/images/guro_img/board/day.gif";
+		$('#startDtVal').datepicker({
+			dateFormat:"yy-mm-dd",
+			buttonText: '시작일',
+			showOn: 'button',
+			buttonImage: buttonImage,
+			buttonImageOnly: true
+		});
+		$('#endDtVal').datepicker({
+			dateFormat:"yy-mm-dd",
+			buttonText: '종료일',
+			showOn: 'button',
+			buttonImage: buttonImage,
+			buttonImageOnly: true
+		});
+		*/
+
+	});
+	// end of onReady
+//]]>
+	</script>
+	<!-- 사용자 스크립트 끝  -->
+
+</head>
+
+<body>
+	<!-- 20220427 start -->
+	<div class="info_box">
+		<img src="/www/share/images/common/info_icon01.png" alt="">
+		<div class="info_texts">
+			<p>
+				서울역사박물관 문자소식을 신청하시면 전시, 교육, 행사 등의 소식을 문자로 받아보실 수 있습니다.
+				<br class="mobile_none">신청방법은 박물관이용 / 멤버십메뉴 참조하세요 (발송주기는 주1회 정도)
+			</p>
+			<a href="/www/guide/mem/guideMemInfo.jsp" class="btn basic">멤버십안내 문자신청 바로가기</a>
+		</div>
+	</div>
+	<!-- 20220427 end -->
+
+	<div id="contents">
+
+		<!-- contents : str -->
+		<!-- 검색 폼 -->
+		<form name="dataForm" id="dataForm" method="get" action="NR_boardList.jsp" onsubmit="return jsSearchAction()">
+
+		<fieldset>
+			<legend>검색</legend>
+			<!-- 기본 검색 사항 -->
+			<input type="hidden" name="actionUri" id="actionUri" value="" />
+			<input type="hidden" name="actionMethod" value="" />
+			<input type="hidden" name="bbsCd" value="1005" />
+			<input type="hidden" name="seq" value="" />
+			<input type="hidden" name="currentPage" value="" />
+			<input type="hidden" name="ctgCd" id="ctgCd" value="" />
+			<input type="hidden" name="sortName" value="" />
+			<input type="hidden" name="sortOrder" value="" />
+			<input type="hidden" name="startDt" value="" />
+			<input type="hidden" name="endDt" value="" />
+			<input type="hidden" name="pageType" value="" />
+			<input type="hidden" name="regPwd" value="" />
+			<input type="hidden" name="showSummaryYn" value="" />
+			<input type="hidden" name="rssYn" id="rssYn" value="" />
+
+		</fieldset>
+		<!-- 검색 삽입. -->
+		
+			
+
+
+
+	<script src="/resources/spi/jquery/ui/datepicker/calendar.js"></script>
+	<script>
+	</script>
+	<table class="tb_search edu_search">
+		<caption>교육예약의 검색조건 입력을 위한 표로 대상, 접수상태, 검색조건(제목/내용) 등으로 검색할 수 있습니다.</caption>
+		<colgroup>
+			<col style="width:100px;" />
+			<col />
+			<col style="width:100px;" />
+			<col />
+		</colgroup>
+		<tbody>
+			<tr>
+				<th scope="row"><label for="categoryVal">대상</label></th>
+				<td>
+					
+						<script>
+						
+							bbsCtgAry['1001'] = '유아';
+						
+							bbsCtgAry['1002'] = '어린이';
+						
+							bbsCtgAry['1003'] = '청소년';
+						
+							bbsCtgAry['1004'] = '가족';
+						
+							bbsCtgAry['1005'] = '성인';
+						
+							bbsCtgAry['1006'] = '나눔';
+						
+							bbsCtgAry['1007'] = '전문';
+						
+							bbsCtgAry['1008'] = '외국인';
+						
+						</script>
+						<noscript>분류를 표시하려면 스크립트를 지원해야 합니다.</noscript>
+						
+						
+						<select id="categoryVal" name="categoryVal" title="대상" class="full">
+							<option value="">- 전 체 -</option>
+							
+								<option value="1001" >유아</option>
+							
+								<option value="1002" >어린이</option>
+							
+								<option value="1003" >청소년</option>
+							
+								<option value="1004" >가족</option>
+							
+								<option value="1005" >성인</option>
+							
+								<option value="1006" >나눔</option>
+							
+								<option value="1007" >전문</option>
+							
+								<option value="1008" >외국인</option>
+							
+						</select>
+					
+				</td>
+				<th scope="row">
+					접수상태
+				</th>
+				<td >
+					<select name="q_applyState" id="q_applyState" title="접수상태 선택" class="full">
+						<option>- 전 체 -</option>
+						<option value="1001" >안내</option>
+						<option value="1002" selected="selected">접수중</option>
+						<option value="1003" >마감</option>
+					</select>
+				</td>
+			</tr>
+			<tr>
+				<th scope="row"><label for="categoryVal">검색 조건</label></th>
+				<td colspan="3">
+					<select name="searchKey" id="searchKey" class="half" title="검색 조건 선택">
+						<option value="">- 전 체 -</option>
+						
+							
+							<option value="TITLE___1002" >
+								
+									
+										제목
+									
+									
+								
+							</option>
+						
+							
+							<option value="CONTENTS___1002" >
+								
+									
+										내용
+									
+									
+								
+							</option>
+						
+					</select>
+					<input type="text" id="searchVal" name="searchVal" class="i_keyword i_md m_left_mg0 m_top_mg8" title="검색어 입력" placeholder="검색어를 입력해주세요." value="" />
+					<span class="mobile_none">
+						<button type="submit" class="btn search">검색</button>
+						<a href="NR_boardList.do?bbsCd=1005&amp;categoryVal=all" class="btn basic list_all">전체목록</a>
+					</span>
+				</td>
+			</tr>
+		</tbody>
+	</table>
+	<div class="mobile_block edu_searchBtn">
+		<button type="submit" class="btn search">검색</button>
+		<a href="NR_boardList.do?bbsCd=1005&amp;categoryVal=all" class="btn basic list_all">전체목록</a>
+	</div>
+		
+
+		<div class="list_ctrl">
+			<p class="bbs_info">
+			 <span>[페이지 : 1/1]</span>
+			 <span>[전체목록 : 9건]</span>
+			</p>
+		</div>
+
+		
+
+
+
+
+
+
+
+
+
+<!-- 게시판 목록 시작 -->
+
+<table id="boardTbl" class="tb_list list_board">
+    <caption>교육예약 정보를 나타낸 표로 번호, 대상, 교육과정명, 교육기간, 접수상태, 접수기간, 접수/선정 으로 구성되어 있습니다.</caption>
+    <colgroup>
+        
+        <col style="width:5%" />
+        
+        
+            
+            <col style="width:8%" />
+        
+        
+        
+        <col />
+
+        
+        <col style="width:13%" />
+
+        
+        <col style="width:8%" />
+
+        
+        <col style="width:13%" />
+
+        
+        <col style="width:9%" />
+        
+    </colgroup>
+    <thead>
+        <tr>
+            <th scope="col">번호</th>
+            
+                <th scope="col">대상</th>
+            
+            <th scope="col">교육과정명</th>
+            <th scope="col">교육기간</th>
+            <th scope="col">접수상태</th>
+            <th scope="col">접수기간</th>
+            <th scope="col">접수/선정</th>
+        </tr>
+    </thead>
+    <tbody>
+    <!-- 공지 목록  -->
+    
+    
+    
+        <tr>
+            <td class="m_list_none">
+                
+                    
+                    
+                    
+                        9
+                    
+                
+            </td>
+            
+                <td class="m_list_none">
+                	
+                		
+                			가족
+                		
+                		
+                	
+                </td>
+            
+            <td class="al m_edu_title">
+
+                
+
+                
+                    
+                        <a href="#"
+                            onclick="jsViewAction('1005', '20261021153443848', 'N', 'Y'); return false;">
+                            2026년 겨울학기 &#039;한밤의 역사기행&#039; 모집
+                            
+                        </a>
+                    
+                    
+                
+
+                
+                    
+                
+
+                
+
+                
+                    <span class="ico_file">첨부파일 2개 있음</span>
+                
+
+                
+
+                
+
+            </td>
+
+            <td class="m_edu_fl">
+            	<span>교육기간</span>
+                2026-11-06~<br/>2026-11-27
+            </td>
+
+            <td class="m_edu_fr">
+                
+                    
+                        
+                            
+                                <span style="color: #e5002b;">접수중</span>
+                            
+                            
+                            
+                        
+                    
+                    
+                
+                
+            </td>
+
+            <td class="m_edu_fl">
+            	<span>접수기간</span>
+                2026-10-26~<br/>2026-11-20
+            </td>
+
+            <td class="m_edu_fr">
+            	온라인
+                <br />
+                선착순
+            </td>
+
+        </tr>
+
+    
+        <tr>
+            <td class="m_list_none">
+                
+                    
+                    
+                    
+                        8
+                    
+                
+            </td>
+            
+                <td class="m_list_none">
+                	
+                		
+                			외국인
+                		
+                		
+                	
+                </td>
+            
+            <td class="al m_edu_title">
+
+                
+
+                
+                    
+                        <a href="#"
+                            onclick="jsViewAction('1005', '20261023133311301', 'N', 'Y'); return false;">
+                            2026년 11월 SEMU-YEOL LECTURE(세뮤 예올)
+                            
+                        </a>
+                    
+                    
+                
+
+                
+                    
+                
+
+                
+
+                
+                    <span class="ico_file">첨부파일 1개 있음</span>
+                
+
+                
+
+                
+
+            </td>
+
+            <td class="m_edu_fl">
+            	<span>교육기간</span>
+                2026-11-12~<br/>2026-11-12
+            </td>
+
+            <td class="m_edu_fr">
+                
+                    
+                        
+                            
+                                <span style="color: #e5002b;">접수중</span>
+                            
+                            
+                            
+                        
+                    
+                    
+                
+                
+            </td>
+
+            <td class="m_edu_fl">
+            	<span>접수기간</span>
+                2026-10-23~<br/>2026-11-11
+            </td>
+
+            <td class="m_edu_fr">
+            	온라인
+                <br />
+                선착순
+            </td>
+
+        </tr>
+
+    
+        <tr>
+            <td class="m_list_none">
+                
+                    
+                    
+                    
+                        7
+                    
+                
+            </td>
+            
+                <td class="m_list_none">
+                	
+                		
+                			어린이
+                		
+                		
+                	
+                </td>
+            
+            <td class="al m_edu_title">
+
+                
+
+                
+                    
+                        <a href="#"
+                            onclick="jsViewAction('1005', '20261015152427523', 'N', 'Y'); return false;">
+                            [서울생활사박물관] (추가모집)2026년 조각조각 서울이야기 엮기 교육생 모집(초등5~6학년 학급단체)
+                            
+                        </a>
+                    
+                    
+                
+
+                
+                    
+                
+
+                
+
+                
+                    <span class="ico_file">첨부파일 1개 있음</span>
+                
+
+                
+
+                
+
+            </td>
+
+            <td class="m_edu_fl">
+            	<span>교육기간</span>
+                2026-12-09~<br/>2026-12-09
+            </td>
+
+            <td class="m_edu_fr">
+                
+                    
+                        
+                            
+                                <span style="color: #e5002b;">접수중</span>
+                            
+                            
+                            
+                        
+                    
+                    
+                
+                
+            </td>
+
+            <td class="m_edu_fl">
+            	<span>접수기간</span>
+                2026-10-15~<br/>2026-11-13
+            </td>
+
+            <td class="m_edu_fr">
+            	온라인
+                <br />
+                선착순
+            </td>
+
+        </tr>
+
+    
+        <tr>
+            <td class="m_list_none">
+                
+                    
+                    
+                    
+                        6
+                    
+                
+            </td>
+            
+                <td class="m_list_none">
+                	
+                		
+                			가족
+                		
+                		
+                	
+                </td>
+            
+            <td class="al m_edu_title">
+
+                
+
+                
+                    
+                        <a href="#"
+                            onclick="jsViewAction('1005', '20260922112035208', 'N', 'Y'); return false;">
+                            [서울생활사박물관] 2026년 하반기 가족 생활사 공작소(초등학생 동반 가족)
+                            
+                        </a>
+                    
+                    
+                
+
+                
+                    
+                
+
+                
+
+                
+                    <span class="ico_file">첨부파일 1개 있음</span>
+                
+
+                
+
+                
+
+            </td>
+
+            <td class="m_edu_fl">
+            	<span>교육기간</span>
+                2026-10-10~<br/>2026-12-12
+            </td>
+
+            <td class="m_edu_fr">
+                
+                    
+                        
+                            
+                                <span style="color: #e5002b;">접수중</span>
+                            
+                            
+                            
+                        
+                    
+                    
+                
+                
+            </td>
+
+            <td class="m_edu_fl">
+            	<span>접수기간</span>
+                2026-09-30~<br/>2026-12-08
+            </td>
+
+            <td class="m_edu_fr">
+            	온라인
+                <br />
+                선착순
+            </td>
+
+        </tr>
+
+    
+        <tr>
+            <td class="m_list_none">
+                
+                    
+                    
+                    
+                        5
+                    
+                
+            </td>
+            
+                <td class="m_list_none">
+                	
+                		
+                			어린이
+                		
+                		
+                	
+                </td>
+            
+            <td class="al m_edu_title">
+
+                
+
+                
+                    
+                        <a href="#"
+                            onclick="jsViewAction('1005', '20260831092528017', 'N', 'Y'); return false;">
+                            [청계천박물관] 2026년 11월 초등1~3학년 학급단체 교육 &lt;씽씽! 청계천 시간여행&gt; 모집 안내
+                            
+                        </a>
+                    
+                    
+                
+
+                
+                    
+                
+
+                
+
+                
+                    <span class="ico_file">첨부파일 1개 있음</span>
+                
+
+                
+
+                
+
+            </td>
+
+            <td class="m_edu_fl">
+            	<span>교육기간</span>
+                2026-11-04~<br/>2026-11-27
+            </td>
+
+            <td class="m_edu_fr">
+                
+                    
+                        
+                            
+                                <span style="color: #e5002b;">접수중</span>
+                            
+                            
+                            
+                        
+                    
+                    
+                
+                
+            </td>
+
+            <td class="m_edu_fl">
+            	<span>접수기간</span>
+                2026-09-07~<br/>2026-11-17
+            </td>
+
+            <td class="m_edu_fr">
+            	온라인
+                <br />
+                선착순
+            </td>
+
+        </tr>
+
+    
+        <tr>
+            <td class="m_list_none">
+                
+                    
+                    
+                    
+                        4
+                    
+                
+            </td>
+            
+                <td class="m_list_none">
+                	
+                		
+                			가족
+                		
+                		
+                	
+                </td>
+            
+            <td class="al m_edu_title">
+
+                
+
+                
+                    
+                        <a href="#"
+                            onclick="jsViewAction('1005', '20260806132547293', 'N', 'Y'); return false;">
+                            2026년 하반기 &#039;우리 가족 경희궁 탐험대&#039; 교육생 모집
+                            
+                        </a>
+                    
+                    
+                
+
+                
+                    
+                
+
+                
+
+                
+                    <span class="ico_file">첨부파일 1개 있음</span>
+                
+
+                
+
+                
+
+            </td>
+
+            <td class="m_edu_fl">
+            	<span>교육기간</span>
+                2026-09-05~<br/>2026-11-21
+            </td>
+
+            <td class="m_edu_fr">
+                
+                    
+                        
+                            
+                                <span style="color: #e5002b;">접수중</span>
+                            
+                            
+                            
+                        
+                    
+                    
+                
+                
+            </td>
+
+            <td class="m_edu_fl">
+            	<span>접수기간</span>
+                2026-08-24~<br/>2026-11-15
+            </td>
+
+            <td class="m_edu_fr">
+            	온라인
+                <br />
+                선착순
+            </td>
+
+        </tr>
+
+    
+        <tr>
+            <td class="m_list_none">
+                
+                    
+                    
+                    
+                        3
+                    
+                
+            </td>
+            
+                <td class="m_list_none">
+                	
+                		
+                			가족
+                		
+                		
+                	
+                </td>
+            
+            <td class="al m_edu_title">
+
+                
+
+                
+                    
+                        <a href="#"
+                            onclick="jsViewAction('1005', '20260811154712925', 'N', 'Y'); return false;">
+                            2026 하반기 &lt;우리 가족 박물관 여행(주말)&gt; 수강생 모집
+                            
+                        </a>
+                    
+                    
+                
+
+                
+                    
+                
+
+                
+
+                
+                    <span class="ico_file">첨부파일 1개 있음</span>
+                
+
+                
+
+                
+
+            </td>
+
+            <td class="m_edu_fl">
+            	<span>교육기간</span>
+                2026-08-29~<br/>2026-12-19
+            </td>
+
+            <td class="m_edu_fr">
+                
+                    
+                        
+                            
+                                <span style="color: #e5002b;">접수중</span>
+                            
+                            
+                            
+                        
+                    
+                    
+                
+                
+            </td>
+
+            <td class="m_edu_fl">
+            	<span>접수기간</span>
+                2026-08-18~<br/>2026-12-16
+            </td>
+
+            <td class="m_edu_fr">
+            	온라인
+                <br />
+                선착순
+            </td>
+
+        </tr>
+
+    
+        <tr>
+            <td class="m_list_none">
+                
+                    
+                    
+                    
+                        2
+                    
+                
+            </td>
+            
+                <td class="m_list_none">
+                	
+                		
+                			나눔
+                		
+                		
+                	
+                </td>
+            
+            <td class="al m_edu_title">
+
+                
+
+                
+                    
+                        <a href="#"
+                            onclick="jsViewAction('1005', '20260723104316247', 'N', 'Y'); return false;">
+                            [청계천박물관] 2026년 하반기 온라인 교육 &lt;톡톡톡 청계천&gt; 모집 안내
+                            
+                        </a>
+                    
+                    
+                
+
+                
+                    
+                
+
+                
+
+                
+                    <span class="ico_file">첨부파일 1개 있음</span>
+                
+
+                
+
+                
+
+            </td>
+
+            <td class="m_edu_fl">
+            	<span>교육기간</span>
+                2026-08-26~<br/>2026-11-25
+            </td>
+
+            <td class="m_edu_fr">
+                
+                    
+                        
+                            
+                                <span style="color: #e5002b;">접수중</span>
+                            
+                            
+                            
+                        
+                    
+                    
+                
+                
+            </td>
+
+            <td class="m_edu_fl">
+            	<span>접수기간</span>
+                2026-08-03~<br/>2026-11-16
+            </td>
+
+            <td class="m_edu_fr">
+            	온라인
+                <br />
+                선착순
+            </td>
+
+        </tr>
+
+    
+        <tr>
+            <td class="m_list_none">
+                
+                    
+                    
+                    
+                        1
+                    
+                
+            </td>
+            
+                <td class="m_list_none">
+                	
+                		
+                			외국인
+                		
+                		
+                	
+                </td>
+            
+            <td class="al m_edu_title">
+
+                
+
+                
+                    
+                        <a href="#"
+                            onclick="jsViewAction('1005', '20260310132118331', 'N', 'Y'); return false;">
+                            2026 &#034;Visit Museum, Enjoy Seoul&#034; 모집 안내
+                            
+                        </a>
+                    
+                    
+                
+
+                
+                    
+                
+
+                
+
+                
+                    <span class="ico_file">첨부파일 3개 있음</span>
+                
+
+                
+
+                
+
+            </td>
+
+            <td class="m_edu_fl">
+            	<span>교육기간</span>
+                2026-04-01~<br/>2026-12-31
+            </td>
+
+            <td class="m_edu_fr">
+                
+                    
+                        
+                            
+                                <span style="color: #e5002b;">접수중</span>
+                            
+                            
+                            
+                        
+                    
+                    
+                
+                
+            </td>
+
+            <td class="m_edu_fl">
+            	<span>접수기간</span>
+                2026-03-10~<br/>2026-12-24
+            </td>
+
+            <td class="m_edu_fr">
+            	온라인
+                <br />
+                추첨
+            </td>
+
+        </tr>
+
+    
+    
+    </tbody>
+</table>
+<!-- 게시판 목록 끝 -->
+
+
+
+		
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    
+        
+        
+        
+        
+        
+    
+    
+
+
+        
+            
+            
+            
+            
+            
+			
+			
+			
+            
+            <div class="paging">
+                
+                    
+                        
+                        
+                            
+                                <strong>1</strong>
+                            
+                            
+                        
+                        
+                    
+                    
+                
+            </div>
+            
+        
+
+
+
+		
+		
+		<!-- contents : end -->
+
+		</form>
+	</div>
+</body>
+</html>
+
+
+
+	

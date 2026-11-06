@@ -38,3 +38,9 @@ COLLECTORS["korea_job_world"] = KoreaJobWorld()
 from .seoul_grand_park import SeoulGrandPark  # noqa: E402
 
 COLLECTORS["seoul_grand_park"] = SeoulGrandPark()
+from .seoul_history_museum import SeoulHistoryMuseum  # noqa: E402
+
+COLLECTORS["seoul_history_museum"] = SeoulHistoryMuseum()
+from .folk_museum import FolkMuseum  # noqa: E402
+
+COLLECTORS["folk_museum"] = FolkMuseum()
