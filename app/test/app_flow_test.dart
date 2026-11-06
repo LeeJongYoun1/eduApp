@@ -60,7 +60,7 @@ void main() {
     expect(find.textContaining('경기 성남시'), findsOneWidget);
     await t.tap(find.widgetWithText(NavigationDestination, '체험'));
     await t.pumpAndSettle();
-    expect(find.text('관심 지역에 진행 중인 프로그램이 없어요'), findsOneWidget);
+    expect(find.text('4학년에 맞는 프로그램이 없어요'), findsOneWidget);
   });
 
   testWidgets('sign out returns to login', (t) async {

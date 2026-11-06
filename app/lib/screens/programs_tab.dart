@@ -75,7 +75,10 @@ class _ProgramsTabState extends State<ProgramsTab> {
     if (d == _Dates.custom) {
       final day = DateTime(today.year, today.month, today.day);
       final r = await showDateRangePicker(
-          context: context, firstDate: day, lastDate: day.add(const Duration(days: 365)));
+        context: context,
+        firstDate: day,
+        lastDate: day.add(const Duration(days: 365)),
+      );
       if (r == null) return;
       _range = (r.start, r.end);
     } else {
@@ -98,9 +101,12 @@ class _ProgramsTabState extends State<ProgramsTab> {
   }
 
   Future<void> _openDetail(ProgramItem p) async {
-    final fav = await Navigator.of(context).push<bool>(MaterialPageRoute(
-        builder: (_) => ProgramDetailScreen(
-            repo: widget.repo, program: p, favorite: _favorites.contains(p.id), now: widget.now)));
+    final fav = await Navigator.of(context).push<bool>(
+      MaterialPageRoute(
+        builder: (_) =>
+            ProgramDetailScreen(repo: widget.repo, program: p, favorite: _favorites.contains(p.id), now: widget.now),
+      ),
+    );
     if (fav != null && mounted) setState(() => fav ? _favorites.add(p.id) : _favorites.remove(p.id));
   }
 
@@ -113,27 +119,33 @@ class _ProgramsTabState extends State<ProgramsTab> {
   Widget _filters() {
     final today = widget.now();
     Widget choice(String label, bool selected, VoidCallback onTap) => Padding(
-          padding: const EdgeInsets.only(right: 8),
-          child: ChoiceChip(label: Text(label), selected: selected, onSelected: (_) => onTap()),
-        );
+      padding: const EdgeInsets.only(right: 8),
+      child: ChoiceChip(label: Text(label), selected: selected, onSelected: (_) => onTap()),
+    );
     Widget row(List<Widget> chips) => SingleChildScrollView(
-          scrollDirection: Axis.horizontal,
-          padding: const EdgeInsets.symmetric(horizontal: 16),
-          child: Row(children: chips),
-        );
-    return Column(children: [
-      row([
-        for (final c in _children ?? const <Child>[]) choice('${c.nickname} ${c.grade}학년', _child == c, () => _pickChild(c)),
-        choice('모든 학년', _child == null, () => _pickChild(null)),
-      ]),
-      row([
-        choice('전체', _dates == _Dates.all, () => _pickDates(_Dates.all)),
-        choice('이번 주말', _dates == _Dates.weekend, () => _pickDates(_Dates.weekend)),
-        choice(_dates == _Dates.custom ? fmtPeriod(_range!.$1, _range!.$2, today) : '날짜 선택',
-            _dates == _Dates.custom, () => _pickDates(_Dates.custom)),
-        FilterChip(label: const Text('관심만'), selected: _favOnly, onSelected: (v) => setState(() => _favOnly = v)),
-      ]),
-    ]);
+      scrollDirection: Axis.horizontal,
+      padding: const EdgeInsets.symmetric(horizontal: 16),
+      child: Row(children: chips),
+    );
+    return Column(
+      children: [
+        row([
+          for (final c in _children ?? const <Child>[])
+            choice('${c.nickname} ${c.grade}학년', _child == c, () => _pickChild(c)),
+          choice('모든 학년', _child == null, () => _pickChild(null)),
+        ]),
+        row([
+          choice('전체', _dates == _Dates.all, () => _pickDates(_Dates.all)),
+          choice('이번 주말', _dates == _Dates.weekend, () => _pickDates(_Dates.weekend)),
+          choice(
+            _dates == _Dates.custom ? fmtPeriod(_range!.$1, _range!.$2, today) : '날짜 선택',
+            _dates == _Dates.custom,
+            () => _pickDates(_Dates.custom),
+          ),
+          FilterChip(label: const Text('관심만'), selected: _favOnly, onSelected: (v) => setState(() => _favOnly = v)),
+        ]),
+      ],
+    );
   }
 
   Widget _body() {
@@ -143,10 +155,15 @@ class _ProgramsTabState extends State<ProgramsTab> {
     }
     final list = _favOnly ? _programs!.where((p) => _favorites.contains(p.id)).toList() : _programs!;
     if (list.isEmpty) {
-      return _favOnly
-          ? _message('관심 표시한 프로그램이 없어요', null)
-          : _message('관심 지역에 진행 중인 프로그램이 없어요',
-              OutlinedButton(onPressed: _changeRegions, child: const Text('지역 바꾸기')));
+      if (_favOnly) return _message('관심 표시한 프로그램이 없어요', null);
+      final child = _child;
+      if (child != null) {
+        return _message(
+          '${child.grade}학년에 맞는 프로그램이 없어요',
+          OutlinedButton(onPressed: () => _pickChild(null), child: const Text('모든 학년 보기')),
+        );
+      }
+      return _message('관심 지역에 진행 중인 프로그램이 없어요', OutlinedButton(onPressed: _changeRegions, child: const Text('지역 바꾸기')));
     }
     final now = widget.now();
     return ListView.separated(
@@ -164,17 +181,19 @@ class _ProgramsTabState extends State<ProgramsTab> {
   }
 
   Widget _message(String text, Widget? action) => ListView(
-        padding: const EdgeInsets.all(32),
-        children: [
-          Text(text, textAlign: TextAlign.center),
-          if (action != null) ...[const SizedBox(height: 16), Center(child: action)],
-        ],
-      );
+    padding: const EdgeInsets.all(32),
+    children: [
+      Text(text, textAlign: TextAlign.center),
+      if (action != null) ...[const SizedBox(height: 16), Center(child: action)],
+    ],
+  );
 
   @override
-  Widget build(BuildContext context) => Column(children: [
-        const SizedBox(height: 8),
-        _filters(),
-        Expanded(child: _body()),
-      ]);
+  Widget build(BuildContext context) => Column(
+    children: [
+      const SizedBox(height: 8),
+      _filters(),
+      Expanded(child: _body()),
+    ],
+  );
 }

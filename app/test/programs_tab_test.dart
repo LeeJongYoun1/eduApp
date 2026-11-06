@@ -98,6 +98,8 @@ void main() {
   testWidgets('empty state', (t) async {
     final repo = FakeRepository(signedIn: true, children: [seojun]);
     await open(t, repo);
+    await t.tap(find.text('모든 학년'));
+    await t.pumpAndSettle();
     expect(find.text('관심 지역에 진행 중인 프로그램이 없어요'), findsOneWidget);
     expect(find.text('지역 바꾸기'), findsOneWidget);
   });
@@ -117,5 +119,16 @@ void main() {
     await t.tap(find.text('하나'));
     await t.pumpAndSettle();
     expect(find.byType(ProgramDetailScreen), findsOneWidget);
+  });
+
+  testWidgets('empty because of grade offers all grades', (t) async {
+    final repo = FakeRepository(signedIn: true, children: [seojun]);
+    await open(t, repo);
+    expect(find.text('4학년에 맞는 프로그램이 없어요'), findsOneWidget);
+    repo.programList = [prog(1, title: '하나')];
+    await t.tap(find.text('모든 학년 보기'));
+    await t.pumpAndSettle();
+    expect(repo.calls.last, 'programs(null,null,null)');
+    expect(find.text('하나'), findsOneWidget);
   });
 }
