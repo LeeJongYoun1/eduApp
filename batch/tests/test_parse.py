@@ -51,3 +51,7 @@ def test_parse_datetime_without_time_is_none():
 ])
 def test_parse_grades(text, expected):
     assert parse_grades(text) == expected
+
+
+def test_parse_grades_open_ended():
+    assert parse_grades("초등 5학년 이상") == (5, 6)

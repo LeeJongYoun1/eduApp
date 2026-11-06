@@ -42,3 +42,12 @@ def test_list_urls_cover_this_and_next_month():
 
 def test_registered():
     assert COLLECTORS["gwacheon_science"].institution.sido == "경기"
+
+
+def test_collect_reads_every_list_url():
+    seen = []
+    def fetch(url):
+        seen.append(url)
+        return FIXTURE
+    progs = GwacheonScience(today=date(2026, 11, 6)).collect(fetch, date(2026, 11, 6))
+    assert len(seen) == 2 and len(progs) == 60

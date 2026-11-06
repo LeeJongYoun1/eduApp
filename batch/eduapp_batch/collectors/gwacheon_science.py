@@ -24,6 +24,9 @@ class GwacheonScience:
         months = [(y, m), (y + m // 12, m % 12 + 1)]  # 이번 달, 다음 달
         return [f"{BASE}/eduList.json?srchCtgry={ELEMENTARY}&srchYear={y}&srchMonth={m}" for y, m in months]
 
+    def collect(self, fetch, today: date) -> list[Program]:
+        return [p for url in self.list_urls for p in self.parse(fetch(url), url, today)]
+
     def parse(self, html: str, page_url: str, today: date) -> list[Program]:
         out = []
         for o in json.loads(html)["lctreList"]:

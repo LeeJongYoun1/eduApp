@@ -7,12 +7,12 @@ TODAY = date(2026, 11, 6)
 
 
 class Fake:
-    def __init__(self, key, programs=None, error=None, fail_after_parse=False):
+    def __init__(self, key, programs=None, error=None):
         self.institution = Institution(key=key, name=key, sido="서울", sigungu=None, homepage_url="https://x")
-        self.list_urls = [f"https://x/{key}"]
         self._programs, self._error = programs or [], error
 
-    def parse(self, html, page_url, today):
+    def collect(self, fetch, today):
+        fetch(f"https://x/{self.institution.key}")
         if self._error:
             raise ValueError(self._error)
         return self._programs
@@ -45,3 +45,18 @@ def test_fetch_error_is_recorded(db):
         raise ConnectionError("timeout")
     result = run(db, {"a": Fake("a")}, bad_fetch, TODAY)
     assert "timeout" in result["a"]
+
+
+def test_fetch_retries_transient_errors(monkeypatch):
+    import httpx
+    from eduapp_batch import run_programs
+    calls = []
+
+    def flaky_get(url, **kw):
+        calls.append(url)
+        if len(calls) < 3:
+            raise httpx.ConnectError("reset")
+        return httpx.Response(200, text="ok", request=httpx.Request("GET", url))
+    monkeypatch.setattr(httpx, "get", flaky_get)
+    monkeypatch.setattr(run_programs.time, "sleep", lambda s: None)
+    assert run_programs._fetch("https://x") == "ok" and len(calls) == 3

@@ -52,4 +52,6 @@ def parse_grades(text: str) -> tuple[int, int] | None:
         return (1, 6) if "초등" in t else None
     if "세" in t:  # "7세~초2": 유아부터 시작하면 초등 1학년부터
         return 1, max(nums)
+    if "이상" in t:  # "초등 5학년 이상"
+        return min(nums), 6
     return min(nums), max(nums)

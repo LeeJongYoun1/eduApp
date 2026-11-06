@@ -2,6 +2,7 @@
 import json
 import os
 import sys
+import time
 from collections.abc import Callable
 from datetime import date, datetime
 
@@ -18,7 +19,7 @@ def run(conn, collectors: dict[str, Collector], fetch: Callable[[str], str], tod
     for key, c in collectors.items():
         try:
             with conn.transaction():  # 기관마다 따로 커밋: 한 곳 실패가 다른 곳을 되돌리지 않게
-                programs = [p for url in c.list_urls for p in c.parse(fetch(url), url, today)]
+                programs = c.collect(fetch, today)
                 count = upsert_programs(conn, ensure_institution(conn, c.institution), programs)
             record_run(conn, key, True, count, None)
             result[key] = count
@@ -29,10 +30,16 @@ def run(conn, collectors: dict[str, Collector], fetch: Callable[[str], str], tod
     return result
 
 
-def _fetch(url: str) -> str:
-    r = httpx.get(url, timeout=20, follow_redirects=True, headers={"User-Agent": "eduApp-collector"})
-    r.raise_for_status()
-    return r.text
+def _fetch(url: str, tries: int = 3) -> str:
+    for i in range(tries):
+        try:
+            r = httpx.get(url, timeout=20, follow_redirects=True, headers={"User-Agent": "eduApp-collector"})
+            r.raise_for_status()
+            return r.text
+        except httpx.TransportError:  # 연결 끊김 등 일시 오류만 재시도
+            if i == tries - 1:
+                raise
+            time.sleep(2 ** (i + 1))
 
 
 def main() -> int:
