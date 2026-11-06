@@ -1,6 +1,6 @@
-# eduApp 설계 문서 (v1)
+# eduApp 설계 문서 (v1) — 확정
 
-작성일: 2026-11-06
+작성일: 2026-11-06 · 확정: 2026-11-06
 
 ## 1. 의도와 이유
 
@@ -86,6 +86,29 @@
 - **DB/인증**: Supabase.
 - **푸시**: FCM (Firebase Cloud Messaging).
 - **배치**: Claude 예약 작업이 매일 1회 새 세션으로 실행. 수집 스크립트는 Python(hwp/pdf 처리 도구가 가장 풍부).
+
+### FE / BE / DB 구분과 저장소 구조
+
+| 구분 | 담당 | 하는 일 |
+|---|---|---|
+| FE | Flutter 앱 | 화면, 자녀·지역 선택, 알림 수신 |
+| BE | Supabase 자동 API + RLS | 데이터 조회, 권한 확인 |
+| BE | Edge Functions | 알림 발송, 운영자 승인, 학교 수집 요청 |
+| BE | Claude 예약 작업 + Python 스크립트 | 수집, AI 생성 (야간 배치) |
+| DB | Supabase Postgres | 학교, 교과서, 성취기준, 프로그램, 책, 사용자 |
+
+```
+eduApp/
+├── app/              # FE: Flutter 앱
+├── supabase/
+│   ├── migrations/   # DB: 테이블, RLS
+│   └── functions/    # BE: Edge Functions
+├── batch/            # BE: 수집 스크립트, AI 프롬프트, 예약 작업 지침
+└── docs/
+```
+
+- **인증**: Supabase Auth (JWT 발급). 자체 JWT 서버는 만들지 않는다 (아동 개인정보 보안 위험·개발량).
+- **별도 API 서버(3계층) 없음**: 실시간 AI 처리, Supabase 이탈, 다중 클라이언트가 필요해질 때 도입. 대비책으로 Flutter 앱의 데이터 접근 코드를 한 계층(repository)에 모아, 그때 그 부분만 바꾼다.
 
 ### 학교 선택 → 교과서 수집 흐름
 1. 사용자가 학교 선택 (나이스 학교 목록에서).
