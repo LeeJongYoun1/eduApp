@@ -24,3 +24,13 @@ class Program:
     apply_starts_at: datetime | None = None
     apply_ends_at: datetime | None = None
     fee: str | None = None
+
+
+@dataclass(frozen=True)
+class School:
+    neis_code: str
+    edu_office_code: str
+    name: str
+    sido: str
+    sigungu: str | None
+    homepage_url: str | None

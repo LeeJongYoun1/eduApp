@@ -59,7 +59,6 @@ def test_upcoming_view_hides_closed_applications(db):
 def test_textbook_correction_rejects_mismatched_textbook(db):
     uid = "00000000-0000-0000-0000-00000000000a"
     db.execute("insert into auth.users values (%s)", (uid,))
-    db.execute("insert into profiles (id) values (%s)", (uid,))
     db.execute("insert into schools (neis_code, edu_office_code, name, sido) values ('1', 'B10', '초', '서울')")
     db.execute("insert into children (parent_id, nickname, school_id, grade) values (%s, 'a', 1, 4)", (uid,))
     db.execute("insert into textbooks (subject, grade, publisher, title) values ('수학', 4, 'A', 'm'), ('과학', 4, 'A', 's')")

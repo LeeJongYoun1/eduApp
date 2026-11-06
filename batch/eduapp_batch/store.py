@@ -6,7 +6,7 @@ from datetime import date, datetime, timezone
 
 import httpx
 
-from .models import Institution, Program
+from .models import Institution, Program, School
 
 _COLS = [f.name for f in fields(Program)]
 
@@ -33,6 +33,19 @@ def upsert_programs(conn, institution_id: int, programs: list[Program]) -> int:
     return len(programs)
 
 
+def upsert_schools(conn, schools: list[School]) -> int:
+    """보낸 컬럼만 갱신 — collect_status 등 수집 상태는 그대로 둔다."""
+    with conn.cursor() as cur:
+        cur.executemany(
+            """insert into schools (neis_code, edu_office_code, name, sido, sigungu, homepage_url)
+               values (%(neis_code)s, %(edu_office_code)s, %(name)s, %(sido)s, %(sigungu)s, %(homepage_url)s)
+               on conflict (neis_code) do update set edu_office_code = excluded.edu_office_code,
+                 name = excluded.name, sido = excluded.sido, sigungu = excluded.sigungu,
+                 homepage_url = excluded.homepage_url""",
+            [asdict(s) for s in schools])
+    return len(schools)
+
+
 def record_run(conn, target: str, ok: bool, item_count: int | None, error: str | None) -> None:
     conn.execute(
         "insert into collect_runs (target, ok, item_count, error) values (%s, %s, %s, %s)",
@@ -54,6 +67,9 @@ class PgStore:
 
     def upsert_programs(self, institution_id: int, programs: list[Program]) -> int:
         return upsert_programs(self.conn, institution_id, programs)
+
+    def upsert_schools(self, schools: list[School]) -> int:
+        return upsert_schools(self.conn, schools)
 
     def record_run(self, target: str, ok: bool, item_count: int | None, error: str | None) -> None:
         record_run(self.conn, target, ok, item_count, error)
@@ -90,6 +106,12 @@ class RestStore:
             self._post("programs", rows, "resolution=merge-duplicates,return=minimal",
                        on_conflict="institution_id,source_id")
         return len(rows)
+
+    def upsert_schools(self, schools: list[School]) -> int:
+        if schools:
+            self._post("schools", [asdict(s) for s in schools], "resolution=merge-duplicates,return=minimal",
+                       on_conflict="neis_code")
+        return len(schools)
 
     def record_run(self, target: str, ok: bool, item_count: int | None, error: str | None) -> None:
         self._post("collect_runs", [{"target": target, "ok": ok, "item_count": item_count, "error": error}],
