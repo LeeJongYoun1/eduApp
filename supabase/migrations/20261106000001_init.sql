@@ -221,12 +221,13 @@ create table notifications (
 create index notifications_due_idx on notifications (send_at) where sent_at is null;
 
 -- ───────── 뷰 ─────────
--- 마감·종료된 프로그램은 앱에 보이지 않는다.
+-- 종료됐거나 접수가 마감된 프로그램은 앱에 보이지 않는다.
 create view upcoming_programs with (security_invoker = true) as
 select p.*, i.name as institution_name, i.sido, i.sigungu
 from programs p join institutions i on i.id = p.institution_id
-where coalesce(p.ends_on, p.starts_on) >= current_date
-   or (p.ends_on is null and p.starts_on is null and p.apply_ends_at >= now());
+where (coalesce(p.ends_on, p.starts_on) >= current_date
+       or (p.ends_on is null and p.starts_on is null and p.apply_ends_at >= now()))
+  and (p.apply_ends_at is null or p.apply_ends_at >= now());  -- 접수 마감도 숨김
 
 -- ───────── 트리거: 자녀 등록 시 학교 수집 요청 ─────────
 create function request_school_collect() returns trigger
@@ -252,6 +253,10 @@ declare c children;
 begin
   select * into c from children where id = p_child_id and parent_id = auth.uid();
   if not found then raise exception 'not your child'; end if;
+  if p_textbook_id is not null and not exists (
+    select 1 from textbooks where id = p_textbook_id and subject = p_subject and grade = c.grade) then
+    raise exception 'textbook does not match subject and grade';
+  end if;
   insert into school_textbooks (school_id, grade, subject, textbook_id, confidence, source, updated_at)
   values (c.school_id, c.grade, p_subject, p_textbook_id, 'confirmed', 'parent', now())
   on conflict (school_id, grade, subject) do update

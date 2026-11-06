@@ -16,10 +16,13 @@ def _short_year(month: int, day: int, today: date) -> date:
 
 
 def parse_date(text: str, today: date) -> date | None:
-    if m := _FULL.search(text):
-        return date(*map(int, m.groups()))
-    if m := _SHORT.search(text):
-        return _short_year(int(m[1]), int(m[2]), today)
+    try:
+        if m := _FULL.search(text):
+            return date(*map(int, m.groups()))
+        if m := _SHORT.search(text):
+            return _short_year(int(m[1]), int(m[2]), today)
+    except ValueError:  # "2.30" 같은 없는 날짜
+        pass
     return None
 
 
@@ -43,15 +46,16 @@ def parse_datetime(text: str, today: date) -> datetime | None:
 
 def parse_grades(text: str) -> tuple[int, int] | None:
     t = text.replace(" ", "")
-    if "전학년" in t or re.fullmatch(r"초등학생(전체)?", t):
-        return 1, 6
-    nums = [int(n) for n in re.findall(r"(?:초등?|^|[~\-])(\d)(?:학년)?", t) if 1 <= int(n) <= 6]
-    if "초" not in t and "학년" not in t:
-        return None
+    i = t.find("초")
+    if i < 0:  # 초등 언급 없음: 중·고·유아 대상
+        return (1, 6) if t == "전학년" else None
+    parts = re.split(r"중|고(?!학년)", t[i:], maxsplit=1)  # 초등 부분만, 뒤에 중·고가 이어지는지
+    nums = [int(n) for n in re.findall(r"(?<!\d)([1-6])(?![\d세년])", parts[0])]
     if not nums:
-        return (1, 6) if "초등" in t else None
-    if "세" in t:  # "7세~초2": 유아부터 시작하면 초등 1학년부터
-        return 1, max(nums)
-    if "이상" in t:  # "초등 5학년 이상"
-        return min(nums), 6
-    return min(nums), max(nums)
+        return (1, 3) if "저학년" in t else (4, 6) if "고학년" in t else (1, 6)
+    lo, hi = min(nums), max(nums)
+    if "세" in t[:i] or "이하" in t:  # "7세~초2", "초등 2학년 이하"
+        lo = 1
+    if "이상" in t or len(parts) > 1:  # "초등 5학년 이상", "초등 4학년~중등 2학년"
+        hi = 6
+    return lo, hi

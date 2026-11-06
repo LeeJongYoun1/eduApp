@@ -55,3 +55,23 @@ def test_parse_grades(text, expected):
 
 def test_parse_grades_open_ended():
     assert parse_grades("초등 5학년 이상") == (5, 6)
+
+
+@pytest.mark.parametrize("text,expected", [
+    ("중1~3학년", None),
+    ("고등학생 1~2학년", None),
+    ("중학교 전학년", None),
+    ("초등학생(3~6학년)", (3, 6)),
+    ("초등 3, 4학년", (3, 4)),
+    ("초등 4학년~중등 2학년", (4, 6)),
+    ("초등 2학년 이하", (1, 2)),
+    ("초등 저학년", (1, 3)),
+    ("초등 고학년", (4, 6)),
+])
+def test_parse_grades_real_world(text, expected):
+    assert parse_grades(text) == expected
+
+
+@pytest.mark.parametrize("text", ["2.30", "2026.13.01", "2026. 2. 30."])
+def test_parse_date_invalid_is_none(text):
+    assert parse_date(text, TODAY) is None

@@ -42,3 +42,29 @@ def test_grade_range_check(db):
             "values (%s, 'g', 'g', 'g', 5, 3)",
             (iid,),
         )
+
+
+def test_upcoming_view_hides_closed_applications(db):
+    iid = add_institution(db)
+    db.execute(
+        "insert into programs (institution_id, source_id, title, url, starts_on, apply_ends_at) values "
+        "(%s, 'c', '접수마감', 'https://x/c', current_date + 1, now() - interval '1 day'), "
+        "(%s, 'o', '접수중', 'https://x/o', current_date + 1, now() + interval '1 day'), "
+        "(%s, 'n', '기간없음', 'https://x/n', current_date + 1, null)",
+        (iid, iid, iid),
+    )
+    assert sorted(r[0] for r in db.execute("select title from upcoming_programs")) == ["기간없음", "접수중"]
+
+
+def test_textbook_correction_rejects_mismatched_textbook(db):
+    uid = "00000000-0000-0000-0000-00000000000a"
+    db.execute("insert into auth.users values (%s)", (uid,))
+    db.execute("insert into profiles (id) values (%s)", (uid,))
+    db.execute("insert into schools (neis_code, edu_office_code, name, sido) values ('1', 'B10', '초', '서울')")
+    db.execute("insert into children (parent_id, nickname, school_id, grade) values (%s, 'a', 1, 4)", (uid,))
+    db.execute("insert into textbooks (subject, grade, publisher, title) values ('수학', 4, 'A', 'm'), ('과학', 4, 'A', 's')")
+    db.execute("set role authenticated")
+    db.execute("select set_config('request.jwt.claim.sub', %s, false)", (uid,))
+    with pytest.raises(psycopg.errors.RaiseException):
+        db.execute("select correct_school_textbook(1, '과학', 1)")  # 수학 교과서를 과학으로
+    db.execute("select correct_school_textbook(1, '과학', 2)")
