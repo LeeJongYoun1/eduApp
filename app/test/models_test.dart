@@ -40,7 +40,8 @@ void main() {
 
   test('Region equality', () {
     expect(const Region('서울', ''), const Region('서울', ''));
-    expect(Set.of([const Region('서울', ''), const Region('서울', '')]).length, 1);
+    const a = Region('서울', ''), b = Region('서울', '');
+    expect((<Region>{}..add(a)..add(b)).length, 1);
     expect(const Region('서울', '') == const Region('서울', '용산구'), isFalse);
   });
 }
