@@ -43,6 +43,8 @@ class _LoginScreenState extends State<LoginScreen> {
     try {
       if (signUp) {
         await widget.repo.signUp(email, _password.text);
+        // 메일 확인이 꺼져 있으면 가입과 동시에 로그인된다.
+        if (widget.repo.signedIn) return widget.onSignedIn();
         setState(() => _message = '가입 확인 메일을 보냈어요. 메일의 링크를 누른 뒤 로그인해요.');
       } else {
         await widget.repo.signIn(email, _password.text);

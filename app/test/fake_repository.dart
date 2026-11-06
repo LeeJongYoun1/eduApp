@@ -10,6 +10,7 @@ class FakeRepository implements EduRepository {
     Set<Region>? regions,
     List<ProgramItem>? programs,
     Set<int>? favorites,
+    this.autoConfirm = false,
   })  : childList = children ?? [],
         schoolList = schools ?? [],
         regionSet = regions ?? {},
@@ -24,6 +25,7 @@ class FakeRepository implements EduRepository {
   List<ProgramItem> programList;
   Set<int> favorites;
   Object? failWith;
+  bool autoConfirm; // true면 가입 즉시 로그인 상태 (Supabase 메일 확인 꺼짐)
   final List<String> calls = [];
 
   Future<T> _call<T>(String name, T Function() body) async {
@@ -39,7 +41,7 @@ class FakeRepository implements EduRepository {
   @override
   Future<void> signIn(String email, String password) => _call('signIn($email)', () => signedIn = true);
   @override
-  Future<void> signUp(String email, String password) => _call('signUp($email)', () {});
+  Future<void> signUp(String email, String password) => _call('signUp($email)', () => signedIn = autoConfirm);
   @override
   Future<void> signOut() => _call('signOut', () => signedIn = false);
   @override

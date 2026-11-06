@@ -67,4 +67,15 @@ void main() {
     await t.pumpAndSettle();
     expect(find.text('가입 확인 메일의 링크를 먼저 눌러요.'), findsOneWidget);
   });
+
+  testWidgets('sign up with auto-confirm goes straight in', (t) async {
+    final repo = FakeRepository(autoConfirm: true);
+    var signedIn = false;
+    await open(t, repo, onSignedIn: () => signedIn = true);
+    await fill(t, 'a@b.kr', '123456');
+    await t.tap(find.text('처음이에요 · 가입하기'));
+    await t.pumpAndSettle();
+    expect(signedIn, isTrue);
+    expect(find.textContaining('확인 메일을 보냈어요'), findsNothing);
+  });
 }
