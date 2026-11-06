@@ -26,3 +26,9 @@ COLLECTORS["gg_childrens_museum"] = GgChildrensMuseum()
 from .gg_museum import GgMuseum  # noqa: E402
 
 COLLECTORS["gg_museum"] = GgMuseum()
+from .hangeul_museum import HangeulMuseum  # noqa: E402
+
+COLLECTORS["hangeul_museum"] = HangeulMuseum()
+from .seoul_childrens_museum import SeoulChildrensMuseum  # noqa: E402
+
+COLLECTORS["seoul_childrens_museum"] = SeoulChildrensMuseum()
