@@ -44,3 +44,6 @@ COLLECTORS["seoul_history_museum"] = SeoulHistoryMuseum()
 from .folk_museum import FolkMuseum  # noqa: E402
 
 COLLECTORS["folk_museum"] = FolkMuseum()
+from .seoul_science import SeoulScience  # noqa: E402
+
+COLLECTORS["seoul_science"] = SeoulScience()
