@@ -1,0 +1,482 @@
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+	
+	
+	
+	
+		
+
+
+
+
+
+
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="ko" lang="ko">
+<head>
+	<title>[서울생활사박물관] (추가모집)2026년 조각조각 서울이야기 엮기 교육생 모집(초등5~6학년 학급단체)</title>
+
+	
+
+    <script type="text/javascript" src="/resources/spi/jquery/validator/form.js"></script>
+    <script type="text/javascript" src="/resources/spi/jquery/validator/validate.js"></script>
+    <script type="text/javascript" src="/resources/spi/jquery/validator/script-addon.js"></script>
+	
+
+<!--     <link rel="stylesheet" type="text/css" href="/resources/spi/jquery/colorbox/colorbox.css" /> -->
+<!--     <script type="text/javascript" src="/resources/spi/jquery/colorbox/script.js"></script> -->
+
+	
+
+<script type="text/javascript" src="/resources/spi/jquery/ui/ui.core.js"></script>
+<script type="text/javascript" src="/resources/spi/jquery/ui/ui.widget.js"></script>
+<script type="text/javascript" src="/resources/spi/jquery/ui/ui.mouse.js"></script>
+<script type="text/javascript" src="/resources/spi/jquery/ui/ui.draggable.js"></script>
+<script type="text/javascript" src="/resources/spi/jquery/ui/ui.droppable.js"></script>
+<script type="text/javascript" src="/resources/spi/jquery/ui/ui.sortable.js"></script>
+
+	<link rel="stylesheet" type="text/css" href="/resources/spi/jquery/rating/jquery.rating.css"/>
+
+	<script type="text/javascript" src="/resources/spi/jquery/ui/ui.position.js"></script>
+	<script type="text/javascript" src="/resources/spi/jquery/effects/effects.core.js"></script>
+	<script type="text/javascript" src="/resources/spi/jquery/effects/effects.slide.js"></script>
+	<script type="text/javascript" src="/resources/spi/jquery/jquery.highlight.js"></script>
+	<script type="text/javascript" src="/resources/spi/jquery/cluetip/jquery.cluetip.js"></script>
+	<script type="text/javascript" src="/resources/spi/jquery/jquery.bgiframe.js"></script>
+	<script type="text/javascript" src="/resources/spi/jquery/jquery.cookie.js"></script>
+	<script type="text/javascript" src="/resources/spi/jquery/rating/jquery.rating.js"></script>
+	<script type="text/javascript" src="/resources/solutions/board/js/web.board.basic.js"></script>
+
+	<!-- 사용자 스크립트 시작  -->
+	<script type="text/javascript">
+//<![CDATA[
+	// 카테고리 저장용
+	var bbsCtgAry = new Array();
+	// 우클릭 방지용 스크립트 추가 2017.07.17 최재혁
+	$(window.document).on("contextmenu", function(event){return false;});
+
+	$().ready( function() {
+
+		//게시판 설정값들을 초기화 합니다.
+		if (typeof OpenWorks == "undefined") {OpenWorks = {};}
+		OpenWorks.pageType			= 'VIEW';
+		OpenWorks.boardType			= '1001';
+		OpenWorks.boardNm			= '교육예약';
+		OpenWorks.useCategory		= 'Y';
+		OpenWorks.fileYn			= 'Y';
+		OpenWorks.fileExts			= 'hwp|doc|pdf|jpg|gif';
+		OpenWorks.captchaYn			= 'N';
+		OpenWorks.loginGrade		= '0';
+		OpenWorks.readCookieHour	= '3';
+		OpenWorks.bbsCd				= '1005';
+		OpenWorks.seq				= '20261015152427523';
+		OpenWorks.bbsNm				= '교육예약';
+		OpenWorks.searchVal			= '';
+		OpenWorks.searchKey			= '';
+		OpenWorks.sortName			= '';
+		OpenWorks.sortOrder			= '';
+		OpenWorks.webYn				= 'Y';
+		OpenWorks.tagYn				= "N";
+		OpenWorks.listViewCd		= '0';
+		OpenWorks.showSummaryYn		= '';
+
+		onReadyEventFunctions();
+
+		
+
+		// 평가 항목 표시(감빡임 방지)
+		$("#scoreSpan").show();
+
+		$("#view_pd img").each(function() {
+
+			var contWidth = 500;
+			var width = $(this).width();
+
+			if(width > contWidth) {
+				$(this).css("width", "500px");
+				$(this).css("text-align", "center");
+			}
+		});
+
+	});
+	
+	// file_url : 파일경로
+	// file_name: 파일명 - 파일경로에서 파일명을 추출할 수 없는 경우 파일명을 입력해주십시오.
+	function previewAjax(file_url, file_name) {
+		
+		var apiKey = "CXMYHPIDKQJVRLBWOZZNOA";
+		var cc = "sg_011";
+		var fileUrl = encodeURIComponent(file_url);
+		var fileName = encodeURIComponent(file_name);
+		window.open("https://seoul.viewstory.net/previewAjax.do?apikey={0}&cc={1}&url={2}&fileName={3}".format(apiKey, cc, fileUrl, fileName),"a", "width=1200, height=1000, left=100, top=50");
+	}
+	
+	function preListen(file_url, file_name) {
+		var apiKey = "CXMYHPIDKQJVRLBWOZZNOA";
+		var cc = "sg_011";
+		var fileUrl = encodeURIComponent(file_url);
+		var fileName = encodeURIComponent(file_name);
+		window.open("https://seoul.viewstory.net/voiceOverAjax.do?apikey={0}&cc={1}&url={2}&fileName={3}".format(apiKey, cc, fileUrl, fileName), "a", "width=1200, height=1000, left=100, top=50"); 
+	}
+	
+	String.prototype.format = function() {
+		var formatted = this;
+		for( var arg in arguments ) {
+		formatted = formatted.replace("{" +arg + "}", arguments[arg]);}
+		return formatted; 
+	}; 
+//]]>
+	</script>
+	<!-- 사용자 스크립트 끝  -->
+
+
+	<meta name="keywords" content="서울시 역사박물관, 서울역사박물관, 박물관, 역사, [서울생활사박물관] (추가모집)2026년 조각조각 서울이야기 엮기 교육생 모집(초등5~6학년 학급단체)" />
+	
+	<meta name="description" content="2026년 하반기 초등학교 학급 단체 프로그램
+
+&amp;lt;조각조각 서울이야기 엮기&amp;gt; 교육생 추가 모집
+
+&amp;nbsp;
+
+서울생활사박물관에서는 초등학생 5~6학년 학급 " />
+
+</head>
+
+<body>
+
+
+
+<!-- contents : str -->
+<div id="contents">
+	<div class="detail_info">
+		<p class="poster_area">
+			
+				
+					
+					
+						
+						
+							<img src="/upload/bbs/2026/10/15/916133c1-a82d-4df7-9a0d-06805dd8b3a5.png" alt="[서울생활사박물관] (추가모집)2026년 조각조각 서울이야기 엮기 교육생 모집(초등5~6학년 학급단체)" style="width: 100%;"/>
+						
+					
+						
+					
+					
+				
+				
+			
+		</p>
+		<table id="boardTbl" class="tb_view info_area"><!-- summary="교육 과정명, 교육기간, 접수기간, 접수/선정, 대상, 교육시간, 수강료, 모집인원, 문의처, 내용으로 구성된 표입니다." -->
+			<caption class="tit_article">
+				
+				
+					
+					
+						
+							
+						
+							
+								
+							
+						
+							
+						
+							
+						
+							
+						
+							
+						
+							
+						
+							
+						
+						[어린이]
+					
+				
+				&nbsp;
+				[서울생활사박물관] (추가모집)2026년 조각조각 서울이야기 엮기 교육생 모집(초등5~6학년 학급단체)
+			</caption>
+			<colgroup>
+				<col style="width:85px;" />
+				<col />
+			</colgroup>
+			<tbody>
+			
+			
+				
+					<tr>
+						<th scope="row">교육기간</th>
+						<td>2026-12-09-2026-12-09</td>
+					</tr>
+					<tr>
+						<th scope="row">접수기간</th>
+						<td>
+							2026-10-15-2026-11-13
+							
+						</td>
+					</tr>
+					<tr>
+						<th scope="row">접수/선정</th>
+						<td>
+							온라인
+							&nbsp;/&nbsp;
+							선착순
+						</td>
+					</tr>
+					<tr>
+						<th scope="row">신청방법</th>
+						<td>
+							서울특별시 공공서비스예약시스템
+						</td>
+					</tr>
+					<tr>
+						<th scope="row">대상</th>
+						<td>
+							<div class="row">초등5~6학년 학급단체</div>
+							
+								<div class="row">
+									
+										<a href="https://yeyak.seoul.go.kr/web/reservation/selectReservView.do?rsv_svc_id=S261015152624527779" target="_blank"  title="서울특별시 공공서비스 예약(새창열림)" class="btn inline primary">예약신청하기</a>
+									
+									
+								</div>
+							
+						</td>
+					</tr>
+					<tr>
+						<th scope="row">교육시간</th>
+						<td>10:00-12:00</td>
+					</tr>
+					<tr>
+						
+						<th scope="row">모집인원</th>
+						<td>회당 1학급 20명 내외</td>
+					</tr>
+					<tr>
+						<th scope="row">문의처</th>
+						<td>02-3399-2953, 2974</td>
+					</tr>
+					
+						<tr>
+							<th scope="row">첨부파일</th>
+							<td>
+								
+									
+							
+					 			
+									
+					 					<a href="/common/file/NR_download.do;jsessionid=F5587BD214701855158788B015F4157E?id=49227c26-d837-4224-a46d-a6337369abf0" title="다운로드">12월_9일_추가_교육_모집_안내문_2026년_조각조각_서울이야기_엮기.pdf</a>
+										(205 KB, application/pdf, 다운로드 6 회)<br/>
+									
+										
+									
+							
+					 			
+							</td>
+						</tr>
+			 		
+					
+					
+				
+				
+			
+			</tbody>
+		</table>
+	</div>
+	
+
+	
+
+	
+	<div class="bbs_article">
+		<h4 class="tit1">교육 내용</h4>
+		<div class="output area">
+			
+				
+					<h1 style="margin-left: 3.9pt; text-align: center;">2026년 하반기 초등학교 학급 단체 프로그램</h1>
+
+<h1 style="margin-left: 3.9pt; text-align: center;"><span style="color:#FF8C00;"><strong>&lt;조각조각 서울이야기 엮기&gt;</strong></span> 교육생 <span style="color:#FF0000;">추가 모집</span></h1>
+
+<p style="margin-left: 3.9pt; text-align: center;">&nbsp;</p>
+
+<div style="margin-left: 3.9pt; text-align: center;"><span style="font-size:16px;">서울생활사박물관에서는 초등학생 5~6학년 학급 단체를 대상으로</span></div>
+
+<div style="margin-left: 3.9pt; text-align: center;"><span style="font-size:16px;"><span style="background-color:#FFA07A;">&lsquo;조각조각 서울이야기 엮기&rsquo;</span>를 운영하고자 합니다.</span></div>
+
+<div style="margin-left: 3.9pt; text-align: center;"><span style="font-size:16px;">본 교육은 1960~90년대 유물을 탐색하고 당시 광고물을 통해</span></div>
+
+<div style="margin-left: 3.9pt; text-align: center;"><span style="font-size:16px;">서울의 생활상, 대중문화를 이해하는 체험 프로그램입니다.</span></div>
+
+<div style="margin-left: 3.9pt; text-align: center;"><span style="font-size:16px;">박물관 체험활동에 관심 있으신 선생님들의 많은 신청 바랍니다.</span></div>
+
+<p style="margin-left: 3.9pt;"><br />
+<strong><span style="font-size:16px;">□ 교육 개요</span></strong></p>
+
+<p style="margin-left: 3.9pt;"><span style="font-size:14px;">◾ 교 육 명: 조각조각 서울이야기 엮기 &ndash; 광고로 엮는 생활사 이야기</span></p>
+
+<p style="margin-left: 3.9pt;"><span style="font-size:14px;">◾ 일 시: <span style="color:#FF0000;"><strong>[하반기] 2026. 12. 9.(수) 1회</strong></span></span></p>
+
+<p style="margin-left: 3.9pt;"><span style="font-size:14px;">&nbsp;<strong>10:00~12:00(120분)</strong>, 일 1회 (회차별 교육 내용은 모두 동일, 1회 신청)</span></p>
+
+<p style="margin-left: 3.9pt;"><span style="font-size:14px;">※ <u>교육 시작 시간</u>은 학교 수업 시간에 맞춰 조정 가능<strong> (단, 9:30~10:30분 내)</strong></span></p>
+
+<p style="margin-left: 3.9pt;"><span style="font-size:14px;">※ 박물관 사정에 따라 교육일정 및 운영방법 등은 변경될 수 있습니다.</span></p>
+
+<p style="margin-left: 3.9pt;"><span style="font-size:14px;">◾ 교육장소: 서울생활사박물관 <span style="color:#0000FF;">※ 박물관에 직접 와서 참여하는 대면(현장)교육입니다.</span></span></p>
+
+<p style="margin-left: 3.9pt;"><span style="font-size:14px;">◾ 대 상: <strong>초등학교 5~6학년 학급 단체</strong>(회당 1학급 20명 내외)</span></p>
+
+<p style="margin-left: 3.9pt;"><span style="font-size:14px;">◾ 교 육 비: 무료</span></p>
+
+<p style="margin-left: 3.9pt;"><span style="font-size:14px;">◾ 교육내용: 상설전시실의 1960~90년대 유물 탐색과 당시 광고물을 통해 서울의 생활상과 대중문화를 이해하고, 유물을 재해석한 광고 제작 체험</span></p>
+
+<p style="margin-left: 3.9pt;">&nbsp;</p>
+
+<p style="margin-left: 3.9pt;"><strong><span style="font-size:16px;">□ 세부 교육 내용</span></strong></p>
+
+<p style="margin-left: 3.9pt;"><strong><span style="font-size:16px;"><img alt="" src="/upload/ckeditor/2026/10/15/74ab5c60-5ead-4ea8-b1b3-7193c7a7a3e7.png" style="width: 755px; height: 750px;" /></span></strong></p>
+
+<p style="margin-left: 3.9pt;"><strong><span style="font-size:16px;">□ 교육 관련 사진</span></strong></p>
+
+<p style="margin-left: 3.9pt;"><strong><span style="font-size:16px;"><img alt="" src="/upload/ckeditor/2026/10/15/455f5532-055f-40af-b4d5-cfc2fe5b9725.png" style="width: 767px; height: 311px;" /></span></strong></p>
+
+<p style="margin-left: 3.9pt;">&nbsp;</p>
+
+<p style="margin-left:3.9pt;"><img alt="" src="/upload/ckeditor/2026/10/15/52c750bf-5cd6-491e-b699-8e85fbf8a717.png" style="width: 774px; height: 756px;" /></p>
+
+<p style="margin-left: 3.9pt;">&nbsp;</p>
+
+<div data-hjsonver="1.0" data-jsonlen="35600" id="hwpEditorBoardContent">&nbsp;</div>
+
+<p>&nbsp;</p>
+
+				
+				
+			
+		</div>
+	</div>
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+	<div class="btn_area large">
+		
+			<a href="https://yeyak.seoul.go.kr/web/reservation/selectReservView.do?rsv_svc_id=S261015152624527779" target="_blank"  title="서울특별시 공공서비스 예약(새창열림)" class="btn primary w100 mr10">예약신청하기</a>
+		
+		
+	</div>
+	
+
+	<p class="btn_area">
+
+		
+
+		
+
+		
+
+		<a href="NR_boardList.do?bbs_cd=1005&amp;currentPage=1&amp;searchVal=&amp;searchKey=&amp;sortName=&amp;sortOrder=&amp;startDt=&amp;endDt=" onclick="jsListAction();return false;" class="btn">목록</a>
+	</p>
+
+	<!-- 목록 보여주기 시작 -->
+	<form name="dataForm" id="dataForm" method="get" action="#search" onsubmit="return false;">
+
+		<input type="submit" style="display:none; " />
+		<input type="hidden" name="actionUri" value="" />
+		<input type="hidden" name="actionMethod" value="" />
+		<input type="hidden" name="searchVal" value="" />
+		<input type="hidden" name="searchKey" value="" />
+		<input type="hidden" name="sortName" value="" />
+		<input type="hidden" name="sortOrder" value="" />
+		<input type="hidden" name="currentPage" value="" />
+		<input type="hidden" name="rowPerPage" value="" />
+		<input type="hidden" name="listShowType" value="" />
+
+		<input type="hidden" name="startDt" value="" />
+		<input type="hidden" name="endDt" value="" />
+
+		<input type="hidden" name="bbsCd" value="1005" />
+		<input type="hidden" name="seq" value="20261015152427523" />
+		<input type="hidden" name="refSeq" value="20261015152427523" />
+		<input type="hidden" name="regPwd" value="" />
+
+		<input type="hidden" name="iconKey" value="" />
+		<input type="hidden" name="contents" value="" />
+		<input type="hidden" name="ctgCd" id="ctgCd" value="" />
+		<input type="hidden" name="pageType" id="pageType" value="" />
+		<input type="hidden" name="rssYn" id="rssYn" value="" />
+		<input type="hidden" name="categoryVal" id="categoryVal" value="" />
+		<input type="hidden" name="q_applyState" id="q_applyState" value="" />
+
+		<!-- 다음/이전을 다음/이전으로 보기 -->
+		
+		<!-- 다음/이전을 다음/이전으로 보기 끝 -->
+
+		<!-- 다음/이전을 목록으로 보기 -->
+		
+		<!-- 다음/이전을 목록으로 보기 -->
+	</form>
+
+	
+
+</div>
+<!-- contents : str -->
+
+</body>
+</html>
+
+	

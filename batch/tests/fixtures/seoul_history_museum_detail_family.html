@@ -1,0 +1,436 @@
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+	
+	
+	
+	
+		
+
+
+
+
+
+
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="ko" lang="ko">
+<head>
+	<title>2026년 겨울학기 &#039;한밤의 역사기행&#039; 모집</title>
+
+	
+
+    <script type="text/javascript" src="/resources/spi/jquery/validator/form.js"></script>
+    <script type="text/javascript" src="/resources/spi/jquery/validator/validate.js"></script>
+    <script type="text/javascript" src="/resources/spi/jquery/validator/script-addon.js"></script>
+	
+
+<!--     <link rel="stylesheet" type="text/css" href="/resources/spi/jquery/colorbox/colorbox.css" /> -->
+<!--     <script type="text/javascript" src="/resources/spi/jquery/colorbox/script.js"></script> -->
+
+	
+
+<script type="text/javascript" src="/resources/spi/jquery/ui/ui.core.js"></script>
+<script type="text/javascript" src="/resources/spi/jquery/ui/ui.widget.js"></script>
+<script type="text/javascript" src="/resources/spi/jquery/ui/ui.mouse.js"></script>
+<script type="text/javascript" src="/resources/spi/jquery/ui/ui.draggable.js"></script>
+<script type="text/javascript" src="/resources/spi/jquery/ui/ui.droppable.js"></script>
+<script type="text/javascript" src="/resources/spi/jquery/ui/ui.sortable.js"></script>
+
+	<link rel="stylesheet" type="text/css" href="/resources/spi/jquery/rating/jquery.rating.css"/>
+
+	<script type="text/javascript" src="/resources/spi/jquery/ui/ui.position.js"></script>
+	<script type="text/javascript" src="/resources/spi/jquery/effects/effects.core.js"></script>
+	<script type="text/javascript" src="/resources/spi/jquery/effects/effects.slide.js"></script>
+	<script type="text/javascript" src="/resources/spi/jquery/jquery.highlight.js"></script>
+	<script type="text/javascript" src="/resources/spi/jquery/cluetip/jquery.cluetip.js"></script>
+	<script type="text/javascript" src="/resources/spi/jquery/jquery.bgiframe.js"></script>
+	<script type="text/javascript" src="/resources/spi/jquery/jquery.cookie.js"></script>
+	<script type="text/javascript" src="/resources/spi/jquery/rating/jquery.rating.js"></script>
+	<script type="text/javascript" src="/resources/solutions/board/js/web.board.basic.js"></script>
+
+	<!-- 사용자 스크립트 시작  -->
+	<script type="text/javascript">
+//<![CDATA[
+	// 카테고리 저장용
+	var bbsCtgAry = new Array();
+	// 우클릭 방지용 스크립트 추가 2017.07.17 최재혁
+	$(window.document).on("contextmenu", function(event){return false;});
+
+	$().ready( function() {
+
+		//게시판 설정값들을 초기화 합니다.
+		if (typeof OpenWorks == "undefined") {OpenWorks = {};}
+		OpenWorks.pageType			= 'VIEW';
+		OpenWorks.boardType			= '1001';
+		OpenWorks.boardNm			= '교육예약';
+		OpenWorks.useCategory		= 'Y';
+		OpenWorks.fileYn			= 'Y';
+		OpenWorks.fileExts			= 'hwp|doc|pdf|jpg|gif';
+		OpenWorks.captchaYn			= 'N';
+		OpenWorks.loginGrade		= '0';
+		OpenWorks.readCookieHour	= '3';
+		OpenWorks.bbsCd				= '1005';
+		OpenWorks.seq				= '20261021153443848';
+		OpenWorks.bbsNm				= '교육예약';
+		OpenWorks.searchVal			= '';
+		OpenWorks.searchKey			= '';
+		OpenWorks.sortName			= '';
+		OpenWorks.sortOrder			= '';
+		OpenWorks.webYn				= 'Y';
+		OpenWorks.tagYn				= "N";
+		OpenWorks.listViewCd		= '0';
+		OpenWorks.showSummaryYn		= '';
+
+		onReadyEventFunctions();
+
+		
+
+		// 평가 항목 표시(감빡임 방지)
+		$("#scoreSpan").show();
+
+		$("#view_pd img").each(function() {
+
+			var contWidth = 500;
+			var width = $(this).width();
+
+			if(width > contWidth) {
+				$(this).css("width", "500px");
+				$(this).css("text-align", "center");
+			}
+		});
+
+	});
+	
+	// file_url : 파일경로
+	// file_name: 파일명 - 파일경로에서 파일명을 추출할 수 없는 경우 파일명을 입력해주십시오.
+	function previewAjax(file_url, file_name) {
+		
+		var apiKey = "CXMYHPIDKQJVRLBWOZZNOA";
+		var cc = "sg_011";
+		var fileUrl = encodeURIComponent(file_url);
+		var fileName = encodeURIComponent(file_name);
+		window.open("https://seoul.viewstory.net/previewAjax.do?apikey={0}&cc={1}&url={2}&fileName={3}".format(apiKey, cc, fileUrl, fileName),"a", "width=1200, height=1000, left=100, top=50");
+	}
+	
+	function preListen(file_url, file_name) {
+		var apiKey = "CXMYHPIDKQJVRLBWOZZNOA";
+		var cc = "sg_011";
+		var fileUrl = encodeURIComponent(file_url);
+		var fileName = encodeURIComponent(file_name);
+		window.open("https://seoul.viewstory.net/voiceOverAjax.do?apikey={0}&cc={1}&url={2}&fileName={3}".format(apiKey, cc, fileUrl, fileName), "a", "width=1200, height=1000, left=100, top=50"); 
+	}
+	
+	String.prototype.format = function() {
+		var formatted = this;
+		for( var arg in arguments ) {
+		formatted = formatted.replace("{" +arg + "}", arguments[arg]);}
+		return formatted; 
+	}; 
+//]]>
+	</script>
+	<!-- 사용자 스크립트 끝  -->
+
+
+	<meta name="keywords" content="서울시 역사박물관, 서울역사박물관, 박물관, 역사, 2026년 겨울학기 &#039;한밤의 역사기행&#039; 모집" />
+	
+	<meta name="description" content="
+
+&amp;nbsp;
+" />
+
+</head>
+
+<body>
+
+
+
+<!-- contents : str -->
+<div id="contents">
+	<div class="detail_info">
+		<p class="poster_area">
+			
+				
+					
+					
+						
+						
+							<img src="/upload/bbs/2026/10/21/d2398901-5c11-4c99-a5aa-a4530d00c383.jpg" alt="2026년 겨울학기 &#039;한밤의 역사기행&#039; 모집" style="width: 100%;"/>
+						
+					
+						
+					
+						
+					
+					
+				
+				
+			
+		</p>
+		<table id="boardTbl" class="tb_view info_area"><!-- summary="교육 과정명, 교육기간, 접수기간, 접수/선정, 대상, 교육시간, 수강료, 모집인원, 문의처, 내용으로 구성된 표입니다." -->
+			<caption class="tit_article">
+				
+				
+					
+					
+						
+							
+						
+							
+						
+							
+						
+							
+								
+							
+						
+							
+						
+							
+						
+							
+						
+							
+						
+						[가족]
+					
+				
+				&nbsp;
+				2026년 겨울학기 &#039;한밤의 역사기행&#039; 모집
+			</caption>
+			<colgroup>
+				<col style="width:85px;" />
+				<col />
+			</colgroup>
+			<tbody>
+			
+			
+				
+					<tr>
+						<th scope="row">교육기간</th>
+						<td>2026-11-06-2026-11-27</td>
+					</tr>
+					<tr>
+						<th scope="row">접수기간</th>
+						<td>
+							2026-10-26-2026-11-20
+							/ 10:00-17:00 까지
+						</td>
+					</tr>
+					<tr>
+						<th scope="row">접수/선정</th>
+						<td>
+							온라인
+							&nbsp;/&nbsp;
+							선착순
+						</td>
+					</tr>
+					<tr>
+						<th scope="row">신청방법</th>
+						<td>
+							인터넷 선착순 접수(서울공공서비스예약)
+						</td>
+					</tr>
+					<tr>
+						<th scope="row">대상</th>
+						<td>
+							<div class="row">초등학생 자녀를 둔 가족 (미취학 아동, 중고생 동반 불가)</div>
+							
+								<div class="row">
+									
+										<a href="https://yeyak.seoul.go.kr/web/reservation/selectReservView.do?rsv_svc_id=S260910130946384643&locale=ko" target="_blank"  title="서울특별시 공공서비스 예약(새창열림)" class="btn inline primary">예약신청하기</a>
+									
+									
+								</div>
+							
+						</td>
+					</tr>
+					<tr>
+						<th scope="row">교육시간</th>
+						<td>19:00 ~ 20:40</td>
+					</tr>
+					<tr>
+						
+						<th scope="row">모집인원</th>
+						<td>회당 15가족</td>
+					</tr>
+					<tr>
+						<th scope="row">문의처</th>
+						<td>02-724-9750, 0196</td>
+					</tr>
+					
+						<tr>
+							<th scope="row">첨부파일</th>
+							<td>
+								
+									
+							
+					 			
+									
+					 					<a href="/common/file/NR_download.do;jsessionid=7C92E7BFBCC2442D20EE311F4291BB71?id=3fb50179-1117-451e-9e27-fa108a5ffef0" title="다운로드">2026년_한밤의_역사기행_모집_공고문.pdf</a>
+										(109 KB, application/pdf, 다운로드 2 회)<br/>
+									
+										
+									
+							
+					 			
+									
+					 					<a href="/common/file/NR_download.do;jsessionid=7C92E7BFBCC2442D20EE311F4291BB71?id=762adac4-adec-46f8-b147-c7c7806bd834" title="다운로드">3._한밤_가을학기_포털이미지.jpg</a>
+										(168 KB, image/jpeg, 다운로드 0 회)<br/>
+									
+										
+									
+							
+					 			
+							</td>
+						</tr>
+			 		
+					
+					
+				
+				
+			
+			</tbody>
+		</table>
+	</div>
+	
+
+	
+
+	
+	<div class="bbs_article">
+		<h4 class="tit1">교육 내용</h4>
+		<div class="output area">
+			
+				
+					<p><img alt="" src="/upload/ckeditor/2026/10/21/ec442ab5-2b7d-44fe-846a-7bbde4358d25.jpg" style="width: 992px; height: 1403px;" /><img alt="" src="/upload/ckeditor/2026/10/21/6781c0b3-e578-4b3c-ace6-59793c47fd5b.jpg" style="width: 992px; height: 1403px;" /><img alt="" src="/upload/ckeditor/2026/10/21/2250f1dd-9c09-4aed-8ed9-12ab58f0f2fb.jpg" style="width: 992px; height: 1403px;" /></p>
+
+<p>&nbsp;</p>
+
+				
+				
+			
+		</div>
+	</div>
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+
+	
+	<div class="btn_area large">
+		
+			<a href="https://yeyak.seoul.go.kr/web/reservation/selectReservView.do?rsv_svc_id=S260910130946384643&locale=ko" target="_blank"  title="서울특별시 공공서비스 예약(새창열림)" class="btn primary w100 mr10">예약신청하기</a>
+		
+		
+	</div>
+	
+
+	<p class="btn_area">
+
+		
+
+		
+
+		
+
+		<a href="NR_boardList.do?bbs_cd=1005&amp;currentPage=1&amp;searchVal=&amp;searchKey=&amp;sortName=&amp;sortOrder=&amp;startDt=&amp;endDt=" onclick="jsListAction();return false;" class="btn">목록</a>
+	</p>
+
+	<!-- 목록 보여주기 시작 -->
+	<form name="dataForm" id="dataForm" method="get" action="#search" onsubmit="return false;">
+
+		<input type="submit" style="display:none; " />
+		<input type="hidden" name="actionUri" value="" />
+		<input type="hidden" name="actionMethod" value="" />
+		<input type="hidden" name="searchVal" value="" />
+		<input type="hidden" name="searchKey" value="" />
+		<input type="hidden" name="sortName" value="" />
+		<input type="hidden" name="sortOrder" value="" />
+		<input type="hidden" name="currentPage" value="" />
+		<input type="hidden" name="rowPerPage" value="" />
+		<input type="hidden" name="listShowType" value="" />
+
+		<input type="hidden" name="startDt" value="" />
+		<input type="hidden" name="endDt" value="" />
+
+		<input type="hidden" name="bbsCd" value="1005" />
+		<input type="hidden" name="seq" value="20261021153443848" />
+		<input type="hidden" name="refSeq" value="20261021153443848" />
+		<input type="hidden" name="regPwd" value="" />
+
+		<input type="hidden" name="iconKey" value="" />
+		<input type="hidden" name="contents" value="" />
+		<input type="hidden" name="ctgCd" id="ctgCd" value="" />
+		<input type="hidden" name="pageType" id="pageType" value="" />
+		<input type="hidden" name="rssYn" id="rssYn" value="" />
+		<input type="hidden" name="categoryVal" id="categoryVal" value="" />
+		<input type="hidden" name="q_applyState" id="q_applyState" value="" />
+
+		<!-- 다음/이전을 다음/이전으로 보기 -->
+		
+		<!-- 다음/이전을 다음/이전으로 보기 끝 -->
+
+		<!-- 다음/이전을 목록으로 보기 -->
+		
+		<!-- 다음/이전을 목록으로 보기 -->
+	</form>
+
+	
+
+</div>
+<!-- contents : str -->
+
+</body>
+</html>
+
+	
