@@ -8,6 +8,7 @@ from pypdf import PdfWriter
 from test_school_notices import HOME, make_fetch
 
 from eduapp_batch import run_schools
+from eduapp_batch import school_calendar
 from eduapp_batch.models import CalendarDay
 from eduapp_batch.run_schools import apply, prepare
 from eduapp_batch.school_notices import Attachment, Post
@@ -208,6 +209,16 @@ def test_prepare_calendar_record_run_error_does_not_stop_run(tmp_path, monkeypat
     go(store, tmp_path)
     assert (tmp_path / "C" / "meta.json").exists()
     assert ("calendar:A", False, None, "RuntimeError: neis down") in store.runs
+
+
+def test_failing_fetch_schedule_error_does_not_leak_neis_key(tmp_path, monkeypatch):
+    def fake_get(url, timeout, params):
+        return httpx.Response(500, request=httpx.Request("GET", url, params=params))
+    monkeypatch.setattr(school_calendar.httpx, "get", fake_get)
+    store = FakeStore(children=[school(1, "A")])
+    prepare(store, make_fetch(), blob, "SECRETKEY123", tmp_path, TODAY, sleep=lambda s: None)
+    errors = [r[3] for r in store.runs if r[0] == "calendar:A"]
+    assert errors and "500" in errors[0] and "SECRETKEY123" not in errors[0]
 
 
 def test_apply_db_error_on_one_school_does_not_stop_others(tmp_path):

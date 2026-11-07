@@ -33,7 +33,8 @@ def fetch_schedule(edu_office_code: str, neis_code: str, key: str, today: date) 
             "KEY": key, "Type": "json", "ATPT_OFCDC_SC_CODE": edu_office_code, "SD_SCHUL_CODE": neis_code,
             "AA_FROM_YMD": today.strftime("%Y%m%d"), "AA_TO_YMD": (today + timedelta(days=365)).strftime("%Y%m%d"),
             "pIndex": page, "pSize": PAGE})
-        r.raise_for_status()
+        if r.is_error:  # raise_for_status의 예외 문구에는 KEY=가 든 요청 주소가 들어가므로 상태 코드만 남긴다
+            raise RuntimeError(f"NEIS HTTP {r.status_code}")
         payload = r.json()
         if "SchoolSchedule" not in payload and payload.get("RESULT", {}).get("CODE") != "INFO-200":
             raise RuntimeError(payload)  # 인증키 오류 등
