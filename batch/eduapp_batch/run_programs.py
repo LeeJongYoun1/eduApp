@@ -31,11 +31,15 @@ def run(store, collectors: dict[str, Collector], fetch: Callable[[str], str], to
 
 
 def _fetch(url: str, tries: int = 3) -> str:
+    return _get(url, tries).text
+
+
+def _get(url: str, tries: int = 3) -> httpx.Response:
     for i in range(tries):
         try:
             r = httpx.get(url, timeout=20, follow_redirects=True, headers={"User-Agent": "eduApp-collector"})
             r.raise_for_status()
-            return r.text
+            return r
         except httpx.TransportError:  # 연결 끊김 등 일시 오류만 재시도
             if i == tries - 1:
                 raise
