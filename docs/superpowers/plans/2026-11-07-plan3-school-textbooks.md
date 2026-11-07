@@ -28,8 +28,8 @@
 - 앱에서 쓰는 새 DB 함수는 `authenticated`에만 열고, 배치 전용 함수 `apply_school_collection`은 `service_role` 외에는 실행 불가(기본 `public` 실행 권한을 반드시 회수).
 - 개발 컨테이너에서는 학교 홈페이지·나이스에 접속할 수 없으므로 수집 코드는 저장된 샘플(fixtures)로 테스트한다.
 - 이 계획에서 하지 않는 것: 단원·성취기준·진도(계획 4), 알림(계획 5), 방학 기간 계산(재량휴업일 등 나이스가 `휴업일`로 표시한 날만), 학부모가 출판사를 "모름"으로 되돌리기, 학교 홈페이지 자동 크롤링(공지 찾기는 예약 작업이 함), 홈 탭 배너.
-- **결정됨(2026-11-07):** ① 교과서 목록은 공공데이터포털에 2022 개정 자료가 없어(2015 개정뿐) **공식 검정 합격 공고 PDF**(한국과학창의재단·한국교육과정평가원)에서 이 세션이 만들어 `batch/data/textbooks_2022.csv`(336행)로 저장했다. 생성 스크립트 `batch/scripts/build_textbook_catalog.py`, 검증 `batch/tests/test_textbook_catalog.py`. 범위: 초3~6 수학·과학·사회·영어·음악·미술·체육, 초5~6 실과·사회과부도(국어·도덕 등 국정 과목은 목록에 없음). 한 권짜리 과목은 semester=1, 사회과부도(5~6 한 권)는 5·6학년 각각 한 행. 음악 3·4학년 미래엔은 재검정 공고에서 수동 보정. ② 시범 학교 5곳은 사용자가 이름을 알려준다. ③ 나이스 학사일정 실제 응답은 이 세션이 직접 받아 확인함(Task 4 Step 5, 사용자 샘플 불필요). ④ `.hwp` 실파일 확인은 Task 10에서. ⑤ 실행은 subagent-driven.
-- **사용자 준비:** 교과서 목록은 준비 끝(위 ①). `NEIS_API_KEY`는 계획 2에서 등록됨. 시범 학교 5곳 선정(Task 10).
+- **결정됨(2026-11-07):** ① 교과서 목록은 공공데이터포털에 2022 개정 자료가 없어(2015 개정뿐) **공식 검정 합격 공고 PDF**(한국과학창의재단·한국교육과정평가원)에서 이 세션이 만들어 `batch/data/textbooks_2022.csv`(336행)로 저장했다. 생성 스크립트 `batch/scripts/build_textbook_catalog.py`, 검증 `batch/tests/test_textbook_catalog.py`. 범위: 초3~6 수학·과학·사회·영어·음악·미술·체육, 초5~6 실과·사회과부도(국어·도덕 등 국정 과목은 목록에 없음). 한 권짜리 과목은 semester=1, 사회과부도(5~6 한 권)는 5·6학년 각각 한 행. 음악 3·4학년 미래엔은 재검정 공고에서 수동 보정. ② 시범 학교 5곳은 사용자가 이름을 알려준다. ③ 나이스 학사일정 실제 응답은 이 세션이 직접 받아 확인함(Task 4 Step 5, 사용자 샘플 불필요). ④ `.hwp` 실파일 확인은 Task 10에서. ⑤ 실행은 subagent-driven. ⑥ 시범 학교는 **안양 귀인초등학교(나이스 7569013)와 화성 율목초등학교(7679051) 2곳**이고, 두 홈페이지 조사 결과는 `docs/superpowers/specs/2026-11-07-pilot-schools-research.md`(게시판·첨부 구조, 표기 차이, 쉬는 날 대조값). 테스트 fixture는 두 학교 실제 게시물 첨부(`batch/tests/fixtures/school_*`).
+- **사용자 준비:** 교과서 목록·시범 학교는 준비 끝(위 ①⑥). `NEIS_API_KEY`는 계획 2에서 등록됨(나이스는 키 없이는 5건만 줘서 Task 10의 실학사일정 확인에 필요).
 
 ## Review Focus
 
@@ -152,11 +152,13 @@
 
 **Interfaces:**
 - Produces:
-  - `extract_text(data: bytes, filename: str) -> str` — 확장자(`.pdf`, `.hwpx`, `.hwp`, `.txt`, 대소문자 무시)로 분기, 그 외는 `ValueError("unsupported: <ext>")`. 결과의 연속 공백·빈 줄은 정리.
+  - `extract_text(data: bytes, filename: str) -> str` — 확장자(`.pdf`, `.xlsx`, `.hwpx`, `.hwp`, `.txt`, 대소문자 무시)로 분기, 그 외는 `ValueError("unsupported: <ext>")`. 결과의 연속 공백·빈 줄은 정리.
+  - `xlsx_text(data: bytes) -> str` — **`openpyxl`을 쓰지 않는다**(율목초 파일이 서식 오류로 못 읽음). zip 안 `xl/sharedStrings.xml`과 `xl/worksheets/sheet*.xml`을 직접 읽고 태그 접두어(`x:` 유무)에 상관없이 동작하게 하며, 행마다 셀 값을 ` | `로 이어 한 줄로 낸다.
+  - `goe_attachment_links(post_html: str, site_root: str) -> list[tuple[str, str]]` — 경기도 학교 홈페이지 게시물 HTML의 `AddUploadedFile(키, "파일명", "/upload/…", …)`에서 `(파일명, 절대 URL)` 목록. 따옴표는 `'`·`"` 둘 다 온다.
   - `pdf_text(data: bytes) -> str` (pypdf), `hwpx_text(data: bytes) -> str` (zip 안 `Contents/section*.xml`의 `<hp:t>` 텍스트를 문단 단위로 이음), `hwp_text(data: bytes) -> str` (`olefile`로 `BodyText/Section*` 스트림을 열어, 압축 플래그가 켜져 있으면 `zlib.decompress(..., -15)` 후 `hwp_section_text`로 이음; 암호화된 파일이면 `ValueError("encrypted hwp")`), `hwp_section_text(section: bytes) -> str`: 레코드는 4바이트 헤더(하위 10비트 태그, 10비트 레벨, 상위 12비트 크기, 크기가 0xFFF면 뒤 4바이트가 실제 크기); **태그 67(`HWPTAG_PARA_TEXT`)의 페이로드만** UTF-16LE로 읽고, 0x20 미만 제어 문자 중 줄바꿈(10, 13)만 `\n`으로 남기며, 확장 제어 문자(1~8, 11, 12, 14~23)는 뒤따르는 14바이트까지 건너뛴다.
   - CLI: `python -m eduapp_batch.attachment_text <URL 또는 파일경로>` → 텍스트를 표준출력으로. URL이면 `httpx`(리다이렉트 허용, 20MB 초과·타임아웃은 오류), 파일명은 `Content-Disposition`이 있으면 거기서, 없으면 URL 경로에서.
 
-- [ ] **Step 1: 실패하는 테스트** — 테스트 코드에서 만든 입력으로: `test_hwpx_text_joins_paragraphs`(zip을 메모리에서 만들어 `<hp:t>` 두 문단), `test_hwp_section_text_reads_para_text_records`(레코드 바이트를 손으로 조립: 태그 67 레코드 2개 + 다른 태그 1개 → 앞 둘의 텍스트만, 확장 제어 문자 건너뛰기 포함), `test_pdf_text`(pypdf `PdfWriter`로 만든 빈 페이지가 아닌 텍스트 PDF는 만들기 번거로우므로 **`pypdf` 호출을 monkeypatch한 단위 테스트** + 아래 실파일 확인), `test_extract_text_rejects_unknown_extension`, `test_extract_text_collapses_whitespace`.
+- [ ] **Step 1: 실패하는 테스트** — 테스트 코드에서 만든 입력으로: `test_xlsx_text_reads_real_yulmok_file`(`fixtures/school_yulmok_textbooks.xlsx` → `3학년 | 검정 | 수학(3~4학년군)3-1 / 3-2 | 장혜원 | ㈜미래엔` 행 포함, `국정` 행 포함), `test_goe_attachment_links_both_quote_styles`(`fixtures/school_kwiin_post_attachment.html`(큰따옴표)과 `school_yulmok_post_attachment.html`(작은따옴표) → 각각 `(…pdf, https://kwiin-e.goeay.kr/upload/…)`·`(…xlsx, https://yulmok-e.goehs.kr/upload/…)`), `test_pdf_text_reads_real_kwiin_file`(`fixtures/school_kwiin_textbooks.pdf`에서 `천재교육(함순애)` 포함, 실파일이라 monkeypatch 불필요), `test_hwpx_text_joins_paragraphs`(zip을 메모리에서 만들어 `<hp:t>` 두 문단), `test_hwp_section_text_reads_para_text_records`(레코드 바이트를 손으로 조립: 태그 67 레코드 2개 + 다른 태그 1개 → 앞 둘의 텍스트만, 확장 제어 문자 건너뛰기 포함), `test_extract_text_rejects_unknown_extension`, `test_extract_text_collapses_whitespace`.
 - [ ] **Step 2: 실패 확인** — `pytest tests/test_attachment_text.py -v`
 - [ ] **Step 3: 구현** — 위 시그니처대로.
 - [ ] **Step 4: 통과 확인** — PASS
@@ -176,13 +178,14 @@
 **Interfaces:**
 - Consumes: `Store.schools_to_collect`, `Store.textbook_candidates`, `Store.apply_school_collection`
 - Produces:
-  - `normalize_publisher(name: str) -> str` — 공백·`(주)`·`㈜`·`주식회사` 제거, 소문자화.
+  - `normalize_publisher(name: str) -> str` — 공백·`(주)`·`㈜`·`주식회사` 제거, **끝에 붙은 저자 괄호 `(함순애)` 제거**, `컬쳐`→`컬처`, 소문자화. (실제 학교 표기: `천재교육(함순애)`, `㈜아트앤컬쳐`, `동아출판㈜`)
+  - `split_subjects(cell: str) -> list[str]` — `수학 / 수학익힘`→`['수학']`, `과학 / 실험관찰`→`['과학']`, `사회 / 사회과부도`→`['사회','사회과부도']`, `국어(3~4학년군)3-1가 / 3-2가`처럼 도서명에서 과목만(`국어`, `수학`, …, 괄호 앞 단어) 뽑는다. 익힘·실험관찰·활동은 본 과목에 합친다.
   - `build_items(store, items: list[dict]) -> tuple[list[dict], list[dict]]` — 입력 항목 `{"grade":int,"subject":str,"publisher":str,"certain":bool}`. `certain`이 False이거나 `textbook_candidates(grade, subject)`에서 정규화한 출판사가 **정확히 하나** 일치하지 않으면 건너뛴다. 일치하면 후보 중 학기 번호가 가장 작은 행(null 학기 우선)의 id로 `{"grade","subject","textbook_id"}`. 반환 `(저장할 항목, 건너뛴 항목 + "reason")`.
   - `save_result(store, result: dict) -> dict` — 입력 `{"school_id":int,"status":"done"|"not_found"|"failed","source_url":str|None,"items":[...]}`. `status`가 `done`인데 저장 가능한 항목이 0개면 `not_found`로 바꿔 저장한다(확신 못 하면 "찾지 못함"). 반환 `{"school_id", "status", "saved": n, "skipped": [...]}`.
   - CLI: `python -m eduapp_batch.school_collect next [--limit 10]` → `schools_to_collect` 결과를 JSON 배열로 출력(`id, name, homepage_url, neis_code`); `python -m eduapp_batch.school_collect save result.json` → `save_result` 결과 JSON 출력. 저장소 선택은 `run_programs.main` 방식.
-  - `SCHOOL_COLLECT_TASK.md`: 예약 작업 지침 — ① `next` 실행 ② 학교마다 홈페이지 공지에서 "교과용도서 선정" 계열 게시물을 찾고(게시판 이름·검색어 예시 포함), 첨부는 `attachment_text`로 읽기 ③ 학년·과목별 출판사를 읽어 `result.json` 작성(**표에 명시된 것만 `certain:true`, 추측·다른 학교 정보·이전 연도 표는 `certain:false`**; 3~6학년 검정 과목 중 읽은 것만 포함) ④ 못 찾으면 `status:"not_found"`, 접속·파싱 오류는 `status:"failed"` ⑤ `save` 실행 ⑥ 학교별 한 줄 요약(성공/찾지 못함/실패와 원인). 하지 않는 것: 코드 수정, 커밋, `certain`을 사람 눈으로 추측해 올리기. 알림 푸시는 계획 5.
+  - `SCHOOL_COLLECT_TASK.md`: 예약 작업 지침(두 시범 학교 조사 문서의 게시판·첨부 구조를 근거로 쓴다: 경기도 학교 CMS는 목록을 **GET**으로만 받고, 교과서는 알림마당/공지사항에서 `교과서 목록`·`검인정교과서 출판사 안내` 같은 제목, 첨부는 `goe_attachment_links`로 받는 `.xlsx`/`.pdf`, 학사일정이 이미지 한 장이면 이미지를 직접 읽는다) — ① `next` 실행 ② 학교마다 홈페이지 공지에서 "교과용도서 선정" 계열 게시물을 찾고(게시판 이름·검색어 예시 포함), 첨부는 `attachment_text`로 읽기 ③ 학년·과목별 출판사를 읽어 `result.json` 작성(**표에 명시된 것만 `certain:true`, 추측·다른 학교 정보·이전 연도 표는 `certain:false`**; 3~6학년 검정 과목 중 읽은 것만 포함) ④ 못 찾으면 `status:"not_found"`, 접속·파싱 오류는 `status:"failed"` ⑤ `save` 실행 ⑥ 학교별 한 줄 요약(성공/찾지 못함/실패와 원인). 하지 않는 것: 코드 수정, 커밋, `certain`을 사람 눈으로 추측해 올리기. 알림 푸시는 계획 5.
 
-- [ ] **Step 1: 실패하는 테스트** — fake store(메서드 두 개를 가진 간단한 클래스) 사용: `test_normalize_publisher_variants`(`(주)천재교육`·`천재 교육`·`㈜천재교육` 모두 같은 값), `test_certain_exact_match_saves_lowest_semester_row`, `test_uncertain_item_is_skipped`, `test_unmatched_publisher_is_skipped_not_guessed`(후보에 없는 출판사 → 저장 0, skipped에 reason), `test_ambiguous_normalized_match_is_skipped`(정규화 후 두 후보가 같음), `test_done_with_zero_saved_becomes_not_found`, `test_failed_and_not_found_pass_through_without_items`.
+- [ ] **Step 1: 실패하는 테스트** — fake store(메서드 두 개를 가진 간단한 클래스) 사용: `test_normalize_publisher_variants`(`(주)천재교육`·`천재 교육`·`㈜천재교육`·`천재교육(함순애)` 모두 같은 값, `㈜아트앤컬쳐`==`아트앤컬처`), `test_split_subjects_real_cells`(귀인초 표의 `수학 / 수학익힘`·`사회 / 사회과부도`, 율목초 도서명), `test_school_tables_match_catalog`(귀인초 PDF·율목초 XLSX fixture를 `extract_text`→파싱→`build_items`: 검정 행 64건 전부 저장 가능, 국정·인정 행은 건너뛰고 reason에 `not 검정`), `test_certain_exact_match_saves_lowest_semester_row`, `test_uncertain_item_is_skipped`, `test_unmatched_publisher_is_skipped_not_guessed`(후보에 없는 출판사 → 저장 0, skipped에 reason), `test_ambiguous_normalized_match_is_skipped`(정규화 후 두 후보가 같음), `test_done_with_zero_saved_becomes_not_found`, `test_failed_and_not_found_pass_through_without_items`.
 - [ ] **Step 2: 실패 확인** — `pytest tests/test_school_collect.py -v`
 - [ ] **Step 3: 구현** — 시그니처대로. 순수 함수 위주로 두고 CLI는 얇게.
 - [ ] **Step 4: 통과 확인** — `pytest -q` 전체 통과. 지침 문서가 위 ①~⑥과 "하지 않는 것"을 모두 담았는지 눈으로 확인.
@@ -269,6 +272,6 @@
 - [ ] **Step 1: 전체 자동 검사** — `cd batch && TEST_PG_ADMIN_URL=postgresql://postgres:test@localhost:5432/postgres pytest -q` 전부 통과, `cd app && flutter analyze && flutter test` 전부 통과.
 - [ ] **Step 2: 운영 DB 적용(사용자 확인 후)** — 새 마이그레이션 `20261107000002_school_textbooks.sql`을 Supabase에 적용. 적용 전 사용자에게 알린다.
 - [ ] **Step 3: 목록 적재(사용자 환경)** — 교과서 CSV로 `python -m eduapp_batch.textbooks_load <csv>` 실행, `textbooks` 행 수 확인.
-- [ ] **Step 4: 시범 학교 5곳 실수집(사용자 환경, 네트워크 Full)** — 학교 5곳에 자녀를 등록해 대기로 만들고 `neis_calendar`와 `SCHOOL_COLLECT_TASK.md` 절차를 한 번 실행. Task 4·5의 실제 응답·실파일 확인 단계를 여기서 끝낸다. **완료 기준: 5곳 중 4곳에서 교과서 `confirmed`가 하나 이상 저장**되고, 저장된 값이 학교 공지 원문과 일치(사람이 5곳 모두 대조), 틀린 값이 하나라도 있으면 지침(`certain` 기준)을 고쳐 다시 실행.
+- [ ] **Step 4: 시범 학교 2곳 실수집(귀인초 7569013, 율목초 7679051, 네트워크 Full)** — 두 학교에 자녀를 등록해 대기로 만들고 `neis_calendar`와 `SCHOOL_COLLECT_TASK.md` 절차를 한 번 실행. **완료 기준(조사 문서의 실제 값과 대조):** ① 두 학교 모두 검정 과목이 `confirmed`로 저장되고 값이 학교 표와 일치(귀인 3학년 사회=비상교육, 율목 3학년 사회=아이스크림미디어 등 — 같은 지역 두 학교가 서로 다름), 국정·인정 행은 저장되지 않음. ② 나이스 학사일정(`NEIS_API_KEY` 필요)의 `school_calendar.is_holiday`가 귀인초 5/4·11/19, 율목초 5/1·5/4(학교 공지 값)와 일치하고 토요일은 없음. 율목초 학사일정은 이미지라 이 대조가 유일한 검증. ③ 틀린 값이 하나라도 있으면 지침(`certain` 기준)을 고쳐 다시 실행. `.hwp` 실파일은 두 학교 교과서 공지에 없어 확인 대상이 아니다(hwp는 학교 양식 `학교장허가교외체험학습 신청서`뿐) → hwp 확인은 다른 학교를 만날 때까지 보류하고 Task 5의 hwp 레코드 파서 테스트만 유지.
 - [ ] **Step 5: 실기기 확인** — APK를 사용자 휴대폰에 설치(`app/README.md` 절차)해 S3(쉬는 날 필터)·S4(교과서 고치기)를 따라 해보고, S1 4~5의 안내 문구(확인 중 → 수집 후 확인됨)를 확인. 푸시는 계획 5.
 - [ ] **Step 6: Commit** — `docs: plan 3 roadmap and readme updates`
