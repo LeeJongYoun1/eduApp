@@ -6,6 +6,7 @@ import pytest
 
 from eduapp_batch.models import CalendarDay, Institution, Program
 from eduapp_batch.parse import KST
+from eduapp_batch.school_progress import ProgressRow
 from eduapp_batch.store import RestStore
 
 INST = Institution(key="k", name="관", sido="서울", sigungu=None, homepage_url="https://x")
@@ -103,3 +104,30 @@ def test_set_school_status_patches_by_id():
     with pytest.raises(ValueError):
         s.set_school_status(5, "pending")
     assert len(seen) == 2
+
+
+def test_schools_needing_progress_embeds_children_and_filters_on_cutoff():
+    s, seen = store_with(lambda r: httpx.Response(200, json=[{"id": 1, "name": "a", "children": [{"id": 9}]}]))
+    assert s.schools_needing_progress(date(2026, 11, 7)) == [{"id": 1, "name": "a"}]
+    r = seen[0]
+    assert r.method == "GET" and r.url.path == "/rest/v1/schools"
+    assert r.url.params["select"] == COLS + ",children!inner(id)"
+    assert r.url.params["or"] == "(progress_collected_at.is.null,progress_collected_at.lt.2026-10-08T00:00:00+00:00)"
+
+
+def test_apply_progress_calls_rpc_with_named_args():
+    s, seen = store_with(lambda r: httpx.Response(204))
+    s.apply_progress(5, 2026, 4, 1, ProgressRow("국어", "[4국02-04]", "2. 서로 다른 의견", 4), "https://x")
+    r = seen[0]
+    assert r.method == "POST" and r.url.path == "/rest/v1/rpc/apply_school_progress"
+    assert json.loads(r.content) == {
+        "p_school_id": 5, "p_school_year": 2026, "p_grade": 4, "p_semester": 1, "p_subject": "국어",
+        "p_standard_code": "[4국02-04]", "p_unit_title": "2. 서로 다른 의견", "p_month": 4, "p_source_url": "https://x"}
+
+
+def test_set_progress_collected_patches_school():
+    s, seen = store_with(lambda r: httpx.Response(204))
+    s.set_progress_collected(5)
+    r = seen[0]
+    assert r.method == "PATCH" and r.url.path == "/rest/v1/schools" and r.url.params["id"] == "eq.5"
+    assert "progress_collected_at" in json.loads(r.content)

@@ -3,6 +3,7 @@ from datetime import date
 import pytest
 
 from eduapp_batch.models import CalendarDay, Institution, Program
+from eduapp_batch.school_progress import ProgressRow
 from eduapp_batch.store import PgStore, ensure_institution, record_run, upsert_programs
 
 INST = Institution(key="gwacheon_science", name="국립과천과학관", sido="경기", sigungu="과천시",
@@ -91,3 +92,29 @@ def test_apply_textbook_and_set_status(db):
     assert status == "done" and at is not None
     with pytest.raises(ValueError):
         s.set_school_status(sid, "pending")
+
+
+def test_schools_needing_progress_filters(db):
+    db.execute("insert into auth.users (id) values ('00000000-0000-0000-0000-000000000001')")
+    ids = {k: _school(db, k) for k in ("null", "stale", "fresh", "nochild")}
+    for k in ("null", "stale", "fresh"):
+        db.execute("insert into children (parent_id, nickname, school_id, grade) values "
+                   "('00000000-0000-0000-0000-000000000001', 'c', %s, 3)", (ids[k],))
+    db.execute("update schools set progress_collected_at = now() - interval '31 days' where id = %s", (ids["stale"],))
+    db.execute("update schools set progress_collected_at = now() - interval '29 days' where id = %s", (ids["fresh"],))
+    rows = PgStore(db).schools_needing_progress(date.today())
+    assert [r["id"] for r in rows] == sorted([ids["null"], ids["stale"]])
+    assert set(rows[0]) == {"id", "neis_code", "edu_office_code", "name", "homepage_url", "collect_status"}
+
+
+def test_apply_progress_and_mark_collected(db):
+    s = _school(db, "1")
+    store = PgStore(db)
+    row = ProgressRow("국어", "[4국02-04]", "2. 서로 다른 의견", 4)
+    store.apply_progress(s, 2026, 4, 1, row, "https://x")
+    store.apply_progress(s, 2026, 4, 1, ProgressRow("국어", "[4국02-04]", "2. 바뀜", 5), "https://y")
+    assert db.execute("select grade, semester, unit_title, month, source_url from school_progress").fetchall() == [
+        (4, 1, "2. 바뀜", 5, "https://y")]
+    assert db.execute("select progress_collected_at from schools").fetchone()[0] is None
+    store.set_progress_collected(s)
+    assert db.execute("select progress_collected_at from schools").fetchone()[0] is not None

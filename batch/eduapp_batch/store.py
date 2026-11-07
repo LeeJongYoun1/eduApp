@@ -7,15 +7,21 @@ from datetime import date, datetime, timedelta, timezone
 import httpx
 
 from .models import CalendarDay, Institution, Program, School
+from .school_progress import ProgressRow
 
 _COLS = [f.name for f in fields(Program)]
 _SCHOOL_COLS = "id,neis_code,edu_office_code,name,homepage_url,collect_status"
 _STATUSES = ("done", "failed", "not_found")
 _STALE_DAYS = 330
+_PROGRESS_DAYS = 30  # shortcut: 평가계획은 학기에 한두 번 올라오므로 30일마다 다시 본다, 놓치는 학교가 많으면 줄인다
 
 
 def _cutoff(today: date) -> datetime:
     return datetime(today.year, today.month, today.day, tzinfo=timezone.utc) - timedelta(days=_STALE_DAYS)
+
+
+def _progress_cutoff(today: date) -> datetime:
+    return datetime(today.year, today.month, today.day, tzinfo=timezone.utc) - timedelta(days=_PROGRESS_DAYS)
 
 
 def _dedupe(days: list[CalendarDay]) -> list[CalendarDay]:
@@ -117,6 +123,20 @@ class PgStore:
                    on conflict (school_id, day, event_name) do update set is_holiday = excluded.is_holiday""", rows)
         return len(rows)
 
+    def schools_needing_progress(self, today: date) -> list[dict]:
+        return self._schools(
+            "exists (select 1 from children c where c.school_id = s.id) and "
+            "(progress_collected_at is null or progress_collected_at < %s)", (_progress_cutoff(today),))
+
+    def apply_progress(self, school_id: int, school_year: int, grade: int, semester: int, row: ProgressRow,
+                       source_url: str | None) -> None:
+        self.conn.execute("select apply_school_progress(%s, %s, %s, %s, %s, %s, %s, %s, %s)",
+                          (school_id, school_year, grade, semester, row.subject, row.standard_code,
+                           row.unit_title, row.month, source_url))
+
+    def set_progress_collected(self, school_id: int) -> None:
+        self.conn.execute("update schools set progress_collected_at = now() where id = %s", (school_id,))
+
     def apply_textbook(self, school_id: int, grade: int, subject: str, publisher: str,
                        source_url: str | None) -> None:
         self.conn.execute("select apply_school_textbook(%s, %s, %s, %s, %s)",
@@ -193,6 +213,26 @@ class RestStore:
             self._post("school_calendar", rows, "resolution=merge-duplicates,return=minimal",
                        on_conflict="school_id,day,event_name")
         return len(rows)
+
+    def schools_needing_progress(self, today: date) -> list[dict]:
+        cutoff = _progress_cutoff(today).isoformat()
+        rows = self._get("schools", select=_SCHOOL_COLS + ",children!inner(id)", order="id", **{"or": (
+            f"(progress_collected_at.is.null,progress_collected_at.lt.{cutoff})")})
+        return [{k: v for k, v in r.items() if k != "children"} for r in rows]
+
+    def apply_progress(self, school_id: int, school_year: int, grade: int, semester: int, row: ProgressRow,
+                       source_url: str | None) -> None:
+        r = self.client.post("/rest/v1/rpc/apply_school_progress", content=json.dumps(
+            {"p_school_id": school_id, "p_school_year": school_year, "p_grade": grade, "p_semester": semester,
+             "p_subject": row.subject, "p_standard_code": row.standard_code, "p_unit_title": row.unit_title,
+             "p_month": row.month, "p_source_url": source_url}, ensure_ascii=False))
+        r.raise_for_status()
+
+    def set_progress_collected(self, school_id: int) -> None:
+        r = self.client.patch("/rest/v1/schools", params={"id": f"eq.{school_id}"},
+                              headers={"Prefer": "return=minimal"},
+                              content=json.dumps({"progress_collected_at": datetime.now(timezone.utc).isoformat()}))
+        r.raise_for_status()
 
     def apply_textbook(self, school_id: int, grade: int, subject: str, publisher: str,
                        source_url: str | None) -> None:
