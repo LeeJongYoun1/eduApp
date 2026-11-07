@@ -36,6 +36,11 @@ List<SchoolTextbook> four() => [
   tb('영어'),
 ];
 
+ProgressItem pr(String subject, String unit, int month) =>
+    ProgressItem(subject: subject, standardCode: '[4국01-01]', unitTitle: unit, month: month);
+
+final _today = DateTime(2026, 11, 7);
+
 Future<void> open(
   WidgetTester t,
   FakeRepository repo, {
@@ -48,7 +53,7 @@ Future<void> open(
         data: MediaQuery.of(ctx).copyWith(textScaler: TextScaler.linear(scale)),
         child: child!,
       ),
-      home: Scaffold(body: SchoolTab(repo: repo)),
+      home: Scaffold(body: SchoolTab(repo: repo, now: () => _today)),
     ),
   );
   await t.pumpAndSettle();
@@ -114,7 +119,9 @@ void main() {
     await t.tap(find.text('저장'));
     await t.pumpAndSettle();
     expect(repo.calls, contains('correctPublisher(1,사회,비상교육)'));
-    expect(repo.calls.last, 'schoolTextbooks(1)');
+    // 저장 뒤 목록을 다시 불러왔다 (마지막 호출은 진도 조회일 수 있어 순서만 본다)
+    expect(repo.calls.lastIndexOf('schoolTextbooks(1)'),
+        greaterThan(repo.calls.indexWhere((c) => c.startsWith('correctPublisher'))));
     expect(find.text('비상교육'), findsOneWidget);
     expect(find.text('지학사'), findsNothing);
     expect(find.text('확인 중'), findsNWidgets(2)); // 과학 칩 + 영어 글자
@@ -156,7 +163,8 @@ void main() {
   testWidgets('grade under 3 shows notice', (t) async {
     final repo = FakeRepository(signedIn: true, children: [kid(grade: 2)]);
     await open(t, repo);
-    expect(find.text('3학년부터 출판사를 볼 수 있어요'), findsOneWidget);
+    expect(find.text('3학년부터 출판사를 볼 수 있어요'), findsNothing);
+    expect(find.text('1·2학년은 모든 학교가 같은 국정교과서를 써요'), findsOneWidget);
     expect(repo.calls, isNot(contains('schoolTextbooks(1)')));
   });
 
@@ -190,7 +198,7 @@ void main() {
     await open(t, repo);
     await t.tap(find.text('하은'));
     await t.pumpAndSettle();
-    expect(repo.calls.last, 'schoolTextbooks(2)');
+    expect(repo.calls, contains('schoolTextbooks(2)'));
     expect(find.text('동아출판'), findsOneWidget);
   });
 
@@ -239,6 +247,99 @@ void main() {
     await open(t, repo, scale: 2.0);
     expect(t.takeException(), isNull);
     await openSheet(t, '수학');
+    expect(t.takeException(), isNull);
+  });
+
+  testWidgets('shows this month items with assessment month label', (t) async {
+    final repo = FakeRepository(signedIn: true, children: [kid()])
+      ..textbooks[1] = four()
+      ..progressByChild[1] = [
+        pr('국어', '2. 서로 다른 의견', 11),
+        pr('수학', '1. 큰 수', 12),
+        pr('과학', '3. 식물', 3),
+      ];
+    await open(t, repo);
+    expect(repo.calls, contains('childProgress(1,2026,2)'));
+    await t.scrollUntilVisible(find.text('국어 · 2. 서로 다른 의견'), 200);
+    expect(find.text('이번 달 예상 진도'), findsOneWidget);
+    expect(find.text('11월 평가 예정'), findsOneWidget);
+    expect(find.text('다음 달'), findsOneWidget);
+    await t.scrollUntilVisible(find.text('학교 평가계획 기준이며 바뀔 수 있어요'), 200);
+    expect(find.text('수학 · 1. 큰 수'), findsOneWidget);
+    expect(find.text('12월 평가 예정'), findsOneWidget);
+    expect(find.text('과학 · 3. 식물'), findsNothing);
+  });
+
+  testWidgets('empty progress shows notice', (t) async {
+    final repo = FakeRepository(signedIn: true, children: [kid()])..textbooks[1] = four();
+    await open(t, repo);
+    await t.scrollUntilVisible(find.text('학교 평가계획을 아직 찾지 못했어요'), 200);
+    expect(find.text('학교 평가계획 기준이며 바뀔 수 있어요'), findsNothing);
+  });
+
+  testWidgets('no items this and next month shows no-exam notice', (t) async {
+    final repo = FakeRepository(signedIn: true, children: [kid()])
+      ..textbooks[1] = four()
+      ..progressByChild[1] = [pr('과학', '3. 식물', 3)];
+    await open(t, repo);
+    await t.scrollUntilVisible(find.text('이번 달 평가 예정 단원이 없어요'), 200);
+    expect(find.text('학교 평가계획 기준이며 바뀔 수 있어요'), findsOneWidget);
+    expect(find.text('과학 · 3. 식물'), findsNothing);
+  });
+
+  testWidgets('grade under 3 shows national textbook notice and progress', (t) async {
+    final repo = FakeRepository(signedIn: true, children: [kid(grade: 2)])
+      ..progressByChild[1] = [pr('국어', '3. 그림일기를 써요', 11)];
+    await open(t, repo);
+    expect(find.text('1·2학년은 모든 학교가 같은 국정교과서를 써요'), findsOneWidget);
+    expect(find.text('국어 · 3. 그림일기를 써요'), findsOneWidget);
+    expect(find.text('11월 평가 예정'), findsOneWidget);
+  });
+
+  testWidgets('stale progress load ignored', (t) async {
+    final repo = FakeRepository(signedIn: true, children: [
+      kid(),
+      kid(id: 2, name: '하은'),
+    ])
+      ..textbooks[1] = four()
+      ..textbooks[2] = four()
+      ..progressByChild[1] = [pr('국어', 'A단원', 11)]
+      ..progressByChild[2] = [pr('수학', 'B단원', 11)];
+    await open(t, repo);
+    repo.holdProgress[2] = Completer<void>();
+    await t.tap(find.widgetWithText(ChoiceChip, '하은'));
+    await t.pump(const Duration(milliseconds: 300)); // 칩 애니메이션이 끝난 뒤에 다음 탭
+    await t.tap(find.widgetWithText(ChoiceChip, '서준'));
+    await t.pumpAndSettle();
+    repo.holdProgress[2]!.complete();
+    await t.pumpAndSettle();
+    // 칩 줄도 스크롤 영역이라 목록(ListView)의 것만 지정한다
+    await t.scrollUntilVisible(find.text('국어 · A단원'), 200,
+        scrollable: find.descendant(of: find.byType(ListView), matching: find.byType(Scrollable)));
+    expect(find.text('수학 · B단원'), findsNothing);
+  });
+
+  testWidgets('progress failure does not hide publishers', (t) async {
+    final repo = FakeRepository(signedIn: true, children: [kid()])
+      ..textbooks[1] = four()
+      ..progressByChild[1] = [pr('국어', 'A단원', 11)]
+      ..progressFailWith = Exception('boom');
+    await open(t, repo);
+    expect(find.text('수학'), findsOneWidget);
+    await t.scrollUntilVisible(find.text('다시 시도'), 200);
+    expect(find.text('불러오지 못했어요'), findsOneWidget);
+    await t.tap(find.text('다시 시도'));
+    await t.pumpAndSettle();
+    await t.scrollUntilVisible(find.text('국어 · A단원'), 200);
+  });
+
+  testWidgets('no overflow at textScale 2.0 with progress', (t) async {
+    final repo = FakeRepository(signedIn: true, children: [kid()])
+      ..textbooks[1] = four()
+      ..progressByChild[1] = [pr('국어', '3. 짜임새 있는 글, 재미와 감동이 있는 글', 11)];
+    await open(t, repo, scale: 2);
+    await t.scrollUntilVisible(find.text('국어 · 3. 짜임새 있는 글, 재미와 감동이 있는 글'), 200);
+    expect(find.text('11월 평가 예정'), findsOneWidget);
     expect(t.takeException(), isNull);
   });
 }

@@ -93,6 +93,13 @@ class SupabaseRepository implements EduRepository {
   }
 
   @override
+  Future<List<ProgressItem>> childProgress(int childId, int schoolYear, int semester) async {
+    final rows = await _db.rpc('child_progress',
+        params: {'p_child_id': childId, 'p_school_year': schoolYear, 'p_semester': semester}) as List;
+    return rows.map((r) => ProgressItem.fromJson(r as Map<String, dynamic>)).toList();
+  }
+
+  @override
   Future<Set<DateTime>> holidays(int schoolId, DateTime from, DateTime to) async {
     final rows = await _db
         .from('school_calendar')

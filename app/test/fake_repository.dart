@@ -27,6 +27,9 @@ class FakeRepository implements EduRepository {
   List<ProgramItem> programList;
   Set<int> favorites;
   Map<int, List<SchoolTextbook>> textbooks = {}; // 자녀 id → 과목 목록
+  Map<int, List<ProgressItem>> progressByChild = {}; // 자녀 id → 진도 행
+  Map<int, Completer<void>> holdProgress = {}; // 자녀 id → childProgress 응답을 붙잡는다 (경합 테스트용)
+  Object? progressFailWith; // 다음 childProgress 한 번이 던질 예외 (진도 구역 실패가 출판사를 막지 않는지 보는 용도)
   Map<int, Completer<void>> holdTextbooks = {}; // 자녀 id → 완료될 때까지 schoolTextbooks 응답을 붙잡는다 (경합 테스트용)
   Set<DateTime> holidaySet = {}; // 날짜만(시각 없음) 쉬는 날
   Map<int, Completer<void>> holdHolidays = {}; // 학교 id → 완료될 때까지 holidays 응답을 붙잡는다 (경합 테스트용)
@@ -82,6 +85,19 @@ class FakeRepository implements EduRepository {
   Future<List<SchoolTextbook>> schoolTextbooks(int childId) async {
     final rows = await _call<List<SchoolTextbook>>('schoolTextbooks($childId)', () => List.of(textbooks[childId] ?? []));
     await holdTextbooks[childId]?.future;
+    return rows;
+  }
+  @override
+  Future<List<ProgressItem>> childProgress(int childId, int schoolYear, int semester) async {
+    final rows = await _call<List<ProgressItem>>('childProgress($childId,$schoolYear,$semester)', () {
+      final f = progressFailWith;
+      if (f != null) {
+        progressFailWith = null;
+        throw f;
+      }
+      return List.of(progressByChild[childId] ?? []);
+    });
+    await holdProgress[childId]?.future;
     return rows;
   }
   @override

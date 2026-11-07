@@ -16,6 +16,7 @@ abstract class EduRepository {
   Future<Set<int>> favoriteIds();
   Future<void> setFavorite(int programId, bool on);
   Future<List<SchoolTextbook>> schoolTextbooks(int childId);
+  Future<List<ProgressItem>> childProgress(int childId, int schoolYear, int semester);
   /// 학교 `is_holiday` 날(날짜만, 시각 없음) — from~to 포함.
   Future<Set<DateTime>> holidays(int schoolId, DateTime from, DateTime to);
   Future<void> correctPublisher(int childId, String subject, String publisher);

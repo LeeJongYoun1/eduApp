@@ -51,4 +51,13 @@ void main() {
     final t = kst(DateTime.utc(2026, 11, 26, 14, 59));
     expect((t.day, t.hour, t.minute), (26, 23, 59));
   });
+
+  test('school term boundaries', () {
+    expect(schoolTerm(DateTime(2026, 2, 28)), (2025, 2));
+    expect(schoolTerm(DateTime(2026, 3, 1)), (2026, 1));
+    expect(schoolTerm(DateTime(2026, 8, 31)), (2026, 1));
+    expect(schoolTerm(DateTime(2026, 9, 1)), (2026, 2));
+    expect(schoolTerm(DateTime(2026, 12, 31)), (2026, 2));
+    expect(schoolTerm(DateTime(2027, 1, 1)), (2026, 2));
+  });
 }

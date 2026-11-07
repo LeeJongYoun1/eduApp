@@ -5,6 +5,13 @@ const _weekdays = ['월', '화', '수', '목', '금', '토', '일'];
 /// DB의 timestamptz → KST 벽시계 (기기 시간대 무시).
 DateTime kst(DateTime t) => t.toUtc().add(const Duration(hours: 9));
 
+/// (학년도, 학기). 3~8월 = 그 해 1학기, 9~12월 = 그 해 2학기, 1~2월 = 직전 학년도 2학기. 인자는 KST 벽시계 값.
+(int, int) schoolTerm(DateTime today) {
+  if (today.month >= 9) return (today.year, 2);
+  if (today.month >= 3) return (today.year, 1);
+  return (today.year - 1, 2);
+}
+
 String fmtDate(DateTime d, DateTime today) {
   final w = _weekdays[d.weekday - 1];
   return d.year == today.year ? '${d.month}/${d.day}($w)' : '${d.year}/${d.month}/${d.day}($w)';

@@ -54,6 +54,22 @@ class SchoolTextbook {
       );
 }
 
+/// 학교 평가계획에서 읽은 한 단원. month는 수업이 아니라 평가 월이다.
+class ProgressItem {
+  const ProgressItem({required this.subject, required this.standardCode, required this.unitTitle, required this.month});
+  final String subject;
+  final String standardCode;
+  final String unitTitle;
+  final int month;
+
+  factory ProgressItem.fromJson(Map<String, dynamic> j) => ProgressItem(
+        subject: j['subject'] as String,
+        standardCode: j['standard_code'] as String,
+        unitTitle: j['unit_title'] as String,
+        month: j['month'] as int,
+      );
+}
+
 class Child {
   const Child({required this.id, required this.nickname, required this.grade, required this.school});
   final int id;
