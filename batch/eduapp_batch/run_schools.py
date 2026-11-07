@@ -40,7 +40,7 @@ def _collect(school: dict, fetch, fetch_bytes, work: Path, sleep) -> int | str:
     if not posts:
         return "교과서 선정 공지 없음"
     texts: list[tuple[str, str, str, str]] = []  # (게시물 제목, 이름, 글자, 게시물 주소)
-    downloads = failures = 0
+    downloads = failures = att_texts = 0
     last_error: Exception | None = None
     for p in posts:
         if p.body.strip():
@@ -57,10 +57,11 @@ def _collect(school: dict, fetch, fetch_bytes, work: Path, sleep) -> int | str:
                 failures, last_error = failures + 1, e
                 continue
             if text.strip():
+                att_texts += 1
                 texts.append((p.title, att.name, text, p.url))
+    if failures and not att_texts:  # 파일을 못 받은 것은 '공지 없음'이 아니라 재시도 대상 (본문이 "붙임 참조"뿐일 수 있다)
+        raise last_error  # type: ignore[misc]
     if not texts:
-        if downloads and failures == downloads:  # 파일을 못 받은 것은 '공지 없음'이 아니라 재시도 대상
-            raise last_error  # type: ignore[misc]
         return "첨부에서 글자를 읽지 못함"
     out = work / school["neis_code"]
     out.mkdir(parents=True, exist_ok=True)

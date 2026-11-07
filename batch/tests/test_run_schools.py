@@ -122,15 +122,37 @@ def test_all_downloads_failing_marks_failed_not_not_found(tmp_path, monkeypatch)
     assert "ConnectError" in res["A"] and store.status == {1: "failed"}
 
 
-def test_one_download_failure_skips_attachment_and_body_alone_is_enough(tmp_path, monkeypatch):
-    posts = [post("2026학년도 천재교육 과학", [("a.pdf", "https://x/a.pdf"), ("b.pdf", "https://x/b.pdf")])]
+def _down(url):
+    raise httpx.ConnectError("reset")
+
+
+def test_download_failures_with_no_attachment_text_mark_failed_even_with_body(tmp_path, monkeypatch):
+    posts = [post("붙임 참조", [("a.pdf", "https://x/a.pdf"), ("b.pdf", "https://x/b.pdf")])]
+    monkeypatch.setattr(run_schools, "find_textbook_posts", lambda u, f: posts)
+    store = FakeStore([school(1, "A")])
+    res = go(store, tmp_path, fetch_bytes=_down)
+    assert "ConnectError" in res["A"] and store.status == {1: "failed"}
+    assert not (tmp_path / "A").exists()
+
+
+def test_body_alone_is_enough_when_post_has_no_attachments(tmp_path, monkeypatch):
+    monkeypatch.setattr(run_schools, "find_textbook_posts", lambda u, f: [post("2026학년도 천재교육 과학", [])])
+    store = FakeStore([school(1, "A")])
+    assert go(store, tmp_path, fetch_bytes=_down) == {"A": 1}
+    assert "(본문)" in (tmp_path / "A" / "text_1.txt").read_text().splitlines()[0]
+    assert store.status == {}
+
+
+def test_one_attachment_ok_and_one_failed_is_written(tmp_path, monkeypatch):
+    posts = [post("", [("a.pdf", "https://x/a.pdf"), ("b.pdf", "https://x/b.pdf")])]
     monkeypatch.setattr(run_schools, "find_textbook_posts", lambda u, f: posts)
 
     def down(url):
-        raise httpx.ConnectError("reset")
+        if url.endswith("b.pdf"):
+            raise httpx.ConnectError("reset")
+        return blob(url)
     store = FakeStore([school(1, "A")])
     assert go(store, tmp_path, fetch_bytes=down) == {"A": 1}
-    assert "(본문)" in (tmp_path / "A" / "text_1.txt").read_text().splitlines()[0]
     assert store.status == {}
 
 
