@@ -5,8 +5,9 @@ import '../data/repository.dart';
 import 'child_edit_screen.dart';
 import 'programs_tab.dart';
 import 'region_screen.dart';
+import 'school_tab.dart';
 
-/// 하단 탭: 홈 · 체험 (우리 학교·집 실험은 계획 3·4).
+/// 하단 탭: 홈 · 체험 · 우리 학교 (집 실험은 계획 4).
 class HomeShell extends StatefulWidget {
   const HomeShell({super.key, required this.repo, required this.onSignedOut});
   final EduRepository repo;
@@ -22,12 +23,14 @@ class _HomeShellState extends State<HomeShell> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text(_tab == 0 ? '홈' : '체험')),
+      appBar: AppBar(title: Text(const ['홈', '체험', '우리 학교'][_tab])),
       // 탭을 바꿀 때마다 새로 만든다: 홈에서 바꾼 자녀·지역이 체험 목록에 바로 반영된다.
       body: SafeArea(
-        child: _tab == 0
-            ? HomeTab(repo: widget.repo, onSignedOut: widget.onSignedOut)
-            : ProgramsTab(repo: widget.repo),
+        child: switch (_tab) {
+          0 => HomeTab(repo: widget.repo, onSignedOut: widget.onSignedOut),
+          1 => ProgramsTab(repo: widget.repo),
+          _ => SchoolTab(repo: widget.repo),
+        },
       ),
       bottomNavigationBar: NavigationBar(
         selectedIndex: _tab,
@@ -35,6 +38,7 @@ class _HomeShellState extends State<HomeShell> {
         destinations: const [
           NavigationDestination(icon: Icon(Icons.home_outlined), selectedIcon: Icon(Icons.home), label: '홈'),
           NavigationDestination(icon: Icon(Icons.explore_outlined), selectedIcon: Icon(Icons.explore), label: '체험'),
+          NavigationDestination(icon: Icon(Icons.school_outlined), selectedIcon: Icon(Icons.school), label: '우리 학교'),
         ],
       ),
     );

@@ -1,14 +1,57 @@
 import '../format.dart';
 
+/// 학교 교과서 정보 수집 상태 (schools.collect_status).
+enum SchoolStatus {
+  notRequested,
+  pending,
+  done,
+  failed,
+  notFound;
+
+  /// 없거나 모르는 값은 notRequested.
+  static SchoolStatus parse(Object? v) => switch (v) {
+        'pending' => pending,
+        'done' => done,
+        'failed' => failed,
+        'not_found' => notFound,
+        _ => notRequested,
+      };
+}
+
 class School {
-  const School({required this.id, required this.name, required this.sido, this.sigungu});
+  const School(
+      {required this.id, required this.name, required this.sido, this.sigungu, this.status = SchoolStatus.notRequested});
   final int id;
   final String name;
   final String sido;
   final String? sigungu;
+  final SchoolStatus status;
 
-  factory School.fromJson(Map<String, dynamic> j) =>
-      School(id: j['id'] as int, name: j['name'] as String, sido: j['sido'] as String, sigungu: j['sigungu'] as String?);
+  factory School.fromJson(Map<String, dynamic> j) => School(
+      id: j['id'] as int,
+      name: j['name'] as String,
+      sido: j['sido'] as String,
+      sigungu: j['sigungu'] as String?,
+      status: SchoolStatus.parse(j['collect_status']));
+}
+
+/// 한 과목의 출판사. publisher가 없으면 아직 모르는 과목.
+class SchoolTextbook {
+  const SchoolTextbook(
+      {required this.subject, this.publisher, required this.confirmed, required this.isGuess, this.sourceUrl});
+  final String subject;
+  final String? publisher;
+  final bool confirmed;
+  final bool isGuess;
+  final String? sourceUrl;
+
+  factory SchoolTextbook.fromJson(Map<String, dynamic> j) => SchoolTextbook(
+        subject: j['subject'] as String,
+        publisher: j['publisher'] as String?,
+        confirmed: j['confidence'] == 'confirmed',
+        isGuess: j['is_guess'] as bool,
+        sourceUrl: j['source_url'] as String?,
+      );
 }
 
 class Child {

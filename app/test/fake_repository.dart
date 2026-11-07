@@ -24,6 +24,7 @@ class FakeRepository implements EduRepository {
   Set<Region> regionSet;
   List<ProgramItem> programList;
   Set<int> favorites;
+  Map<int, List<SchoolTextbook>> textbooks = {}; // 자녀 id → 과목 목록
   Object? failWith;
   bool autoConfirm; // true면 가입 즉시 로그인 상태 (Supabase 메일 확인 꺼짐)
   final List<String> calls = [];
@@ -71,5 +72,16 @@ class FakeRepository implements EduRepository {
   @override
   Future<void> setFavorite(int programId, bool on) => _call('setFavorite($programId,$on)', () {
         on ? favorites.add(programId) : favorites.remove(programId);
+      });
+  @override
+  Future<List<SchoolTextbook>> schoolTextbooks(int childId) =>
+      _call('schoolTextbooks($childId)', () => List.of(textbooks[childId] ?? []));
+  @override
+  Future<void> correctPublisher(int childId, String subject, String publisher) =>
+      _call('correctPublisher($childId,$subject,$publisher)', () {
+        textbooks[childId] = [
+          for (final b in textbooks[childId] ?? <SchoolTextbook>[])
+            b.subject == subject ? SchoolTextbook(subject: subject, publisher: publisher, confirmed: true, isGuess: false) : b
+        ];
       });
 }

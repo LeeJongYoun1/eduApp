@@ -15,4 +15,6 @@ abstract class EduRepository {
   Future<List<ProgramItem>> programs({int? grade, DateTime? from, DateTime? to});
   Future<Set<int>> favoriteIds();
   Future<void> setFavorite(int programId, bool on);
+  Future<List<SchoolTextbook>> schoolTextbooks(int childId);
+  Future<void> correctPublisher(int childId, String subject, String publisher);
 }

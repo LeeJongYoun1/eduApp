@@ -56,6 +56,7 @@ void main() {
     await open(t, repo);
     expect(find.widgetWithText(NavigationDestination, '홈'), findsOneWidget);
     expect(find.widgetWithText(NavigationDestination, '체험'), findsOneWidget);
+    expect(find.widgetWithText(NavigationDestination, '우리 학교'), findsOneWidget);
     expect(find.text('서준'), findsOneWidget);
     expect(find.textContaining('경기 성남시'), findsOneWidget);
     await t.tap(find.widgetWithText(NavigationDestination, '체험'));

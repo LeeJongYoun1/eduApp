@@ -27,7 +27,7 @@ class SupabaseRepository implements EduRepository {
   Future<List<Child>> children() async {
     final rows = await _db
         .from('children')
-        .select('id,nickname,grade,school:schools(id,name,sido,sigungu)')
+        .select('id,nickname,grade,school:schools(id,name,sido,sigungu,collect_status)')
         .order('created_at');
     return rows.map(Child.fromJson).toList();
   }
@@ -47,7 +47,7 @@ class SupabaseRepository implements EduRepository {
 
   @override
   Future<List<School>> searchSchools(String query) async {
-    final rows = await _db.from('schools').select('id,name,sido,sigungu').ilike('name', '%$query%').order('name').limit(20);
+    final rows = await _db.from('schools').select('id,name,sido,sigungu,collect_status').ilike('name', '%$query%').order('name').limit(20);
     return rows.map(School.fromJson).toList();
   }
 
@@ -85,4 +85,15 @@ class SupabaseRepository implements EduRepository {
   Future<void> setFavorite(int programId, bool on) => on
       ? _db.from('favorites').upsert({'user_id': _uid, 'program_id': programId})
       : _db.from('favorites').delete().eq('program_id', programId);
+
+  @override
+  Future<List<SchoolTextbook>> schoolTextbooks(int childId) async {
+    final rows = await _db.rpc('child_textbooks', params: {'p_child_id': childId}) as List;
+    return rows.map((r) => SchoolTextbook.fromJson(r as Map<String, dynamic>)).toList();
+  }
+
+  @override
+  Future<void> correctPublisher(int childId, String subject, String publisher) => _db.rpc(
+      'correct_school_publisher',
+      params: {'p_child_id': childId, 'p_subject': subject, 'p_publisher': publisher});
 }

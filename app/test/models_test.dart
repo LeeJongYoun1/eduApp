@@ -44,4 +44,12 @@ void main() {
     expect((<Region>{}..add(a)..add(b)).length, 1);
     expect(const Region('서울', '') == const Region('서울', '용산구'), isFalse);
   });
+
+  test('School.fromJson reads collect_status and defaults to notRequested', () {
+    School s(Object? v) => School.fromJson({'id': 1, 'name': '가', 'sido': '경기', 'collect_status': v});
+    expect(s('not_found').status, SchoolStatus.notFound);
+    expect(s('done').status, SchoolStatus.done);
+    expect(s(null).status, SchoolStatus.notRequested);
+    expect(s('weird').status, SchoolStatus.notRequested);
+  });
 }
