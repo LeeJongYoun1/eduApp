@@ -82,24 +82,30 @@ def prepare(store, fetch: Callable[[str], str], fetch_bytes: Callable[[str], byt
     for s in store.schools_with_children():  # ① 학사일정: 실패해도 교과서 수집·다음 학교는 계속
         target = f"calendar:{s['neis_code']}"
         try:
-            n = store.upsert_calendar(s["id"], fetch_schedule(s["edu_office_code"], s["neis_code"], key, today))
-            store.record_run(target, True, n, None)
-        except Exception as e:  # noqa: BLE001
-            store.record_run(target, False, None, _err(e))
+            try:
+                n = store.upsert_calendar(s["id"], fetch_schedule(s["edu_office_code"], s["neis_code"], key, today))
+                store.record_run(target, True, n, None)
+            except Exception as e:  # noqa: BLE001
+                store.record_run(target, False, None, _err(e))
+        except Exception:  # noqa: BLE001 — 기록 자체가 실패해도(저장소 5xx) 다음 학교로
+            pass
     result: dict[str, str | int] = {}
     for i, s in enumerate(store.schools_to_collect(today)[:MAX_SCHOOLS]):  # ② 교과서
         if i:
             sleep(SCHOOL_PAUSE)
         code, target = s["neis_code"], f"school:{s['neis_code']}"
         try:
-            result[code] = out = _collect(s, fetch, fetch_bytes, work, sleep)
-            if isinstance(out, str):
-                store.set_school_status(s["id"], "not_found")
-                store.record_run(target, False, None, out)
-        except Exception as e:  # noqa: BLE001
-            result[code] = msg = _err(e)
-            store.set_school_status(s["id"], "failed")
-            store.record_run(target, False, None, msg)
+            try:
+                result[code] = out = _collect(s, fetch, fetch_bytes, work, sleep)
+                if isinstance(out, str):
+                    store.set_school_status(s["id"], "not_found")
+                    store.record_run(target, False, None, out)
+            except Exception as e:  # noqa: BLE001
+                result[code] = msg = _err(e)
+                store.set_school_status(s["id"], "failed")
+                store.record_run(target, False, None, msg)
+        except Exception as e:  # noqa: BLE001 — 오류 처리 중 DB 호출이 실패해도 이 학교만 오류로 남기고 계속
+            result[code] = _err(e)
     return result
 
 
@@ -113,37 +119,43 @@ def _items(answer) -> list[dict]:
     return items
 
 
+def _apply_dir(store, work: Path, d: Path) -> int | str:
+    code, target = d.name, f"school:{d.name}"
+    try:
+        meta = json.loads((d / "meta.json").read_text(encoding="utf-8"))
+        school_id, source_url = meta["school_id"], meta["source_url"]
+        items = _items(json.loads((d / "answer.json").read_text(encoding="utf-8")))
+    except Exception as e:  # noqa: BLE001 — 형식이 틀리면 아무것도 저장하지 않고 폴더도 그대로 둔다
+        msg = _err(e)
+        store.record_run(target, False, None, msg)
+        return msg
+    saved = 0
+    for it in (i for i in items if i["certain"]):
+        try:
+            store.apply_textbook(school_id, it["grade"], it["subject"], it["publisher"].strip(), source_url)
+            saved += 1
+        except Exception as e:  # noqa: BLE001 — 잘못된 항목만 건너뜀
+            store.record_run(target, False, None, f"{it['grade']}학년 {it['subject']}: {_err(e)}")
+    if saved:
+        store.set_school_status(school_id, "done")
+        store.record_run(target, True, saved, None)
+    else:
+        store.set_school_status(school_id, "not_found")
+        store.record_run(target, False, None, NO_CERTAIN)
+    dest = work / "_done" / code
+    shutil.rmtree(dest, ignore_errors=True)
+    dest.parent.mkdir(exist_ok=True)
+    shutil.move(d, dest)
+    return saved
+
+
 def apply(store, work: Path) -> dict[str, str | int]:
     result: dict[str, str | int] = {}
     for answer in sorted(work.glob("*/answer.json")):
-        d = answer.parent
-        code, target = d.name, f"school:{d.name}"
         try:
-            meta = json.loads((d / "meta.json").read_text(encoding="utf-8"))
-            school_id, source_url = meta["school_id"], meta["source_url"]
-            items = _items(json.loads(answer.read_text(encoding="utf-8")))
-        except Exception as e:  # noqa: BLE001 — 형식이 틀리면 아무것도 저장하지 않고 폴더도 그대로 둔다
-            result[code] = msg = _err(e)
-            store.record_run(target, False, None, msg)
-            continue
-        saved = 0
-        for it in (i for i in items if i["certain"]):
-            try:
-                store.apply_textbook(school_id, it["grade"], it["subject"], it["publisher"].strip(), source_url)
-                saved += 1
-            except Exception as e:  # noqa: BLE001 — 잘못된 항목만 건너뜀
-                store.record_run(target, False, None, f"{it['grade']}학년 {it['subject']}: {_err(e)}")
-        if saved:
-            store.set_school_status(school_id, "done")
-            store.record_run(target, True, saved, None)
-        else:
-            store.set_school_status(school_id, "not_found")
-            store.record_run(target, False, None, NO_CERTAIN)
-        result[code] = saved
-        dest = work / "_done" / code
-        shutil.rmtree(dest, ignore_errors=True)
-        dest.parent.mkdir(exist_ok=True)
-        shutil.move(d, dest)
+            result[answer.parent.name] = _apply_dir(store, work, answer.parent)
+        except Exception as e:  # noqa: BLE001 — DB 오류는 그 학교만 오류로 남긴다(폴더는 그대로라 다음 실행에서 멱등 재시도)
+            result[answer.parent.name] = _err(e)
     return result
 
 

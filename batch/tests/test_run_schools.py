@@ -173,6 +173,60 @@ def test_prepare_caps_posts_and_attachments(tmp_path, monkeypatch):
     assert len(got) == 12 and not any(u.startswith("https://x/8_") for u in got)
 
 
+class BrokenStore(FakeStore):
+    """record_run / set_school_status가 특정 학교(school_id 2)에서만 DB 오류를 낸다."""
+    def record_run(self, target, ok, item_count, error):
+        if target.endswith(":B"):
+            raise RuntimeError("rest 503")
+        super().record_run(target, ok, item_count, error)
+
+    def set_school_status(self, school_id, status):
+        if school_id == 2:
+            raise RuntimeError("rest 503")
+        super().set_school_status(school_id, status)
+
+
+def test_prepare_db_error_on_one_school_does_not_stop_others(tmp_path, monkeypatch):
+    monkeypatch.setattr(run_schools, "find_textbook_posts", lambda u, f: [])  # 모두 not_found 경로
+    store = BrokenStore([school(1, "A"), school(2, "B"), school(3, "C")])
+    res = go(store, tmp_path)
+    assert res["A"] == res["C"] == "교과서 선정 공지 없음" and "rest 503" in res["B"]
+    assert store.status == {1: "not_found", 3: "not_found"}
+
+
+def test_prepare_db_error_inside_failure_handler_is_swallowed(tmp_path):
+    store = BrokenStore([school(1, "B", "https://bad.goeay.kr"), school(2, "A")])
+    res = go(store, tmp_path)  # B의 예외 처리 중 DB 호출도 실패
+    assert "rest 503" in res["B"] and isinstance(res["A"], int)
+
+
+def test_prepare_calendar_record_run_error_does_not_stop_run(tmp_path, monkeypatch):
+    def fake(office, code, key, today):
+        raise RuntimeError("neis down")
+    monkeypatch.setattr(run_schools, "fetch_schedule", fake)
+    store = BrokenStore([school(3, "C")], children=[school(1, "B"), school(2, "A")])
+    go(store, tmp_path)
+    assert (tmp_path / "C" / "meta.json").exists()
+    assert ("calendar:A", False, None, "RuntimeError: neis down") in store.runs
+
+
+def test_apply_db_error_on_one_school_does_not_stop_others(tmp_path):
+    answer(tmp_path, "A", 1, {"items": [item()]})
+    answer(tmp_path, "B", 2, {"items": [item()]})
+    answer(tmp_path, "C", 3, {"items": [item()]})
+    store = BrokenStore()
+    res = apply(store, tmp_path)
+    assert res["A"] == res["C"] == 1 and "rest 503" in res["B"]
+    assert (tmp_path / "B").exists() and (tmp_path / "_done" / "C").exists()
+
+
+def test_apply_malformed_answer_with_failing_record_run_continues(tmp_path):
+    answer(tmp_path, "B", 2, "{not json")
+    answer(tmp_path, "C", 3, {"items": [item()]})
+    res = apply(BrokenStore(), tmp_path)
+    assert isinstance(res["B"], str) and res["C"] == 1
+
+
 def test_prepare_caps_schools_per_run(tmp_path):
     res = go(FakeStore([school(i, f"S{i:02d}") for i in range(25)]), tmp_path)
     assert len(res) == 20 and "S19" in res and "S20" not in res
