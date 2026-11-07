@@ -56,21 +56,54 @@ def _menu(home: str, fetch: Callable[[str], str]) -> tuple[str, list[str]]:
     return url, []
 
 
-def find_textbook_posts(homepage_url: str, fetch: Callable[[str], str]) -> list[Post]:
+def _candidates(homepage_url: str, fetch: Callable[[str], str], search_words: tuple[str, ...],
+                title_words: tuple[str, ...]) -> dict[str, str]:
+    """공지사항·가정통신문을 검색어로 훑어 제목이 맞는 글의 상세 주소 → 제목."""
     home = homepage_url.strip() if "//" in homepage_url else "https://" + homepage_url.strip()
     if not (urlparse(home).hostname or "").endswith(".goeay.kr"):
         raise UnsupportedSite(homepage_url)
     _, boards = _menu(home, fetch)
     found: dict[str, str] = {}  # 상세 주소 -> 제목 (게시판·검색어가 겹쳐도 한 번만)
     for board in boards:
-        for word in SEARCH_WORDS:
+        for word in search_words:
             # shortcut: 검색 결과 첫 쪽만 본다(제목 일치 글은 소수), 모자라면 currPage로 더 넘긴다.
             listing = fetch(f"{board}&searchType=sj&searchValue={quote(word)}")
             for a in BeautifulSoup(listing, "html.parser").select("a.nttInfoBtn"):
                 title = htmllib.unescape(_text(a))  # 학교 CMS가 괄호를 &#40; 로 이중 이스케이프하기도 한다
-                if any(w in title.replace(" ", "") for w in TITLE_WORDS):
+                if any(w in title.replace(" ", "") for w in title_words):
                     found.setdefault(board.replace("selectNttList", "selectNttInfo") + f"&nttSn={a['data-id']}", title)
+    return found
+
+
+def find_posts(homepage_url: str, fetch: Callable[[str], str], search_words: tuple[str, ...],
+               title_words: tuple[str, ...]) -> list[Post]:
+    found = _candidates(homepage_url, fetch, search_words, title_words)
     return [_read_post(url, title, fetch) for url, title in found.items()]
+
+
+def find_textbook_posts(homepage_url: str, fetch: Callable[[str], str]) -> list[Post]:
+    return find_posts(homepage_url, fetch, SEARCH_WORDS, TITLE_WORDS)
+
+
+ASSESSMENT_SEARCH = ("평가계획", "평가 계획")  # 띄어 쓴 제목도 잡는다
+MAX_ASSESSMENT_POSTS = 6
+_YEAR = re.compile(r"(\d{4})\s*학년도")
+
+
+def _post_number(url: str) -> int:
+    return int(url.rsplit("nttSn=", 1)[1])
+
+
+def find_assessment_posts(homepage_url: str, fetch: Callable[[str], str]) -> list[Post]:
+    """학생평가계획 글 중 가장 최근 학년도 것만, 글 번호 오름차순(나중 글이 수정본이면 뒤에 온다)으로."""
+    found = _candidates(homepage_url, fetch, ASSESSMENT_SEARCH, ("평가계획",))
+    years = {url: int(m[1]) for url, title in found.items() if (m := _YEAR.search(title))}
+    if not years:
+        return []
+    newest = max(years.values())
+    # shortcut: 최근 학년도 글 중 번호가 큰 6개만 읽는다(학년도당 학기별 1~2개 + 수정 안내), 모자라면 상한을 올린다.
+    keep = sorted((u for u, y in years.items() if y == newest), key=_post_number)[-MAX_ASSESSMENT_POSTS:]
+    return [_read_post(u, found[u], fetch) for u in keep]
 
 
 def _read_post(url: str, title: str, fetch: Callable[[str], str]) -> Post:

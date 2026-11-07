@@ -7,6 +7,7 @@ from eduapp_batch.school_notices import (
     Attachment,
     Post,
     UnsupportedSite,
+    find_assessment_posts,
     find_textbook_posts,
 )
 
@@ -93,3 +94,68 @@ def test_unsupported_site_raises():
 
 def test_no_match_returns_empty():
     assert find_textbook_posts(HOME, make_fetch(list_html=EMPTY_LIST)) == []
+
+
+PROG_LIST = {b: (FX / f"school_progress_list_{b}.html").read_text() for b in ("2799", "2800")}
+PROG_DETAIL = {n: (FX / f"school_progress_detail_{n}.html").read_text() for n in ("1330352", "1312210")}
+
+
+def prog_fetch(calls=None, extra_rows: str = "", detail=PROG_DETAIL):
+    """평가계획 검색: 공지사항(2799)·가정통신문(2800)만 실제 목록, 다른 게시판은 빈 목록."""
+    def fetch(url: str) -> str:
+        if calls is not None:
+            calls.append(url)
+        if url == HOME:
+            return ROOT
+        if url == BASE + "/main.do":
+            return MAIN
+        if "/na/ntt/selectNttList.do" in url:
+            b = re.search(r"bbsId=(\d+)", url)[1]
+            html = PROG_LIST.get(b, EMPTY_LIST)
+            return html.replace("</tbody>", extra_rows + "</tbody>") if b == "2799" else html
+        m = re.search(r"selectNttInfo\.do\?mi=\d+&bbsId=\d+&nttSn=(\d+)$", url)
+        if m:
+            return detail[m[1]]
+        raise KeyError(url)
+    return fetch
+
+
+def row(n: int, title: str) -> str:
+    return f'<tr><td class="ta_l"><a href="javascript:" data-id="{n}" class="nttInfoBtn">{title}</a></td></tr>'
+
+
+def test_find_assessment_posts_keeps_newest_school_year_only():
+    calls: list[str] = []
+    posts = find_assessment_posts(HOME, prog_fetch(calls))
+    assert sorted(p.title for p in posts) == ["2026학년도 1학기 학생평가계획", "2026학년도 2학기 학생평가계획"]
+    assert not any(n in c for c in calls for n in ("nttSn=1242644",))  # 지난 학년도 상세는 읽지 않는다
+
+
+def test_find_assessment_posts_orders_by_post_number_ascending():
+    posts = find_assessment_posts(HOME, prog_fetch())
+    assert [int(p.url.rsplit("nttSn=", 1)[1]) for p in posts] == [1312210, 1330352]
+    assert len(posts[0].attachments) == 7 and posts[0].attachments[1].name == "2026학년도 1학년 1학기 평가계획.hwp"
+
+
+def test_find_assessment_posts_drops_non_plan_titles():
+    posts = find_assessment_posts(HOME, prog_fetch(extra_rows=row(9999999, "2026 학부모 총회 및 교육과정 설명회")))
+    assert all("설명회" not in p.title for p in posts)
+
+
+def test_find_assessment_posts_matches_title_with_space():
+    detail = PROG_DETAIL | {"1400000": PROG_DETAIL["1330352"]}
+    posts = find_assessment_posts(HOME, prog_fetch(extra_rows=row(1400000, "2026학년도 2학기 학생 평가 계획 안내"), detail=detail))
+    assert any(p.url.endswith("nttSn=1400000") for p in posts)
+
+
+def test_find_assessment_posts_caps_at_six_newest():
+    rows = "".join(row(2000000 + i, f"2026학년도 {i}학기 학생평가계획") for i in range(8))
+    detail = {str(2000000 + i): PROG_DETAIL["1330352"] for i in range(8)} | PROG_DETAIL
+    posts = find_assessment_posts(HOME, prog_fetch(extra_rows=rows, detail=detail))
+    nums = [int(p.url.rsplit("nttSn=", 1)[1]) for p in posts]
+    assert len(posts) == 6 and nums == sorted(nums) and nums[-1] == 2000007
+
+
+def test_find_assessment_posts_unsupported_site_raises():
+    with pytest.raises(UnsupportedSite):
+        find_assessment_posts("https://x.sen.es.kr", prog_fetch())
