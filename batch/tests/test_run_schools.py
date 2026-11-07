@@ -173,6 +173,11 @@ def test_prepare_caps_posts_and_attachments(tmp_path, monkeypatch):
     assert len(got) == 12 and not any(u.startswith("https://x/8_") for u in got)
 
 
+def test_prepare_caps_schools_per_run(tmp_path):
+    res = go(FakeStore([school(i, f"S{i:02d}") for i in range(25)]), tmp_path)
+    assert len(res) == 20 and "S19" in res and "S20" not in res
+
+
 def test_rerun_clears_old_text_files(tmp_path):
     (tmp_path / "A").mkdir()
     (tmp_path / "A" / "text_99.txt").write_text("old")

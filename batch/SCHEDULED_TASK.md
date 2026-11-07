@@ -16,7 +16,7 @@ Claude 예약 작업이 매일 새벽(KST) 새 세션에서 이 문서를 따른
 5. 프로그램 결과 요약(기관별 건수, 실패 기관과 원인)을 남기고 학교 단계로 간다.
 
 ## 학교 단계 (교과서 출판사)
-6. `python -m eduapp_batch.run_schools prepare` — 자녀가 있는 학교의 학사일정을 저장하고, 수집 대기·실패·오래된 학교의 공지를 읽어 `work/<neis_code>/`에 `text_<n>.txt`(첫 줄 `# <게시물 제목> | <첨부 이름>`, 게시물 본문은 이름이 `(본문)`)와 `meta.json`을 쓴다.
+6. `python -m eduapp_batch.run_schools prepare` — 자녀가 있는 학교의 학사일정을 저장하고, 수집 대기·실패·오래된 학교의 공지를 읽어 `work/<neis_code>/`에 `text_<n>.txt`(첫 줄 `# <게시물 제목> | <첨부 이름>`, 게시물 본문은 이름이 `(본문)`)와 `meta.json`을 쓴다. 한 번에 최대 20개 학교만 처리하고 나머지는 다음 실행이 이어받는다.
 7. `text_*.txt`가 있는 `work/<neis_code>/` 폴더마다(`work/_done/`은 건너뛴다) 글과 `meta.json`을 읽고 같은 폴더에 `answer.json`을 쓴다. prepare는 글을 새로 쓴 학교의 이전 `answer.json`을 지우므로, `text_*.txt`가 있는 학교마다 항상 `answer.json`을 새로 쓴다. 모양은 정확히 이렇다 (찾은 게 없으면 `items`는 빈 목록). `grade`는 정수, `certain`은 문자열이 아닌 JSON 불리언이며 둘 다 필수다. 아니면 apply가 그 파일 전체를 거부한다:
    `{"items": [{"grade": 4, "subject": "과학", "publisher": "천재교육", "certain": true}]}`
 8. `python -m eduapp_batch.run_schools apply` — `answer.json`이 있는 폴더만 처리한다. `certain: true` 항목을 저장하고, 처리한 폴더는 `work/_done/`으로 옮긴다.

@@ -21,6 +21,8 @@ from .store import PgStore, RestStore
 
 # shortcut: 게시물에 날짜가 없어 최근순을 못 가리므로 앞에서 8개 게시물·12개 첨부까지만 읽는다 — 학교가 더 많이 올리면 늘린다.
 MAX_POSTS, MAX_ATTACHMENTS = 8, 12
+# shortcut: 하루 20개 학교까지만 수집 — Claude 세션이 학교마다 파일을 최대 12개 읽어야 해서, 나머지는 다음 날 실행이 이어받는다.
+MAX_SCHOOLS = 20
 SCHOOL_PAUSE, DOWNLOAD_PAUSE = 1.0, 0.5
 NO_CERTAIN = "답안에 확신하는 출판사 없음"
 
@@ -85,7 +87,7 @@ def prepare(store, fetch: Callable[[str], str], fetch_bytes: Callable[[str], byt
         except Exception as e:  # noqa: BLE001
             store.record_run(target, False, None, _err(e))
     result: dict[str, str | int] = {}
-    for i, s in enumerate(store.schools_to_collect(today)):  # ② 교과서
+    for i, s in enumerate(store.schools_to_collect(today)[:MAX_SCHOOLS]):  # ② 교과서
         if i:
             sleep(SCHOOL_PAUSE)
         code, target = s["neis_code"], f"school:{s['neis_code']}"
