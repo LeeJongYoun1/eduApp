@@ -21,7 +21,7 @@ def parse_school_info(payload: dict) -> list[School]:
     out = []
     for r in payload["schoolInfo"][1]["row"]:
         sido = SIDO.get(r["LCTN_SC_NM"])
-        if not sido:
+        if not sido or not r["SD_SCHUL_CODE"].strip():  # 신설 예정 학교는 코드가 공백이라 건너뜀
             continue
         parts = (r.get("ORG_RDNMA") or "").split()
         homepage = (r.get("HMPG_ADRES") or "").strip()

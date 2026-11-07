@@ -60,3 +60,9 @@ def test_rest_upsert_schools_on_conflict_neis_code():
     assert r.url.path == "/rest/v1/schools" and r.url.params["on_conflict"] == "neis_code"
     assert "resolution=merge-duplicates" in r.headers["Prefer"]
     assert "collect_status" not in json.loads(r.content)[0]
+
+
+def test_parse_school_info_skips_blank_code():
+    d = copy.deepcopy(FIX)
+    d["schoolInfo"][1]["row"][0]["SD_SCHUL_CODE"] = "       "
+    assert len(parse_school_info(d)) == 4
