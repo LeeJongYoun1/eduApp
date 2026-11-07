@@ -52,7 +52,7 @@ end $$;
 revoke execute on function correct_school_publisher(bigint, text, text) from public, anon;
 grant execute on function correct_school_publisher(bigint, text, text) to authenticated;
 
--- 학부모용: 우리 아이 학년의 네 과목 출판사. 학교 값이 없으면 전체 학교 최다 출판사를 추정으로 보여준다.
+-- 학부모용: 우리 아이 학년의 네 과목 출판사. 학교 값이 없으면 전체 학교(배치 수집분) 최다 출판사를 추정으로 보여준다.
 create function child_textbooks(p_child_id bigint)
 returns table(subject text, publisher text, confidence info_confidence, source info_source, source_url text, is_guess boolean)
 language plpgsql stable security definer set search_path = public as $$
@@ -74,7 +74,7 @@ begin
   left join lateral (
     select mode() within group (order by t2.publisher) as publisher
     from school_textbooks st2 join textbooks t2 on t2.id = st2.textbook_id
-    where st2.grade = c.grade and st2.subject = s.subject
+    where st2.grade = c.grade and st2.subject = s.subject and st2.source = 'auto'  -- 학부모 입력은 다른 학교의 추정에 쓰지 않는다
   ) g on true
   order by s.ord;
 end $$;

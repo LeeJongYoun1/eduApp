@@ -77,6 +77,33 @@ def test_child_textbooks_uses_school_row_then_guess(db):
     assert db.execute(q, (ca,)).fetchall()[2] == ("과학", "천재교육", "confirmed", False)
 
 
+def parent_fix(db, uid, school, publisher):
+    c = add_child(db, uid, school, 4)
+    as_user(db, uid)
+    db.execute("select correct_school_publisher(%s, '과학', %s)", (c, publisher))
+    db.execute("reset role")
+
+
+def test_guess_ignores_parent_typed_values(db):
+    add_user(db, U1)
+    a, b, c_, d, target = (add_school(db, k) for k in "ABCDE")
+    for sch in (a, b, c_):
+        parent_fix(db, U1, sch, "오타출판")  # 학부모가 입력한 값이 다수
+    apply(db, d, 4, "과학", "천재교육")  # 배치 값은 소수
+    ct = add_child(db, U1, target, 4)
+    as_user(db, U1)
+    assert db.execute("select publisher, is_guess from child_textbooks(%s)", (ct,)).fetchall()[2] == ("천재교육", True)
+
+
+def test_guess_is_null_when_only_parent_values_exist(db):
+    add_user(db, U1)
+    a, target = add_school(db, "A"), add_school(db, "B")
+    parent_fix(db, U1, a, "오타출판")
+    ct = add_child(db, U1, target, 4)
+    as_user(db, U1)
+    assert db.execute("select publisher, is_guess from child_textbooks(%s)", (ct,)).fetchall()[2] == (None, False)
+
+
 def test_child_textbooks_empty_for_grade_under_3(db):
     add_user(db, U1)
     c = add_child(db, U1, add_school(db, "A"), 2)
