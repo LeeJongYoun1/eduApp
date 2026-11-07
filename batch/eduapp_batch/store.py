@@ -2,13 +2,34 @@
 import contextlib
 import json
 from dataclasses import asdict, fields
-from datetime import date, datetime, timezone
+from datetime import date, datetime, timedelta, timezone
 
 import httpx
 
-from .models import Institution, Program, School
+from .models import CalendarDay, Institution, Program, School
 
 _COLS = [f.name for f in fields(Program)]
+_SCHOOL_COLS = "id,neis_code,edu_office_code,name,homepage_url,collect_status"
+_STATUSES = ("done", "failed", "not_found")
+_STALE_DAYS = 330
+
+
+def _cutoff(today: date) -> datetime:
+    return datetime(today.year, today.month, today.day, tzinfo=timezone.utc) - timedelta(days=_STALE_DAYS)
+
+
+def _dedupe(days: list[CalendarDay]) -> list[CalendarDay]:
+    """같은 (day, event_name)이 한 번의 upsert에 두 번 들어가면 Postgres가 실패한다. 하나라도 휴업일이면 휴업일."""
+    out: dict[tuple, CalendarDay] = {}
+    for d in days:
+        k = (d.day, d.event_name)
+        out[k] = CalendarDay(d.day, d.event_name, d.is_holiday or (k in out and out[k].is_holiday))
+    return list(out.values())
+
+
+def _check_status(status: str) -> None:
+    if status not in _STATUSES:
+        raise ValueError(f"bad status: {status}")
 
 
 def ensure_institution(conn, inst: Institution) -> int:
@@ -74,6 +95,39 @@ class PgStore:
     def record_run(self, target: str, ok: bool, item_count: int | None, error: str | None) -> None:
         record_run(self.conn, target, ok, item_count, error)
 
+    def _schools(self, where: str, params=()) -> list[dict]:
+        cur = self.conn.execute(
+            f"select {_SCHOOL_COLS} from schools s where {where} order by id", params)
+        names = [c.name for c in cur.description]
+        return [dict(zip(names, r)) for r in cur.fetchall()]
+
+    def schools_to_collect(self, today: date) -> list[dict]:
+        return self._schools(
+            "collect_status in ('pending', 'failed') or (collect_status = 'done' and "
+            "(last_collected_at is null or last_collected_at < %s))", (_cutoff(today),))
+
+    def schools_with_children(self) -> list[dict]:
+        return self._schools("exists (select 1 from children c where c.school_id = s.id)")
+
+    def upsert_calendar(self, school_id: int, days: list[CalendarDay]) -> int:
+        rows = [(school_id, d.day, d.event_name, d.is_holiday) for d in _dedupe(days)]
+        with self.conn.cursor() as cur:
+            cur.executemany(
+                """insert into school_calendar (school_id, day, event_name, is_holiday) values (%s, %s, %s, %s)
+                   on conflict (school_id, day, event_name) do update set is_holiday = excluded.is_holiday""", rows)
+        return len(rows)
+
+    def apply_textbook(self, school_id: int, grade: int, subject: str, publisher: str,
+                       source_url: str | None) -> None:
+        self.conn.execute("select apply_school_textbook(%s, %s, %s, %s, %s)",
+                          (school_id, grade, subject, publisher, source_url))
+
+    def set_school_status(self, school_id: int, status: str) -> None:
+        _check_status(status)
+        self.conn.execute(
+            "update schools set collect_status = %s, last_collected_at = case when %s = 'done' "
+            "then now() else last_collected_at end where id = %s", (status, status, school_id))
+
 
 class RestStore:
     """Supabase REST(HTTPS) 저장. 클라우드 환경에서 DB 직접 연결이 막혀 있어 배치는 이 경로를 쓴다."""
@@ -93,6 +147,11 @@ class RestStore:
                              content=json.dumps(rows, default=_iso, ensure_ascii=False))
         r.raise_for_status()
         return r
+
+    def _get(self, table: str, **params) -> list[dict]:
+        r = self.client.get(f"/rest/v1/{table}", params=params)
+        r.raise_for_status()
+        return r.json()
 
     def ensure_institution(self, inst: Institution) -> int:
         r = self._post("institutions", [asdict(inst)], "resolution=merge-duplicates,return=representation",
@@ -116,6 +175,40 @@ class RestStore:
     def record_run(self, target: str, ok: bool, item_count: int | None, error: str | None) -> None:
         self._post("collect_runs", [{"target": target, "ok": ok, "item_count": item_count, "error": error}],
                    "return=minimal")
+
+    def schools_to_collect(self, today: date) -> list[dict]:
+        cutoff = _cutoff(today).isoformat()
+        return self._get("schools", select=_SCHOOL_COLS, order="id", **{"or": (
+            f"(collect_status.in.(pending,failed),and(collect_status.eq.done,"
+            f"or(last_collected_at.is.null,last_collected_at.lt.{cutoff})))")})
+
+    def schools_with_children(self) -> list[dict]:
+        rows = self._get("schools", select=_SCHOOL_COLS + ",children!inner(id)", order="id")
+        return [{k: v for k, v in r.items() if k != "children"} for r in rows]
+
+    def upsert_calendar(self, school_id: int, days: list[CalendarDay]) -> int:
+        rows = [{"school_id": school_id, "day": d.day, "event_name": d.event_name, "is_holiday": d.is_holiday}
+                for d in _dedupe(days)]
+        if rows:
+            self._post("school_calendar", rows, "resolution=merge-duplicates,return=minimal",
+                       on_conflict="school_id,day,event_name")
+        return len(rows)
+
+    def apply_textbook(self, school_id: int, grade: int, subject: str, publisher: str,
+                       source_url: str | None) -> None:
+        r = self.client.post("/rest/v1/rpc/apply_school_textbook", content=json.dumps(
+            {"p_school_id": school_id, "p_grade": grade, "p_subject": subject,
+             "p_publisher": publisher, "p_source_url": source_url}, ensure_ascii=False))
+        r.raise_for_status()
+
+    def set_school_status(self, school_id: int, status: str) -> None:
+        _check_status(status)
+        body = {"collect_status": status}
+        if status == "done":
+            body["last_collected_at"] = datetime.now(timezone.utc).isoformat()
+        r = self.client.patch("/rest/v1/schools", params={"id": f"eq.{school_id}"},
+                              headers={"Prefer": "return=minimal"}, content=json.dumps(body))
+        r.raise_for_status()
 
 
 def _iso(v):
