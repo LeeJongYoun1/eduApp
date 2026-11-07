@@ -28,7 +28,8 @@
 - 앱에서 쓰는 새 DB 함수는 `authenticated`에만 열고, 배치 전용 함수 `apply_school_collection`은 `service_role` 외에는 실행 불가(기본 `public` 실행 권한을 반드시 회수).
 - 개발 컨테이너에서는 학교 홈페이지·나이스에 접속할 수 없으므로 수집 코드는 저장된 샘플(fixtures)로 테스트한다.
 - 이 계획에서 하지 않는 것: 단원·성취기준·진도(계획 4), 알림(계획 5), 방학 기간 계산(재량휴업일 등 나이스가 `휴업일`로 표시한 날만), 학부모가 출판사를 "모름"으로 되돌리기, 학교 홈페이지 자동 크롤링(공지 찾기는 예약 작업이 함), 홈 탭 배너.
-- **사용자 준비 (Task 3 전에 확인받는다):** 교육부 교과서 목록을 `subject,grade,semester,publisher,title` 헤더의 CSV로 만들어 주기(공공데이터포털 원본 → 열 이름 변환은 사용자 또는 이 세션이 함, 원본 형식을 아직 모름). `NEIS_API_KEY`는 계획 2에서 등록됨. 시범 학교 5곳 선정(Task 10).
+- **결정됨(2026-11-07):** ① 교과서 목록은 사용자가 공공데이터포털 원본(csv/xlsx)을 올리면 이 세션이 변환 스크립트(`batch/scripts/convert_textbooks.py`)까지 만든다(Task 3). ② 시범 학교 5곳은 사용자가 이름을 알려준다. ③ 나이스 학사일정은 사용자가 실제 응답 JSON 샘플을 보내주면 그것을 `neis_school_schedule.json` fixture로 쓴다(Task 4, Step 5 불필요). ④ `.hwp` 실파일 확인은 Task 10에서. ⑤ 실행은 subagent-driven.
+- **사용자 준비 (Task 3 전에 확인받는다, 위 결정 반영):** 교육부 교과서 목록을 `subject,grade,semester,publisher,title` 헤더의 CSV로 만들어 주기(공공데이터포털 원본 → 열 이름 변환은 사용자 또는 이 세션이 함, 원본 형식을 아직 모름). `NEIS_API_KEY`는 계획 2에서 등록됨. 시범 학교 5곳 선정(Task 10).
 
 ## Review Focus
 
@@ -103,6 +104,7 @@
 
 **Files:**
 - Create: `batch/eduapp_batch/textbooks_load.py`
+- Create: `batch/scripts/convert_textbooks.py` (사용자가 올린 공공데이터포털 원본 → 아래 헤더 CSV. 원본 열 이름은 파일을 받은 뒤 정하고, 원본 일부(10행 내외)를 `batch/tests/fixtures/textbooks_raw_sample.*`로 두어 변환 테스트에 쓴다. 학기를 못 구하는 행은 버리지 말고 변환 결과 요약에 건수를 출력)
 - Create: `batch/tests/fixtures/textbooks_sample.csv`
 - Test: `batch/tests/test_textbooks_load.py`
 
@@ -136,7 +138,7 @@
 - [ ] **Step 2: 실패 확인** — `pytest tests/test_neis_calendar.py -v`
 - [ ] **Step 3: 구현** — 시그니처대로. 요청 필드명은 위 값으로 쓰되, 실제 응답과 다르면 fixture와 함께 고친다(Step 5에서 확인).
 - [ ] **Step 4: 통과 확인** — PASS
-- [ ] **Step 5: 실제 응답 확인(사용자 환경, 네트워크 Full)** — `NEIS_API_KEY`로 시범 학교 하나를 호출해 응답 필드명·`SBTR_DD_SC_NM` 값이 fixture와 같은지 확인하고, 다르면 fixture·파서를 맞춘다. 개발 컨테이너에서는 접속 불가라 이 단계는 Task 10에서 실행해도 된다.
+- [ ] **Step 5: (결정됨) fixture는 사용자가 보낸 실제 응답** — 구현 전에 샘플을 받아 필드명·`SBTR_DD_SC_NM` 값을 확인하고, 위 Interfaces와 다르면 이 Task의 시그니처 설명과 파서를 샘플에 맞춘다. 샘플이 오기 전에는 Task 4를 시작하지 않는다.
 - [ ] **Step 6: Commit** — `feat(batch): NEIS school calendar collector`
 
 ---
