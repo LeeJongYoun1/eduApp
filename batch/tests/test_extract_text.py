@@ -69,3 +69,44 @@ def test_unknown_extension_and_corrupt_bytes_give_empty():
     assert extract_text("a.pdf", b"not a pdf") == ""
     assert extract_text("a.hwp", b"not an hwp") == ""
     assert extract_text("a.hwpx", b"not a zip") == ""
+
+
+def test_hwp_full_body_not_truncated():
+    text = extract_text("a.hwp", (FIX / "assessment_1_1.hwp").read_bytes())
+    assert len(text) > 1500  # 미리보기는 1,023자에서 잘렸다
+    assert "[2국01-04]" in text
+    assert "위 평가계획은 교육과정에 의해 변경 운영될 수 있습니다" in text
+
+
+def test_hwp_falls_back_to_preview_when_body_unreadable(monkeypatch):
+    def boom(data):
+        raise ValueError("encrypted")
+
+    monkeypatch.setattr(extract_mod, "_hwp_body", boom)
+    assert "교과" in extract_text("a.hwp", (FIX / "sample.hwp").read_bytes())
+
+
+def _hwpx(sec_xml: str) -> bytes:
+    buf = io.BytesIO()
+    with zipfile.ZipFile(buf, "w") as z:
+        z.writestr("Contents/section0.xml", (
+            '<hs:sec xmlns:hs="http://www.hancom.co.kr/hwpml/2011/section" '
+            'xmlns:hp="http://www.hancom.co.kr/hwpml/2011/paragraph">' + sec_xml + "</hs:sec>"))
+    return buf.getvalue()
+
+
+def test_hwpx_paragraphs_on_separate_lines():
+    data = _hwpx("<hp:p><hp:run><hp:t>가</hp:t><hp:t>다</hp:t></hp:run></hp:p>"
+                 "<hp:p><hp:run><hp:t>나</hp:t></hp:run></hp:p>")
+    assert extract_text("a.hwpx", data) == "가다\n나"
+
+
+def test_hwpx_table_cell_paragraphs_on_separate_lines():
+    cell = lambda s: f"<hp:tc><hp:subList><hp:p><hp:run><hp:t>{s}</hp:t></hp:run></hp:p></hp:subList></hp:tc>"
+    data = _hwpx(f"<hp:p><hp:run><hp:tbl><hp:tr>{cell('과목')}{cell('국어')}</hp:tr></hp:tbl></hp:run></hp:p>")
+    assert extract_text("a.hwpx", data).split("\n") == ["과목", "국어"]
+
+
+def test_real_hwpx_standard_code_starts_a_line():
+    text = extract_text("a.hwpx", (FIX / "assessment_4_1.hwpx").read_bytes())
+    assert any(line.startswith("[4국02-04]") for line in text.split("\n"))
