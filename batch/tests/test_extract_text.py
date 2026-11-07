@@ -4,6 +4,7 @@ from pathlib import Path
 
 from pypdf import PdfWriter
 
+from eduapp_batch import extract_text as extract_mod
 from eduapp_batch.extract_text import extract_text
 
 FIX = Path(__file__).parent / "fixtures"
@@ -25,6 +26,30 @@ def test_hwpx_text():
         )
     text = extract_text("A.HWPX", buf.getvalue())
     assert "과학 4학년" in text and "천재교육" in text
+
+
+def test_hwpx_text_after_inline_child_is_kept():
+    buf = io.BytesIO()
+    with zipfile.ZipFile(buf, "w") as z:
+        z.writestr(
+            "Contents/section0.xml",
+            '<hs:sec xmlns:hs="http://www.hancom.co.kr/hwpml/2011/section" '
+            'xmlns:hp="http://www.hancom.co.kr/hwpml/2011/paragraph">'
+            "<hp:p><hp:run><hp:t>과학<hp:tab/>천재교육</hp:t></hp:run></hp:p></hs:sec>",
+        )
+    assert "천재교육" in extract_text("A.hwpx", buf.getvalue())
+
+
+def test_hwp_bad_byte_in_preview_keeps_the_rest(monkeypatch):
+    class FakeOle:
+        def __init__(self, f): pass
+        def __enter__(self): return self
+        def __exit__(self, *a): pass
+        def openstream(self, name):
+            return io.BytesIO("과학 천재교육".encode("utf-16le") + b"\x00\xd8")  # 끝에 짝 없는 서로게이트
+
+    monkeypatch.setattr(extract_mod.olefile, "OleFileIO", FakeOle)
+    assert "천재교육" in extract_text("a.hwp", b"x")
 
 
 def test_hwp_text():

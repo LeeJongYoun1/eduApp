@@ -20,7 +20,7 @@ def _hwpx(data: bytes) -> str:
         )
         return "\n".join(
             "".join(
-                e.text or "" for e in ET.fromstring(z.read(n)).iter() if e.tag.endswith("}t")
+                "".join(e.itertext()) for e in ET.fromstring(z.read(n)).iter() if e.tag.endswith("}t")
             )
             for n in names
         )
@@ -29,7 +29,7 @@ def _hwpx(data: bytes) -> str:
 def _hwp(data: bytes) -> str:
     # shortcut: PrvText is a truncated preview, upgrade to full body parse when a notice's publisher table falls beyond the preview
     with olefile.OleFileIO(io.BytesIO(data)) as ole:
-        return ole.openstream("PrvText").read().decode("utf-16le")
+        return ole.openstream("PrvText").read().decode("utf-16le", errors="ignore")
 
 
 _READERS = {".pdf": _pdf, ".hwpx": _hwpx, ".hwp": _hwp}
