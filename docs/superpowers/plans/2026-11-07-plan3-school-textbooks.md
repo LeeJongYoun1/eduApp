@@ -28,8 +28,8 @@
 - 앱에서 쓰는 새 DB 함수는 `authenticated`에만 열고, 배치 전용 함수 `apply_school_collection`은 `service_role` 외에는 실행 불가(기본 `public` 실행 권한을 반드시 회수).
 - 개발 컨테이너에서는 학교 홈페이지·나이스에 접속할 수 없으므로 수집 코드는 저장된 샘플(fixtures)로 테스트한다.
 - 이 계획에서 하지 않는 것: 단원·성취기준·진도(계획 4), 알림(계획 5), 방학 기간 계산(재량휴업일 등 나이스가 `휴업일`로 표시한 날만), 학부모가 출판사를 "모름"으로 되돌리기, 학교 홈페이지 자동 크롤링(공지 찾기는 예약 작업이 함), 홈 탭 배너.
-- **결정됨(2026-11-07):** ① 교과서 목록은 사용자가 공공데이터포털 원본(csv/xlsx)을 올리면 이 세션이 변환 스크립트(`batch/scripts/convert_textbooks.py`)까지 만든다(Task 3). ② 시범 학교 5곳은 사용자가 이름을 알려준다. ③ 나이스 학사일정 실제 응답은 이 세션이 직접 받아 확인함(Task 4 Step 5, 사용자 샘플 불필요). ④ `.hwp` 실파일 확인은 Task 10에서. ⑤ 실행은 subagent-driven.
-- **사용자 준비 (Task 3 전에 확인받는다, 위 결정 반영):** 교육부 교과서 목록을 `subject,grade,semester,publisher,title` 헤더의 CSV로 만들어 주기(공공데이터포털 원본 → 열 이름 변환은 사용자 또는 이 세션이 함, 원본 형식을 아직 모름). `NEIS_API_KEY`는 계획 2에서 등록됨. 시범 학교 5곳 선정(Task 10).
+- **결정됨(2026-11-07):** ① 교과서 목록은 공공데이터포털에 2022 개정 자료가 없어(2015 개정뿐) **공식 검정 합격 공고 PDF**(한국과학창의재단·한국교육과정평가원)에서 이 세션이 만들어 `batch/data/textbooks_2022.csv`(336행)로 저장했다. 생성 스크립트 `batch/scripts/build_textbook_catalog.py`, 검증 `batch/tests/test_textbook_catalog.py`. 범위: 초3~6 수학·과학·사회·영어·음악·미술·체육, 초5~6 실과·사회과부도(국어·도덕 등 국정 과목은 목록에 없음). 한 권짜리 과목은 semester=1, 사회과부도(5~6 한 권)는 5·6학년 각각 한 행. 음악 3·4학년 미래엔은 재검정 공고에서 수동 보정. ② 시범 학교 5곳은 사용자가 이름을 알려준다. ③ 나이스 학사일정 실제 응답은 이 세션이 직접 받아 확인함(Task 4 Step 5, 사용자 샘플 불필요). ④ `.hwp` 실파일 확인은 Task 10에서. ⑤ 실행은 subagent-driven.
+- **사용자 준비:** 교과서 목록은 준비 끝(위 ①). `NEIS_API_KEY`는 계획 2에서 등록됨. 시범 학교 5곳 선정(Task 10).
 
 ## Review Focus
 
@@ -104,8 +104,8 @@
 
 **Files:**
 - Create: `batch/eduapp_batch/textbooks_load.py`
-- Create: `batch/scripts/convert_textbooks.py` (사용자가 올린 공공데이터포털 원본 → 아래 헤더 CSV. 원본 열 이름은 파일을 받은 뒤 정하고, 원본 일부(10행 내외)를 `batch/tests/fixtures/textbooks_raw_sample.*`로 두어 변환 테스트에 쓴다. 학기를 못 구하는 행은 버리지 말고 변환 결과 요약에 건수를 출력)
-- Create: `batch/tests/fixtures/textbooks_sample.csv`
+- 이미 있음(이 세션이 생성): `batch/data/textbooks_2022.csv`, `batch/scripts/build_textbook_catalog.py`, `batch/tests/test_textbook_catalog.py`
+- Create: `batch/tests/fixtures/textbooks_sample.csv` (파서 단위 테스트용 소수 행)
 - Test: `batch/tests/test_textbooks_load.py`
 
 **Interfaces:**
