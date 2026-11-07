@@ -1,0 +1,124 @@
+<!-- 출처: 귀인초등학교 https://kwiin-e.goeay.kr /kwiin-e/na/ntt/selectNttInfo.do?mi=6183&bbsId=2799&nttSn=1307880 (첨부 스크립트와 본문 부분), 2026-11-07 수집(일부만 남김) -->
+<html><body>
+<script>
+	var G_UploadID = "";
+	//대용량업로드 생성완료 이벤트
+	function DEXT5UPLOAD_OnCreationComplete(uploadID) {
+		G_UploadID = uploadID;
+		// 기존 파일 추가
+		
+			DEXT5UPLOAD.AddUploadedFile("3bae404604b76aa53d5dc680585a81d8", "2026학년 검인정 교과서 출판사(귀인초).pdf", "/upload/kwiin-e/na/bbs_2799/2026/03/2ac8d36a-8734-4c3d-9f0b-7ec11ff3b213.pdf", "93550", "3bae404604b76aa53d5dc680585a81d8", G_UploadID);
+		
+	}
+	
+     // 다운로드 전 파일조회수 count하기위한 함수 처리
+	 function DEXT5UPLOAD_BeforeFileDownload(uploadID, nWebFile, strItemKey, strItemOrgName, strItemUrlOrPath, largeFiles, isLastEvent) {
+	     $.ajax({
+				type : "POST",
+				url: "/kwiin-e/na/ntt/updateDwldCount.do",
+				data : {strItemKey : strItemKey},
+				dataType: "json",
+				success : function(data) {
+					//파일조회수 count이기때문에 별도로 처리X
+				},
+				error : function(data) {
+					alert("오류가 발생하였습니다.\n관리자에게 문의하세요.");
+				}
+		 });
+         return true;
+     }
+	 //파일 열기전 파일조회수 count하기위한 함수 처리
+	 function DEXT5UPLOAD_BeforeFileViewOrOpen(uploadID, strWebFile, strItemKey, strItemOrgName, strItemUrlOrPath, strLargeFile) { 
+		  $.ajax({
+					type : "POST",
+					url: "/kwiin-e/na/ntt/updateDwldCount.do",
+					data : {strItemKey : strItemKey},
+					dataType: "json",
+					success : function(data) {
+						//파일조회수 count이기때문에 별도로 처리X
+					},
+					error : function(data) {
+						alert("오류가 발생하였습니다.\n관리자에게 문의하세요.");
+					}
+		  });
+	      return true;
+      }
+</script>
+	
+	<div class="bbs_ViewA">
+		<h3>귀인초 검인정교과서 출판사 안내</h3>
+		<ul class="bbsV_data">
+			<li>
+				<strong>작성자</strong>
+				<!-- menuAuthAt 관리자 권한이 있을 시 Y값이 들어간다. 본인글이거나 관리자일 경우 작성자가 보이도록 수정 -->
+				
+					
+					귀인초등학교 관리자
+				
+			</li>
+			<li>
+				<strong>등록일</strong>
+				
+				2026.03.13	
+			</li>
+			<li>
+				<strong>조회수</strong>
+				503
+			</li>
+		</ul>
+	</div>
+	
+	<div class="bbs_ViewA">
+		<div class="bbsV_cont">
+			<p><img src="/dext5editordata/2026/03/20260313_090324350_54183.jpg" alt="2026학년 검인정 교과서 출판사(귀인초)_1.jpg" style="width: 793px; height: 1121px;"></p>
+		</div>
+		<div class="bbsV_atchmnfl">
+			
+			
+				<dl>
+					<dt><span>첨부파일</span></dt>
+					<dd>
+						
+							<script>
+								DEXT5UPLOAD.config.Mode = 'view';
+								new Dext5Upload("upload1");
+							</script>
+						
+					</dd>
+				</dl>
+				
+				
+				<dl>
+					<dt><span>첨부파일 미리보기</span></dt>
+					<dd>
+						
+						
+						
+						<div class="prvw">
+						<span>2026학년 검인정 교과서 출판사(귀인초).pdf</span>                     
+							<div class="prvw_btns">
+							<!-- 미리보기 버튼 -->
+							<a href="javascript:" onclick="javascript:previewAjax('https://kwiin-e.goeay.kr/upload/kwiin-e/na/bbs_2799/2026/03/2ac8d36a-8734-4c3d-9f0b-7ec11ff3b213.pdf', '2026학년 검인정 교과서 출판사(귀인초).pdf')" title="미리보기 (새 창 열림)">
+								<i class="xi-eye" aria-hidden="true"></i> <em>미리보기</em>
+							</a>
+							<!-- 바로듣기 버튼 -->
+							
+								<a href="javascript:" onclick="javascript:preListen('https://kwiin-e.goeay.kr/upload/kwiin-e/na/bbs_2799/2026/03/2ac8d36a-8734-4c3d-9f0b-7ec11ff3b213.pdf', '2026학년 검인정 교과서 출판사(귀인초).pdf')" title="바로듣기 (새 창 열림)">
+									<i class="xi-play-circle-o" aria-hidden="true"></i> <em>바로듣기</em>
+								</a>
+							
+							</div>
+						</div>                           
+						
+					</dd>
+				</dl>
+				
+			
+		</div>
+	</div>
+	
+
+	
+	
+	<!-- 버튼 -->
+</div></body></html>

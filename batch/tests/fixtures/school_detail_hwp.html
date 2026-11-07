@@ -1,0 +1,124 @@
+<!-- 출처: 귀인초등학교 https://kwiin-e.goeay.kr /kwiin-e/na/ntt/selectNttInfo.do?mi=6183&bbsId=2799&nttSn=218674 (첨부 스크립트와 본문 부분), 2026-11-07 수집(일부만 남김) -->
+<html><body>
+<script>
+	var G_UploadID = "";
+	//대용량업로드 생성완료 이벤트
+	function DEXT5UPLOAD_OnCreationComplete(uploadID) {
+		G_UploadID = uploadID;
+		// 기존 파일 추가
+		
+			DEXT5UPLOAD.AddUploadedFile("65017899bd744bedf5dce57392b3b361", "2023학년도_교과용_도서_선정_결과.hwp", "/upload/old_data/eduworks/GG_AY10027/2022/11/29/e4ec4b94cac6774d2b7d89a982802f98.hwp", "124928", "65017899bd744bedf5dce57392b3b361", G_UploadID);
+		
+	}
+	
+     // 다운로드 전 파일조회수 count하기위한 함수 처리
+	 function DEXT5UPLOAD_BeforeFileDownload(uploadID, nWebFile, strItemKey, strItemOrgName, strItemUrlOrPath, largeFiles, isLastEvent) {
+	     $.ajax({
+				type : "POST",
+				url: "/kwiin-e/na/ntt/updateDwldCount.do",
+				data : {strItemKey : strItemKey},
+				dataType: "json",
+				success : function(data) {
+					//파일조회수 count이기때문에 별도로 처리X
+				},
+				error : function(data) {
+					alert("오류가 발생하였습니다.\n관리자에게 문의하세요.");
+				}
+		 });
+         return true;
+     }
+	 //파일 열기전 파일조회수 count하기위한 함수 처리
+	 function DEXT5UPLOAD_BeforeFileViewOrOpen(uploadID, strWebFile, strItemKey, strItemOrgName, strItemUrlOrPath, strLargeFile) { 
+		  $.ajax({
+					type : "POST",
+					url: "/kwiin-e/na/ntt/updateDwldCount.do",
+					data : {strItemKey : strItemKey},
+					dataType: "json",
+					success : function(data) {
+						//파일조회수 count이기때문에 별도로 처리X
+					},
+					error : function(data) {
+						alert("오류가 발생하였습니다.\n관리자에게 문의하세요.");
+					}
+		  });
+	      return true;
+      }
+</script>
+	
+	<div class="bbs_ViewA">
+		<h3>2023학년도 교과용 도서 선정 결과</h3>
+		<ul class="bbsV_data">
+			<li>
+				<strong>작성자</strong>
+				<!-- menuAuthAt 관리자 권한이 있을 시 Y값이 들어간다. 본인글이거나 관리자일 경우 작성자가 보이도록 수정 -->
+				
+					
+					한은주
+				
+			</li>
+			<li>
+				<strong>등록일</strong>
+				
+				2022.11.29	
+			</li>
+			<li>
+				<strong>조회수</strong>
+				407
+			</li>
+		</ul>
+	</div>
+	
+	<div class="bbs_ViewA">
+		<div class="bbsV_cont">
+			<p>2023학년도 교과용 도서 선정 결과입니다.
+		</div>
+		<div class="bbsV_atchmnfl">
+			
+			
+				<dl>
+					<dt><span>첨부파일</span></dt>
+					<dd>
+						
+							<script>
+								DEXT5UPLOAD.config.Mode = 'view';
+								new Dext5Upload("upload1");
+							</script>
+						
+					</dd>
+				</dl>
+				
+				
+				<dl>
+					<dt><span>첨부파일 미리보기</span></dt>
+					<dd>
+						
+						
+						
+						<div class="prvw">
+						<span>2023학년도_교과용_도서_선정_결과.hwp</span>                     
+							<div class="prvw_btns">
+							<!-- 미리보기 버튼 -->
+							<a href="javascript:" onclick="javascript:previewAjax('https://kwiin-e.goeay.kr/upload/old_data/eduworks/GG_AY10027/2022/11/29/e4ec4b94cac6774d2b7d89a982802f98.hwp', '2023학년도_교과용_도서_선정_결과.hwp')" title="미리보기 (새 창 열림)">
+								<i class="xi-eye" aria-hidden="true"></i> <em>미리보기</em>
+							</a>
+							<!-- 바로듣기 버튼 -->
+							
+								<a href="javascript:" onclick="javascript:preListen('https://kwiin-e.goeay.kr/upload/old_data/eduworks/GG_AY10027/2022/11/29/e4ec4b94cac6774d2b7d89a982802f98.hwp', '2023학년도_교과용_도서_선정_결과.hwp')" title="바로듣기 (새 창 열림)">
+									<i class="xi-play-circle-o" aria-hidden="true"></i> <em>바로듣기</em>
+								</a>
+							
+							</div>
+						</div>                           
+						
+					</dd>
+				</dl>
+				
+			
+		</div>
+	</div>
+	
+
+	
+	
+	<!-- 버튼 -->
+</div></body></html>
