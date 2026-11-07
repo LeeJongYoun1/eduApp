@@ -180,6 +180,13 @@ def test_rerun_clears_old_text_files(tmp_path):
     assert not (tmp_path / "A" / "text_99.txt").exists()
 
 
+def test_rerun_deletes_stale_answer_json(tmp_path):
+    (tmp_path / "A").mkdir()
+    (tmp_path / "A" / "answer.json").write_text('{"items": []}')
+    go(FakeStore([school(1, "A")]), tmp_path)
+    assert not (tmp_path / "A" / "answer.json").exists() and (tmp_path / "A" / "meta.json").exists()
+
+
 def test_prepare_refreshes_calendar_for_schools_with_children(tmp_path, monkeypatch):
     def fake(office, code, key, today):
         if code == "B":

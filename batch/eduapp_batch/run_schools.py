@@ -67,6 +67,7 @@ def _collect(school: dict, fetch, fetch_bytes, work: Path, sleep) -> int | str:
     out.mkdir(parents=True, exist_ok=True)
     for old in out.glob("text_*.txt"):
         old.unlink()
+    (out / "answer.json").unlink(missing_ok=True)  # 어제 답안이 오늘 글과 짝지어 반영되지 않게
     for n, (title, name, text, _) in enumerate(texts, 1):
         (out / f"text_{n}.txt").write_text(f"# {title} | {name}\n{text}\n", encoding="utf-8")
     (out / "meta.json").write_text(json.dumps({"school_id": school["id"], "source_url": texts[0][3]},
