@@ -162,3 +162,18 @@ def test_download_pause_between_attachments(monkeypatch):
     sleeps = []
     go(FakeStore([school(1, "A")]), lambda u: plan_bytes(), sleep=sleeps.append)
     assert sleeps == [0.5, 0.5]
+
+
+def test_download_cap_spends_budget_on_newest_posts_first(monkeypatch):
+    names = [f"{i}.hwpx" for i in range(12)]
+    posts = [post(1, names), post(2, names), post(3, names)]  # 36개 > 상한 24
+    monkeypatch.setattr(run_progress, "find_assessment_posts", lambda h, f: posts)
+
+    def data(url):
+        if url.startswith("https://x/3/") and url.endswith("/0.hwpx"):
+            return plan_bytes("2. 수정본 단원", "6월")  # 가장 최근 게시물이 월을 고침
+        return plan_bytes("2. 원본 단원", "4월")
+    store = FakeStore([school(1, "A")])
+    go(store, data)
+    (_, _, _, _, row, url), = store.applied
+    assert (row.unit_title, row.month) == ("2. 수정본 단원", 6) and url == posts[2].url

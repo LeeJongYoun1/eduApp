@@ -37,10 +37,10 @@ def _collect(store, school: dict, fetch, fetch_bytes, sleep) -> tuple[int, str |
         return "지원하지 않는 홈페이지"
     if not posts:
         return "평가계획 공지 없음"
-    entries: dict[tuple, tuple[int, int, int, ProgressRow, str]] = {}  # 같은 키는 나중 게시물이 이긴다
+    entries: dict[tuple, tuple[int, int, int, ProgressRow, str]] = {}  # 같은 키는 더 최신 게시물이 이긴다
     downloads = failures = with_text = dropped = 0
     last_error: Exception | None = None
-    for p in posts:  # 글 번호 오름차순
+    for p in reversed(posts):  # 최신 게시물(수정 안내)부터 내려받는다 — 상한에 걸려도 수정본이 남고, 같은 키는 먼저 본 값이 이긴다
         for att in p.attachments:
             if downloads >= MAX_ATTACHMENTS:
                 break
@@ -60,8 +60,8 @@ def _collect(store, school: dict, fetch, fetch_bytes, sleep) -> tuple[int, str |
                 continue
             dropped += plan.dropped
             for r in plan.rows:
-                entries[(plan.school_year, plan.grade, plan.semester, r.subject, r.standard_code)] = (
-                    plan.school_year, plan.grade, plan.semester, r, p.url)
+                entries.setdefault((plan.school_year, plan.grade, plan.semester, r.subject, r.standard_code), (
+                    plan.school_year, plan.grade, plan.semester, r, p.url))
     if failures and not with_text:  # 파일을 못 받았을 뿐 공지가 없는 게 아니다 → 완료로 표시하지 않고 다시 시도
         raise last_error
     if not with_text:

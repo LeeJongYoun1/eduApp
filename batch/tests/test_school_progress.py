@@ -61,3 +61,31 @@ def test_paren_grade_header_and_no_header():
     p = parse_assessment_plan("2025학년도 귀인초 ( 2 )학년 2학기 학생평가 계획\n[2국05-03] 설명\n4. 마음을 전해요\n10월\n")
     assert (p.school_year, p.grade, p.semester) == (2025, 2, 2)
     assert parse_assessment_plan("아무 글") is None
+
+
+def test_unit_prefers_numbered_line_and_joins_wrapped_cell():
+    by3 = {r.standard_code: r for r in plan("assessment_3_1.hwpx").rows}
+    assert by3["[4사01-02]"].unit_title == "1. 우리가 사는 곳"      # 설명이 따로 문단으로 나뉜 경우
+    assert by3["[4사02-01]"].unit_title == "2. 일상에서 만나는 과거"
+    by4 = {r.standard_code: r for r in plan("assessment_4_1.hwpx").rows}
+    assert by4["[4과10-02]"].unit_title == "2. 물의 상태 변화"        # 단원 칸이 두 문단으로 감김
+    assert by4["[4과12-01]"].unit_title == "4. 다양한 생물과 우리 생활"
+    assert by4["[4음02-02]"].unit_title == "1. 음악과 함께해"
+
+
+def test_month_in_description_is_not_the_month():
+    text = ("2026학년도 귀인초 2학년 1학기 학생평가 계획\n[2수03-01] 설명\n2. 시각과 시간\n▪5월 날씨 그래프 그리기\n"
+            "3월 달력 보기\n(실기평가)\n6월\n")
+    assert parse_assessment_plan(text).rows[0].month == 6
+
+
+def test_code_from_another_grade_band_is_dropped():
+    text = "2026학년도 귀인초 3학년 1학기 학생평가 계획\n[6사01-01] 설명\n1. 단원\n4월\n[4사01-01] 설명\n1. 단원\n5월\n"
+    p = parse_assessment_plan(text)
+    assert [r.standard_code for r in p.rows] == ["[4사01-01]"] and p.dropped == 1
+
+
+def test_unknown_unit_is_dropped_not_guessed_from_description():
+    text = "2026학년도 귀인초 3학년 1학기 학생평가 계획\n[4국01-01]\n설명이 다음 줄에 있는 경우\n읽기\n4월\n"
+    p = parse_assessment_plan(text)
+    assert p.rows == [] and p.dropped == 1
