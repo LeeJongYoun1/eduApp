@@ -122,7 +122,7 @@
 
 ### Task 4: 나이스 학사일정 수집
 
-> **구현됨(2026-11-07):** `neis_calendar.py`(`parse_schedule`·`fetch_schedule`·`run`·`main`), `CalendarDay`·`SchoolRef` 모델, Store의 `upsert_school_calendar`·`schools_with_children`(Pg·Rest), 테스트 `test_neis_calendar.py`(9개, 전체 87개 통과). 키 없이 호출하면 5건만 오고 건수 불일치로 `RuntimeError`가 나게 해, 일부만 조용히 저장하지 않는다. **실제 수집은 `NEIS_API_KEY` 환경변수가 있어야 한다**(현재 환경에 없음).
+> **구현됨(2026-11-07):** `neis_calendar.py`(`parse_schedule`·`fetch_schedule`·`run`·`main`), `CalendarDay`·`SchoolRef` 모델, Store의 `upsert_school_calendar`·`schools_with_children`(Pg·Rest), 테스트 `test_neis_calendar.py`(9개, 전체 87개 통과). 키 없이 호출하면 5건만 오고 건수 불일치로 `RuntimeError`가 나게 해, 일부만 조용히 저장하지 않는다. **실제 응답으로 검증 완료**(키 등록 후): 두 학교 전체 일정을 받았고 재량휴업일이 학교 공지와 일치, 귀인초는 실수집·저장까지 성공(`school_calendar` 87건, 쉬는 날 60건). 율목초는 자녀가 아직 없어 저장 대상이 아님(Task 10에서 자녀 등록 후).
 
 **Files:**
 - Create: `batch/eduapp_batch/neis_calendar.py`
@@ -132,11 +132,11 @@
 **Interfaces:**
 - Consumes: `Store.schools_with_children`, `Store.upsert_school_calendar`, `CalendarDay`, `PendingSchool`
 - Produces:
-  - `parse_schedule(payload: dict) -> list[CalendarDay]` — 나이스 `SchoolSchedule` 응답. 결과 없음(`{"RESULT":{"CODE":"INFO-200"}}`)이면 `[]`. 행 필드 `AA_YMD`(YYYYMMDD), `EVENT_NM`, `SBTR_DD_SC_NM`; **`SBTR_DD_SC_NM == "휴업일"` 이고 `EVENT_NM != "토요휴업일"` 이면 `is_holiday=True`**, 그 외 False. (실제 응답 확인: 토요휴업일도 `휴업일`로 오므로 반드시 제외. 공휴일은 `공휴일`이라 False.)
+  - `parse_schedule(payload: dict) -> list[CalendarDay]` — 나이스 `SchoolSchedule` 응답. 결과 없음(`{"RESULT":{"CODE":"INFO-200"}}`)이면 `[]`. 행 필드 `AA_YMD`(YYYYMMDD), `EVENT_NM`, `SBTR_DD_SC_NM`; **`EVENT_NM != "토요휴업일"` 이고 (`SBTR_DD_SC_NM == "휴업일"` 이거나 이름에 `재량휴업`이 있으면) `is_holiday=True`**, 그 외 False. (실제 응답 확인: 토요휴업일도 `휴업일`로 오므로 제외, 귀인초는 재량휴업일을 `공휴일`로 등록하므로 이름으로도 판단, 방학은 날짜별 `휴업일` 행이라 포함, 일반 공휴일은 False.)
   - `fetch_schedule(school: PendingSchool, key: str, start: date, end: date) -> list[CalendarDay]` — `https://open.neis.go.kr/hub/SchoolSchedule`, 파라미터 `ATPT_OFCDC_SC_CODE`, `SD_SCHUL_CODE`, `AA_FROM_YMD`, `AA_TO_YMD`, `pIndex`/`pSize=1000` 페이지 순회(`schools_list.fetch_office` 방식, 인증 오류는 `RuntimeError`).
   - `main() -> int` — `python -m eduapp_batch.neis_calendar`: 오늘(KST)부터 +180일, 학교별로 try/except 후 `collect_runs`에 `target=f"calendar:{school.id}"`로 성공·실패 기록, 마지막 줄에 학교별 건수/오류 JSON. 학교가 하나도 성공하지 못하면 종료코드 1.
 
-- [ ] **Step 1: 실패하는 테스트** — fixture는 나이스 응답 형식(`{"SchoolSchedule":[{"head":[...]},{"row":[...]}]}`)으로 3행: 재량휴업일(`휴업일`), 개교기념일 등 일반 행(`해당없음`), 공휴일 한 행(`공휴일`). `test_parse_flags_only_closure_days`(재량휴업일 같은 `휴업일`만 `is_holiday`, `토요휴업일`·공휴일은 False), `test_parse_no_result_returns_empty`, `test_fetch_paginates_and_raises_on_auth_error`(httpx 모킹: 1000행+1행 두 페이지 / `INFO-300` 인증 오류).
+- [ ] **Step 1: 실패하는 테스트** — fixture는 나이스 응답 형식(`{"SchoolSchedule":[{"head":[...]},{"row":[...]}]}`)으로 3행: 재량휴업일(`휴업일`), 개교기념일 등 일반 행(`해당없음`), 공휴일 한 행(`공휴일`). `test_parse_flags_closure_day_only`(재량휴업일은 `휴업일`·`공휴일` 어느 쪽으로 와도 True, 방학 True, `토요휴업일`·어린이날 False), `test_parse_no_result_returns_empty`, `test_fetch_paginates_and_raises_on_auth_error`(httpx 모킹: 1000행+1행 두 페이지 / `INFO-300` 인증 오류).
 - [ ] **Step 2: 실패 확인** — `pytest tests/test_neis_calendar.py -v`
 - [ ] **Step 3: 구현** — 시그니처대로. 요청 필드명은 위 값으로 쓰되, 실제 응답과 다르면 fixture와 함께 고친다(Step 5에서 확인).
 - [ ] **Step 4: 통과 확인** — PASS

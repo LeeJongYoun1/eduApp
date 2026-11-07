@@ -22,8 +22,10 @@ def parse_schedule(payload: dict) -> list[CalendarDay]:
     out = []
     for r in payload["SchoolSchedule"][1]["row"]:
         ymd = r["AA_YMD"]
-        # 토요휴업일도 SBTR_DD_SC_NM이 '휴업일'로 오므로 제외해야 모든 토요일이 쉬는 날이 되지 않는다.
-        closed = r.get("SBTR_DD_SC_NM") == "휴업일" and r["EVENT_NM"] != "토요휴업일"
+        # 토요휴업일도 '휴업일'로 오므로 제외해야 모든 토요일이 쉬는 날이 되지 않는다. 반대로 귀인초는 재량휴업일을
+        # '공휴일'로 등록하므로 이름에 '재량휴업'이 있으면 구분과 상관없이 쉬는 날이다. 방학도 날짜마다 '휴업일' 행으로 온다.
+        name = r["EVENT_NM"]
+        closed = name != "토요휴업일" and (r.get("SBTR_DD_SC_NM") == "휴업일" or "재량휴업" in name.replace(" ", ""))
         out.append(CalendarDay(date(int(ymd[:4]), int(ymd[4:6]), int(ymd[6:])), r["EVENT_NM"], closed))
     return out
 

@@ -24,7 +24,10 @@ def test_parse_real_response_saturday_closure_is_not_a_holiday():
 
 def test_parse_flags_closure_day_only():
     got = {d.event_name: d.is_holiday for d in parse_schedule(CLOSURE)}
-    assert got == {"학교장재량휴업일": True, "어린이날": False, "개교기념일": False}
+    # 재량휴업일은 학교에 따라 '휴업일'(율목초) 또는 '공휴일'(귀인초)로 오므로 이름으로도 판단, 방학은 날짜별 '휴업일'
+    assert got == {"학교장재량휴업일": True, "어린이날": False, "개교기념일": False, "여름방학": True}
+    assert [d.day for d in parse_schedule(CLOSURE) if d.event_name == "학교장재량휴업일" and d.is_holiday] == [
+        date(2026, 5, 4), date(2026, 11, 19)]
 
 
 def test_parse_no_result_returns_empty():
