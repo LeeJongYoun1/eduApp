@@ -6,7 +6,7 @@ from datetime import date, datetime, timezone
 
 import httpx
 
-from .models import Institution, Program, School
+from .models import CalendarDay, Institution, Program, School, SchoolRef
 
 _COLS = [f.name for f in fields(Program)]
 
@@ -46,6 +46,23 @@ def upsert_schools(conn, schools: list[School]) -> int:
     return len(schools)
 
 
+def upsert_school_calendar(conn, school_id: int, days: list[CalendarDay]) -> int:
+    with conn.cursor() as cur:
+        cur.executemany(
+            """insert into school_calendar (school_id, day, event_name, is_holiday)
+               values (%s, %s, %s, %s)
+               on conflict (school_id, day, event_name) do update set is_holiday = excluded.is_holiday""",
+            [(school_id, d.day, d.event_name, d.is_holiday) for d in days])
+    return len(days)
+
+
+def schools_with_children(conn) -> list[SchoolRef]:
+    rows = conn.execute(
+        """select id, neis_code, edu_office_code, name from schools s
+           where exists (select 1 from children c where c.school_id = s.id) order by id""").fetchall()
+    return [SchoolRef(*r) for r in rows]
+
+
 def record_run(conn, target: str, ok: bool, item_count: int | None, error: str | None) -> None:
     conn.execute(
         "insert into collect_runs (target, ok, item_count, error) values (%s, %s, %s, %s)",
@@ -70,6 +87,12 @@ class PgStore:
 
     def upsert_schools(self, schools: list[School]) -> int:
         return upsert_schools(self.conn, schools)
+
+    def upsert_school_calendar(self, school_id: int, days: list[CalendarDay]) -> int:
+        return upsert_school_calendar(self.conn, school_id, days)
+
+    def schools_with_children(self) -> list[SchoolRef]:
+        return schools_with_children(self.conn)
 
     def record_run(self, target: str, ok: bool, item_count: int | None, error: str | None) -> None:
         record_run(self.conn, target, ok, item_count, error)
@@ -112,6 +135,21 @@ class RestStore:
             self._post("schools", [asdict(s) for s in schools], "resolution=merge-duplicates,return=minimal",
                        on_conflict="neis_code")
         return len(schools)
+
+    def upsert_school_calendar(self, school_id: int, days: list[CalendarDay]) -> int:
+        if days:
+            rows = [{"school_id": school_id, "day": d.day, "event_name": d.event_name, "is_holiday": d.is_holiday}
+                    for d in days]
+            self._post("school_calendar", rows, "resolution=merge-duplicates,return=minimal",
+                       on_conflict="school_id,day,event_name")
+        return len(days)
+
+    def schools_with_children(self) -> list[SchoolRef]:
+        # children!inner: 자녀가 있는 학교만 (한 학교에 자녀가 여럿이어도 학교 행은 하나)
+        r = self.client.get("/rest/v1/schools", params={
+            "select": "id,neis_code,edu_office_code,name,children!inner(id)", "order": "id"})
+        r.raise_for_status()
+        return [SchoolRef(x["id"], x["neis_code"], x["edu_office_code"], x["name"]) for x in r.json()]
 
     def record_run(self, target: str, ok: bool, item_count: int | None, error: str | None) -> None:
         self._post("collect_runs", [{"target": target, "ok": ok, "item_count": item_count, "error": error}],

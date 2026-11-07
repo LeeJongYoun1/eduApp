@@ -1,0 +1,81 @@
+{
+ "SchoolSchedule": [
+  {
+   "head": [
+    {
+     "list_total_count": 3
+    },
+    {
+     "RESULT": {
+      "CODE": "INFO-000",
+      "MESSAGE": "정상 처리되었습니다."
+     }
+    }
+   ]
+  },
+  {
+   "row": [
+    {
+     "ATPT_OFCDC_SC_CODE": "J10",
+     "SD_SCHUL_CODE": "7652009",
+     "AY": "2026",
+     "AA_YMD": "20260504",
+     "ATPT_OFCDC_SC_NM": "경기도교육청",
+     "SCHUL_NM": "가곡초등학교",
+     "DGHT_CRSE_SC_NM": null,
+     "SCHUL_CRSE_SC_NM": "초등학교",
+     "EVENT_NM": "학교장재량휴업일",
+     "EVENT_CNTNT": "",
+     "ONE_GRADE_EVENT_YN": "Y",
+     "TW_GRADE_EVENT_YN": "Y",
+     "THREE_GRADE_EVENT_YN": "Y",
+     "FR_GRADE_EVENT_YN": "Y",
+     "FIV_GRADE_EVENT_YN": "Y",
+     "SIX_GRADE_EVENT_YN": "Y",
+     "SBTR_DD_SC_NM": "휴업일",
+     "LOAD_DTM": "20261107"
+    },
+    {
+     "ATPT_OFCDC_SC_CODE": "J10",
+     "SD_SCHUL_CODE": "7652009",
+     "AY": "2026",
+     "AA_YMD": "20260505",
+     "ATPT_OFCDC_SC_NM": "경기도교육청",
+     "SCHUL_NM": "가곡초등학교",
+     "DGHT_CRSE_SC_NM": null,
+     "SCHUL_CRSE_SC_NM": "초등학교",
+     "EVENT_NM": "어린이날",
+     "EVENT_CNTNT": "",
+     "ONE_GRADE_EVENT_YN": "Y",
+     "TW_GRADE_EVENT_YN": "Y",
+     "THREE_GRADE_EVENT_YN": "Y",
+     "FR_GRADE_EVENT_YN": "Y",
+     "FIV_GRADE_EVENT_YN": "Y",
+     "SIX_GRADE_EVENT_YN": "Y",
+     "SBTR_DD_SC_NM": "공휴일",
+     "LOAD_DTM": "20261107"
+    },
+    {
+     "ATPT_OFCDC_SC_CODE": "J10",
+     "SD_SCHUL_CODE": "7652009",
+     "AY": "2026",
+     "AA_YMD": "20260518",
+     "ATPT_OFCDC_SC_NM": "경기도교육청",
+     "SCHUL_NM": "가곡초등학교",
+     "DGHT_CRSE_SC_NM": null,
+     "SCHUL_CRSE_SC_NM": "초등학교",
+     "EVENT_NM": "개교기념일",
+     "EVENT_CNTNT": "",
+     "ONE_GRADE_EVENT_YN": "Y",
+     "TW_GRADE_EVENT_YN": "Y",
+     "THREE_GRADE_EVENT_YN": "Y",
+     "FR_GRADE_EVENT_YN": "Y",
+     "FIV_GRADE_EVENT_YN": "Y",
+     "SIX_GRADE_EVENT_YN": "Y",
+     "SBTR_DD_SC_NM": "해당없음",
+     "LOAD_DTM": "20261107"
+    }
+   ]
+  }
+ ]
+}

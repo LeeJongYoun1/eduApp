@@ -122,6 +122,8 @@
 
 ### Task 4: 나이스 학사일정 수집
 
+> **구현됨(2026-11-07):** `neis_calendar.py`(`parse_schedule`·`fetch_schedule`·`run`·`main`), `CalendarDay`·`SchoolRef` 모델, Store의 `upsert_school_calendar`·`schools_with_children`(Pg·Rest), 테스트 `test_neis_calendar.py`(9개, 전체 87개 통과). 키 없이 호출하면 5건만 오고 건수 불일치로 `RuntimeError`가 나게 해, 일부만 조용히 저장하지 않는다. **실제 수집은 `NEIS_API_KEY` 환경변수가 있어야 한다**(현재 환경에 없음).
+
 **Files:**
 - Create: `batch/eduapp_batch/neis_calendar.py`
 - Create: `batch/tests/fixtures/neis_school_schedule.json`

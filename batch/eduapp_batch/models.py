@@ -34,3 +34,18 @@ class School:
     sido: str
     sigungu: str | None
     homepage_url: str | None
+
+
+@dataclass(frozen=True)
+class CalendarDay:
+    day: date
+    event_name: str
+    is_holiday: bool  # 재량휴업일 등 학교가 쉬는 날 (토요휴업일·공휴일 제외)
+
+
+@dataclass(frozen=True)
+class SchoolRef:
+    id: int
+    neis_code: str
+    edu_office_code: str
+    name: str
