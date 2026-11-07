@@ -28,7 +28,7 @@
 - 앱에서 쓰는 새 DB 함수는 `authenticated`에만 열고, 배치 전용 함수 `apply_school_collection`은 `service_role` 외에는 실행 불가(기본 `public` 실행 권한을 반드시 회수).
 - 개발 컨테이너에서는 학교 홈페이지·나이스에 접속할 수 없으므로 수집 코드는 저장된 샘플(fixtures)로 테스트한다.
 - 이 계획에서 하지 않는 것: 단원·성취기준·진도(계획 4), 알림(계획 5), 방학 기간 계산(재량휴업일 등 나이스가 `휴업일`로 표시한 날만), 학부모가 출판사를 "모름"으로 되돌리기, 학교 홈페이지 자동 크롤링(공지 찾기는 예약 작업이 함), 홈 탭 배너.
-- **결정됨(2026-11-07):** ① 교과서 목록은 사용자가 공공데이터포털 원본(csv/xlsx)을 올리면 이 세션이 변환 스크립트(`batch/scripts/convert_textbooks.py`)까지 만든다(Task 3). ② 시범 학교 5곳은 사용자가 이름을 알려준다. ③ 나이스 학사일정은 사용자가 실제 응답 JSON 샘플을 보내주면 그것을 `neis_school_schedule.json` fixture로 쓴다(Task 4, Step 5 불필요). ④ `.hwp` 실파일 확인은 Task 10에서. ⑤ 실행은 subagent-driven.
+- **결정됨(2026-11-07):** ① 교과서 목록은 사용자가 공공데이터포털 원본(csv/xlsx)을 올리면 이 세션이 변환 스크립트(`batch/scripts/convert_textbooks.py`)까지 만든다(Task 3). ② 시범 학교 5곳은 사용자가 이름을 알려준다. ③ 나이스 학사일정 실제 응답은 이 세션이 직접 받아 확인함(Task 4 Step 5, 사용자 샘플 불필요). ④ `.hwp` 실파일 확인은 Task 10에서. ⑤ 실행은 subagent-driven.
 - **사용자 준비 (Task 3 전에 확인받는다, 위 결정 반영):** 교육부 교과서 목록을 `subject,grade,semester,publisher,title` 헤더의 CSV로 만들어 주기(공공데이터포털 원본 → 열 이름 변환은 사용자 또는 이 세션이 함, 원본 형식을 아직 모름). `NEIS_API_KEY`는 계획 2에서 등록됨. 시범 학교 5곳 선정(Task 10).
 
 ## Review Focus
@@ -130,15 +130,15 @@
 **Interfaces:**
 - Consumes: `Store.schools_with_children`, `Store.upsert_school_calendar`, `CalendarDay`, `PendingSchool`
 - Produces:
-  - `parse_schedule(payload: dict) -> list[CalendarDay]` — 나이스 `SchoolSchedule` 응답. 결과 없음(`{"RESULT":{"CODE":"INFO-200"}}`)이면 `[]`. 행 필드 `AA_YMD`(YYYYMMDD), `EVENT_NM`, `SBTR_DD_SC_NM`; **`SBTR_DD_SC_NM == "휴업일"` 이면 `is_holiday=True`**, 그 외 False.
+  - `parse_schedule(payload: dict) -> list[CalendarDay]` — 나이스 `SchoolSchedule` 응답. 결과 없음(`{"RESULT":{"CODE":"INFO-200"}}`)이면 `[]`. 행 필드 `AA_YMD`(YYYYMMDD), `EVENT_NM`, `SBTR_DD_SC_NM`; **`SBTR_DD_SC_NM == "휴업일"` 이고 `EVENT_NM != "토요휴업일"` 이면 `is_holiday=True`**, 그 외 False. (실제 응답 확인: 토요휴업일도 `휴업일`로 오므로 반드시 제외. 공휴일은 `공휴일`이라 False.)
   - `fetch_schedule(school: PendingSchool, key: str, start: date, end: date) -> list[CalendarDay]` — `https://open.neis.go.kr/hub/SchoolSchedule`, 파라미터 `ATPT_OFCDC_SC_CODE`, `SD_SCHUL_CODE`, `AA_FROM_YMD`, `AA_TO_YMD`, `pIndex`/`pSize=1000` 페이지 순회(`schools_list.fetch_office` 방식, 인증 오류는 `RuntimeError`).
   - `main() -> int` — `python -m eduapp_batch.neis_calendar`: 오늘(KST)부터 +180일, 학교별로 try/except 후 `collect_runs`에 `target=f"calendar:{school.id}"`로 성공·실패 기록, 마지막 줄에 학교별 건수/오류 JSON. 학교가 하나도 성공하지 못하면 종료코드 1.
 
-- [ ] **Step 1: 실패하는 테스트** — fixture는 나이스 응답 형식(`{"SchoolSchedule":[{"head":[...]},{"row":[...]}]}`)으로 3행: 재량휴업일(`휴업일`), 개교기념일 등 일반 행(`해당없음`), 공휴일 한 행(`공휴일`). `test_parse_flags_only_closure_days`(휴업일만 `is_holiday`), `test_parse_no_result_returns_empty`, `test_fetch_paginates_and_raises_on_auth_error`(httpx 모킹: 1000행+1행 두 페이지 / `INFO-300` 인증 오류).
+- [ ] **Step 1: 실패하는 테스트** — fixture는 나이스 응답 형식(`{"SchoolSchedule":[{"head":[...]},{"row":[...]}]}`)으로 3행: 재량휴업일(`휴업일`), 개교기념일 등 일반 행(`해당없음`), 공휴일 한 행(`공휴일`). `test_parse_flags_only_closure_days`(재량휴업일 같은 `휴업일`만 `is_holiday`, `토요휴업일`·공휴일은 False), `test_parse_no_result_returns_empty`, `test_fetch_paginates_and_raises_on_auth_error`(httpx 모킹: 1000행+1행 두 페이지 / `INFO-300` 인증 오류).
 - [ ] **Step 2: 실패 확인** — `pytest tests/test_neis_calendar.py -v`
 - [ ] **Step 3: 구현** — 시그니처대로. 요청 필드명은 위 값으로 쓰되, 실제 응답과 다르면 fixture와 함께 고친다(Step 5에서 확인).
 - [ ] **Step 4: 통과 확인** — PASS
-- [ ] **Step 5: (결정됨) fixture는 사용자가 보낸 실제 응답** — 구현 전에 샘플을 받아 필드명·`SBTR_DD_SC_NM` 값을 확인하고, 위 Interfaces와 다르면 이 Task의 시그니처 설명과 파서를 샘플에 맞춘다. 샘플이 오기 전에는 Task 4를 시작하지 않는다.
+- [x] **Step 5: (확인 완료) 나이스 API는 키 없이도 이 환경에서 호출되어 실제 응답을 받아 `neis_school_schedule.json`(초등학교 1곳, 5행)로 저장했다.** 필드명(`AA_YMD`, `EVENT_NM`, `SBTR_DD_SC_NM`)이 위와 같음을 확인. 키 없는 호출은 행 수가 제한되므로 재량휴업일 행은 없다 → 파서 테스트에는 그 행을 실제 응답 형식 그대로 손으로 추가한 fixture를 따로 둔다(`neis_school_schedule_closure.json`). 이전 문구: fixture는 사용자가 보낸 실제 응답 — 구현 전에 샘플을 받아 필드명·`SBTR_DD_SC_NM` 값을 확인하고, 위 Interfaces와 다르면 이 Task의 시그니처 설명과 파서를 샘플에 맞춘다. 샘플이 오기 전에는 Task 4를 시작하지 않는다.
 - [ ] **Step 6: Commit** — `feat(batch): NEIS school calendar collector`
 
 ---
