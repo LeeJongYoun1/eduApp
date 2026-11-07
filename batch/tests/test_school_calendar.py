@@ -19,10 +19,21 @@ def _payload(rows):
 
 def test_parse_marks_holidays():
     by_name = {d.event_name: d for d in parse_schedule(FIX)}
-    assert by_name["토요휴업일"].is_holiday is True  # 휴업일
-    assert by_name["3·1절"].is_holiday is True  # 공휴일
-    assert by_name["3·1절"].day == date(2026, 3, 1)
+    assert by_name["대체공휴일"].day.weekday() < 5 and by_name["대체공휴일"].is_holiday is True  # 평일 공휴일
     assert by_name["시업,입학식"].is_holiday is False  # 해당없음
+
+
+def _row(ymd, name, kind):
+    return {**ROWS[0], "AA_YMD": ymd, "EVENT_NM": name, "SBTR_DD_SC_NM": kind}
+
+
+def test_weekend_off_days_are_stored_but_not_holidays():
+    # 2026-11-07 토요일, 2026-11-09 월요일. 주말 휴업일·공휴일은 '우리 학교 쉬는 날'이 아니다.
+    days = {d.event_name: d for d in parse_schedule(_payload([
+        _row("20261107", "토요휴업일", "휴업일"), _row("20261108", "일요 공휴일", "공휴일"),
+        _row("20261109", "학교장재량휴업일", "공휴일")]))}
+    assert days["토요휴업일"].is_holiday is False and days["일요 공휴일"].is_holiday is False
+    assert days["학교장재량휴업일"].is_holiday is True
 
 
 def test_parse_skips_rows_not_for_any_grade_1_to_6():

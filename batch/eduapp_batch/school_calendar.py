@@ -22,7 +22,7 @@ def parse_schedule(payload: dict) -> list[CalendarDay]:
         day = datetime.strptime(r["AA_YMD"], "%Y%m%d").date()
         name = r["EVENT_NM"]
         out.setdefault((day, name), CalendarDay(day=day, event_name=name,
-                                                is_holiday=r["SBTR_DD_SC_NM"] in HOLIDAY_KINDS))
+                                                is_holiday=r["SBTR_DD_SC_NM"] in HOLIDAY_KINDS and day.weekday() < 5))  # 주말은 원래 쉬는 날
     return list(out.values())
 
 
