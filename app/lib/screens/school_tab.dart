@@ -20,6 +20,7 @@ class _SchoolTabState extends State<SchoolTab> {
   List<SchoolTextbook>? _books;
   bool _loading = true;
   bool _error = false;
+  int _loadId = 0; // 늦게 도착한 이전 요청이 현재 화면을 덮어쓰지 않게 한다
 
   @override
   void initState() {
@@ -28,6 +29,7 @@ class _SchoolTabState extends State<SchoolTab> {
   }
 
   Future<void> _load() async {
+    final id = ++_loadId;
     setState(() {
       _loading = true;
       _error = false;
@@ -40,13 +42,13 @@ class _SchoolTabState extends State<SchoolTab> {
       }
       final c = _child;
       final books = c == null || c.grade < 3 ? null : await widget.repo.schoolTextbooks(c.id);
-      if (!mounted) return;
+      if (!mounted || id != _loadId) return;
       setState(() {
         _books = books;
         _loading = false;
       });
     } catch (_) {
-      if (mounted) {
+      if (mounted && id == _loadId) {
         setState(() {
           _error = true;
           _loading = false;

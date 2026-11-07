@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:eduapp/data/models.dart';
 import 'package:eduapp/data/repository.dart';
 
@@ -25,6 +27,7 @@ class FakeRepository implements EduRepository {
   List<ProgramItem> programList;
   Set<int> favorites;
   Map<int, List<SchoolTextbook>> textbooks = {}; // 자녀 id → 과목 목록
+  Map<int, Completer<void>> holdTextbooks = {}; // 자녀 id → 완료될 때까지 schoolTextbooks 응답을 붙잡는다 (경합 테스트용)
   Object? failWith;
   bool autoConfirm; // true면 가입 즉시 로그인 상태 (Supabase 메일 확인 꺼짐)
   final List<String> calls = [];
@@ -74,8 +77,11 @@ class FakeRepository implements EduRepository {
         on ? favorites.add(programId) : favorites.remove(programId);
       });
   @override
-  Future<List<SchoolTextbook>> schoolTextbooks(int childId) =>
-      _call('schoolTextbooks($childId)', () => List.of(textbooks[childId] ?? []));
+  Future<List<SchoolTextbook>> schoolTextbooks(int childId) async {
+    final rows = await _call<List<SchoolTextbook>>('schoolTextbooks($childId)', () => List.of(textbooks[childId] ?? []));
+    await holdTextbooks[childId]?.future;
+    return rows;
+  }
   @override
   Future<void> correctPublisher(int childId, String subject, String publisher) =>
       _call('correctPublisher($childId,$subject,$publisher)', () {
