@@ -49,10 +49,11 @@ def upsert_schools(conn, schools: list[School]) -> int:
 def upsert_school_calendar(conn, school_id: int, days: list[CalendarDay]) -> int:
     with conn.cursor() as cur:
         cur.executemany(
-            """insert into school_calendar (school_id, day, event_name, is_holiday)
-               values (%s, %s, %s, %s)
-               on conflict (school_id, day, event_name) do update set is_holiday = excluded.is_holiday""",
-            [(school_id, d.day, d.event_name, d.is_holiday) for d in days])
+            """insert into school_calendar (school_id, day, event_name, is_holiday, is_vacation)
+               values (%s, %s, %s, %s, %s)
+               on conflict (school_id, day, event_name) do update
+                 set is_holiday = excluded.is_holiday, is_vacation = excluded.is_vacation""",
+            [(school_id, d.day, d.event_name, d.is_holiday, d.is_vacation) for d in days])
     return len(days)
 
 
@@ -138,8 +139,8 @@ class RestStore:
 
     def upsert_school_calendar(self, school_id: int, days: list[CalendarDay]) -> int:
         if days:
-            rows = [{"school_id": school_id, "day": d.day, "event_name": d.event_name, "is_holiday": d.is_holiday}
-                    for d in days]
+            rows = [{"school_id": school_id, "day": d.day, "event_name": d.event_name, "is_holiday": d.is_holiday,
+                     "is_vacation": d.is_vacation} for d in days]
             self._post("school_calendar", rows, "resolution=merge-duplicates,return=minimal",
                        on_conflict="school_id,day,event_name")
         return len(days)

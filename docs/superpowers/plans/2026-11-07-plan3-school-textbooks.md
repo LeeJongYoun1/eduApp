@@ -28,7 +28,7 @@
 - 앱에서 쓰는 새 DB 함수는 `authenticated`에만 열고, 배치 전용 함수 `apply_school_collection`은 `service_role` 외에는 실행 불가(기본 `public` 실행 권한을 반드시 회수).
 - 개발 컨테이너에서는 학교 홈페이지·나이스에 접속할 수 없으므로 수집 코드는 저장된 샘플(fixtures)로 테스트한다.
 - 이 계획에서 하지 않는 것: 단원·성취기준·진도(계획 4), 알림(계획 5), 방학 기간 계산(재량휴업일 등 나이스가 `휴업일`로 표시한 날만), 학부모가 출판사를 "모름"으로 되돌리기, 학교 홈페이지 자동 크롤링(공지 찾기는 예약 작업이 함), 홈 탭 배너.
-- **결정됨(2026-11-07):** ① 교과서 목록은 공공데이터포털에 2022 개정 자료가 없어(2015 개정뿐) **공식 검정 합격 공고 PDF**(한국과학창의재단·한국교육과정평가원)에서 이 세션이 만들어 `batch/data/textbooks_2022.csv`(336행)로 저장했다. 생성 스크립트 `batch/scripts/build_textbook_catalog.py`, 검증 `batch/tests/test_textbook_catalog.py`. 범위: 초3~6 수학·과학·사회·영어·음악·미술·체육, 초5~6 실과·사회과부도(국어·도덕 등 국정 과목은 목록에 없음). 한 권짜리 과목은 semester=1, 사회과부도(5~6 한 권)는 5·6학년 각각 한 행. 음악 3·4학년 미래엔은 재검정 공고에서 수동 보정. ② 시범 학교 5곳은 사용자가 이름을 알려준다. ③ 나이스 학사일정 실제 응답은 이 세션이 직접 받아 확인함(Task 4 Step 5, 사용자 샘플 불필요). ④ `.hwp` 실파일 확인은 Task 10에서. ⑤ 실행은 subagent-driven. ⑥ 시범 학교는 **안양 귀인초등학교(나이스 7569013)와 화성 율목초등학교(7679051) 2곳**이고, 두 홈페이지 조사 결과는 `docs/superpowers/specs/2026-11-07-pilot-schools-research.md`(게시판·첨부 구조, 표기 차이, 쉬는 날 대조값). 테스트 fixture는 두 학교 실제 게시물 첨부(`batch/tests/fixtures/school_*`).
+- **결정됨(2026-11-07):** ① 교과서 목록은 공공데이터포털에 2022 개정 자료가 없어(2015 개정뿐) **공식 검정 합격 공고 PDF**(한국과학창의재단·한국교육과정평가원)에서 이 세션이 만들어 `batch/data/textbooks_2022.csv`(336행)로 저장했다. 생성 스크립트 `batch/scripts/build_textbook_catalog.py`, 검증 `batch/tests/test_textbook_catalog.py`. 범위: 초3~6 수학·과학·사회·영어·음악·미술·체육, 초5~6 실과·사회과부도(국어·도덕 등 국정 과목은 목록에 없음). 한 권짜리 과목은 semester=1, 사회과부도(5~6 한 권)는 5·6학년 각각 한 행. 음악 3·4학년 미래엔은 재검정 공고에서 수동 보정. ② 시범 학교 5곳은 사용자가 이름을 알려준다. ③ 나이스 학사일정 실제 응답은 이 세션이 직접 받아 확인함(Task 4 Step 5, 사용자 샘플 불필요). ④ `.hwp` 실파일 확인은 Task 10에서. ⑤ 실행은 subagent-driven. ⑥ 시범 학교는 **안양 귀인초등학교(나이스 7569013) 1곳**으로 정상 테스트를 먼저 진행한다(화성 율목초 7679051은 보류, 조사 자료·fixture는 보관). 방학은 재량휴업일과 따로 쓰도록 `school_calendar.is_vacation`을 추가했다(마이그레이션 `20261107000003_calendar_vacation.sql`, 운영 DB에는 SQL Editor에서 직접 실행 필요). 두 학교 두 홈페이지 조사 결과는 `docs/superpowers/specs/2026-11-07-pilot-schools-research.md`(게시판·첨부 구조, 표기 차이, 쉬는 날 대조값). 테스트 fixture는 두 학교 실제 게시물 첨부(`batch/tests/fixtures/school_*`).
 - **사용자 준비:** 교과서 목록·시범 학교는 준비 끝(위 ①⑥). `NEIS_API_KEY`는 계획 2에서 등록됨(나이스는 키 없이는 5건만 줘서 Task 10의 실학사일정 확인에 필요).
 
 ## Review Focus
@@ -122,7 +122,7 @@
 
 ### Task 4: 나이스 학사일정 수집
 
-> **구현됨(2026-11-07):** `neis_calendar.py`(`parse_schedule`·`fetch_schedule`·`run`·`main`), `CalendarDay`·`SchoolRef` 모델, Store의 `upsert_school_calendar`·`schools_with_children`(Pg·Rest), 테스트 `test_neis_calendar.py`(9개, 전체 87개 통과). 키 없이 호출하면 5건만 오고 건수 불일치로 `RuntimeError`가 나게 해, 일부만 조용히 저장하지 않는다. **실제 응답으로 검증 완료**(키 등록 후): 두 학교 전체 일정을 받았고 재량휴업일이 학교 공지와 일치, 귀인초는 실수집·저장까지 성공(`school_calendar` 87건, 쉬는 날 60건). 율목초는 자녀가 아직 없어 저장 대상이 아님(Task 10에서 자녀 등록 후).
+> **구현됨(2026-11-07):** `neis_calendar.py`(`parse_schedule`·`fetch_schedule`·`run`·`main`), `CalendarDay`(`is_holiday`: 재량휴업일 등, `is_vacation`: 방학 날짜, 서로 겹치지 않음)·`SchoolRef` 모델, Store의 `upsert_school_calendar`·`schools_with_children`(Pg·Rest), 테스트 `test_neis_calendar.py`(9개, 전체 87개 통과). 키 없이 호출하면 5건만 오고 건수 불일치로 `RuntimeError`가 나게 해, 일부만 조용히 저장하지 않는다. **실제 응답으로 검증 완료**(키 등록 후): 두 학교 전체 일정을 받았고 재량휴업일이 학교 공지와 일치, 귀인초는 실수집·저장까지 성공(`school_calendar` 87건, 쉬는 날 60건). 율목초는 자녀가 아직 없어 저장 대상이 아님(Task 10에서 자녀 등록 후).
 
 **Files:**
 - Create: `batch/eduapp_batch/neis_calendar.py`
@@ -274,6 +274,6 @@
 - [ ] **Step 1: 전체 자동 검사** — `cd batch && TEST_PG_ADMIN_URL=postgresql://postgres:test@localhost:5432/postgres pytest -q` 전부 통과, `cd app && flutter analyze && flutter test` 전부 통과.
 - [ ] **Step 2: 운영 DB 적용(사용자 확인 후)** — 새 마이그레이션 `20261107000002_school_textbooks.sql`을 Supabase에 적용. 적용 전 사용자에게 알린다.
 - [ ] **Step 3: 목록 적재(사용자 환경)** — 교과서 CSV로 `python -m eduapp_batch.textbooks_load <csv>` 실행, `textbooks` 행 수 확인.
-- [ ] **Step 4: 시범 학교 2곳 실수집(귀인초 7569013, 율목초 7679051, 네트워크 Full)** — 두 학교에 자녀를 등록해 대기로 만들고 `neis_calendar`와 `SCHOOL_COLLECT_TASK.md` 절차를 한 번 실행. **완료 기준(조사 문서의 실제 값과 대조):** ① 두 학교 모두 검정 과목이 `confirmed`로 저장되고 값이 학교 표와 일치(귀인 3학년 사회=비상교육, 율목 3학년 사회=아이스크림미디어 등 — 같은 지역 두 학교가 서로 다름), 국정·인정 행은 저장되지 않음. ② 나이스 학사일정(`NEIS_API_KEY` 필요)의 `school_calendar.is_holiday`가 귀인초 5/4·11/19, 율목초 5/1·5/4(학교 공지 값)와 일치하고 토요일은 없음. 율목초 학사일정은 이미지라 이 대조가 유일한 검증. ③ 틀린 값이 하나라도 있으면 지침(`certain` 기준)을 고쳐 다시 실행. `.hwp` 실파일은 두 학교 교과서 공지에 없어 확인 대상이 아니다(hwp는 학교 양식 `학교장허가교외체험학습 신청서`뿐) → hwp 확인은 다른 학교를 만날 때까지 보류하고 Task 5의 hwp 레코드 파서 테스트만 유지.
+- [ ] **Step 4: 시범 학교 실수집(귀인초 7569013 먼저, 율목초 7679051은 보류, 네트워크 Full)** — 두 학교에 자녀를 등록해 대기로 만들고 `neis_calendar`와 `SCHOOL_COLLECT_TASK.md` 절차를 한 번 실행. **완료 기준(조사 문서의 실제 값과 대조):** ① 두 학교 모두 검정 과목이 `confirmed`로 저장되고 값이 학교 표와 일치(귀인 3학년 사회=비상교육, 율목 3학년 사회=아이스크림미디어 등 — 같은 지역 두 학교가 서로 다름), 국정·인정 행은 저장되지 않음. ② 나이스 학사일정(`NEIS_API_KEY` 필요)의 `school_calendar.is_holiday`가 귀인초 5/4·11/19, 율목초 5/1·5/4(학교 공지 값)와 일치하고 토요일은 없음. 율목초 학사일정은 이미지라 이 대조가 유일한 검증. ③ 틀린 값이 하나라도 있으면 지침(`certain` 기준)을 고쳐 다시 실행. `.hwp` 실파일은 두 학교 교과서 공지에 없어 확인 대상이 아니다(hwp는 학교 양식 `학교장허가교외체험학습 신청서`뿐) → hwp 확인은 다른 학교를 만날 때까지 보류하고 Task 5의 hwp 레코드 파서 테스트만 유지.
 - [ ] **Step 5: 실기기 확인** — APK를 사용자 휴대폰에 설치(`app/README.md` 절차)해 S3(쉬는 날 필터)·S4(교과서 고치기)를 따라 해보고, S1 4~5의 안내 문구(확인 중 → 수집 후 확인됨)를 확인. 푸시는 계획 5.
 - [ ] **Step 6: Commit** — `docs: plan 3 roadmap and readme updates`

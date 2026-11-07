@@ -24,10 +24,26 @@ def test_parse_real_response_saturday_closure_is_not_a_holiday():
 
 def test_parse_flags_closure_day_only():
     got = {d.event_name: d.is_holiday for d in parse_schedule(CLOSURE)}
-    # 재량휴업일은 학교에 따라 '휴업일'(율목초) 또는 '공휴일'(귀인초)로 오므로 이름으로도 판단, 방학은 날짜별 '휴업일'
-    assert got == {"학교장재량휴업일": True, "어린이날": False, "개교기념일": False, "여름방학": True}
+    # 재량휴업일은 학교에 따라 '휴업일'(율목초) 또는 '공휴일'(귀인초)로 오므로 이름으로도 판단.
+    # 방학은 날짜별 '휴업일' 행으로 오지만 is_holiday가 아니라 is_vacation으로 따로 표시한다.
+    assert got == {"학교장재량휴업일": True, "어린이날": False, "개교기념일": False, "여름방학": False}
     assert [d.day for d in parse_schedule(CLOSURE) if d.event_name == "학교장재량휴업일" and d.is_holiday] == [
         date(2026, 5, 4), date(2026, 11, 19)]
+
+
+def test_parse_marks_vacation_separately():
+    by = {d.event_name: d for d in parse_schedule(CLOSURE)}
+    assert by["여름방학"] == CalendarDay(date(2026, 7, 25), "여름방학", False, True)
+    assert not by["학교장재량휴업일"].is_vacation and not by["어린이날"].is_vacation
+
+
+def test_parse_vacation_ceremony_days_are_school_days():
+    """'여름방학식'·'여름개학식'은 학교가 열리는 날(해당없음)이라 방학이 아니다."""
+    p = json.loads(json.dumps(CLOSURE))
+    for r, name in zip(p["SchoolSchedule"][1]["row"][:2], ("여름방학식", "여름개학식")):
+        r.update(EVENT_NM=name, SBTR_DD_SC_NM="해당없음")
+    got = {d.event_name: d for d in parse_schedule(p)}
+    assert not got["여름방학식"].is_vacation and not got["여름개학식"].is_vacation
 
 
 def test_parse_no_result_returns_empty():
@@ -76,8 +92,10 @@ def test_pgstore_calendar_upsert_updates_holiday_flag(db):
     sid = db.execute("insert into schools (neis_code, edu_office_code, name, sido) values ('7569013','J10','귀인초등학교','경기') returning id").fetchone()[0]
     store = PgStore(db)
     store.upsert_school_calendar(sid, [CalendarDay(date(2026, 5, 4), "학교장재량휴업일", False)])
-    store.upsert_school_calendar(sid, [CalendarDay(date(2026, 5, 4), "학교장재량휴업일", True)])
-    assert db.execute("select day, event_name, is_holiday from school_calendar").fetchall() == [(date(2026, 5, 4), "학교장재량휴업일", True)]
+    store.upsert_school_calendar(sid, [CalendarDay(date(2026, 5, 4), "학교장재량휴업일", True),
+                                       CalendarDay(date(2026, 7, 25), "여름방학", False, True)])
+    assert db.execute("select day, event_name, is_holiday, is_vacation from school_calendar order by day").fetchall() == [
+        (date(2026, 5, 4), "학교장재량휴업일", True, False), (date(2026, 7, 25), "여름방학", False, True)]
 
 
 def test_pgstore_schools_with_children_lists_only_registered_schools(db):
@@ -104,4 +122,5 @@ def test_reststore_calendar_upsert_and_schools_with_children():
     assert s.upsert_school_calendar(7, [CalendarDay(date(2026, 5, 4), "학교장재량휴업일", True)]) == 1
     p = seen[1]
     assert p.url.path == "/rest/v1/school_calendar" and p.url.params["on_conflict"] == "school_id,day,event_name"
-    assert json.loads(p.content) == [{"school_id": 7, "day": "2026-05-04", "event_name": "학교장재량휴업일", "is_holiday": True}]
+    assert json.loads(p.content) == [{"school_id": 7, "day": "2026-05-04", "event_name": "학교장재량휴업일",
+                                      "is_holiday": True, "is_vacation": False}]

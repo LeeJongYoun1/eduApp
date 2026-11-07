@@ -40,7 +40,8 @@ class School:
 class CalendarDay:
     day: date
     event_name: str
-    is_holiday: bool  # 재량휴업일 등 학교가 쉬는 날 (토요휴업일·공휴일 제외)
+    is_holiday: bool  # 재량휴업일 등 학교가 쉬는 날 (방학·토요휴업일·공휴일 제외)
+    is_vacation: bool = False  # 여름·겨울방학 기간의 날짜 (is_holiday와 겹치지 않음)
 
 
 @dataclass(frozen=True)
