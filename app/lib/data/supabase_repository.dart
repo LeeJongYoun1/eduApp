@@ -93,6 +93,18 @@ class SupabaseRepository implements EduRepository {
   }
 
   @override
+  Future<Set<DateTime>> holidays(int schoolId, DateTime from, DateTime to) async {
+    final rows = await _db
+        .from('school_calendar')
+        .select('day')
+        .eq('school_id', schoolId)
+        .eq('is_holiday', true)
+        .gte('day', _day(from))
+        .lte('day', _day(to));
+    return {for (final r in rows) DateTime.parse(r['day'] as String)}; // 'YYYY-MM-DD' -> 자정(날짜만)
+  }
+
+  @override
   Future<void> correctPublisher(int childId, String subject, String publisher) => _db.rpc(
       'correct_school_publisher',
       params: {'p_child_id': childId, 'p_subject': subject, 'p_publisher': publisher});

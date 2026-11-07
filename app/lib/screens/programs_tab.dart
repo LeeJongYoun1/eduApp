@@ -29,6 +29,9 @@ class _ProgramsTabState extends State<ProgramsTab> {
   List<ProgramItem>? _programs;
   bool _loading = true;
   bool _error = false;
+  bool _holidayOn = false;
+  Set<DateTime>? _holidays; // null = 불러오는 중
+  int _holidayId = 0; // 늦게 도착한 이전 자녀의 쉬는 날이 덮어쓰지 않게 한다
 
   @override
   void initState() {
@@ -67,7 +70,49 @@ class _ProgramsTabState extends State<ProgramsTab> {
 
   void _pickChild(Child? c) {
     _child = c;
+    if (_holidayOn) _loadHolidays();
     _load();
+  }
+
+  // 학년 필터가 "모든 학년"이면 첫 자녀의 학교를 따른다.
+  Child? get _holidayChild => _child ?? (_children?.isEmpty ?? true ? null : _children!.first);
+
+  Future<void> _loadHolidays() async {
+    final id = ++_holidayId;
+    final child = _holidayChild;
+    if (child == null) return;
+    setState(() {
+      _holidayOn = true;
+      _holidays = null;
+    });
+    final today = widget.now();
+    final from = DateTime(today.year, today.month, today.day);
+    try {
+      // shortcut: 오늘~1년 뒤만 가져온다, 더 먼 프로그램이 생기면 프로그램 날짜 범위로 바꾼다.
+      final days = await widget.repo.holidays(child.school.id, from, from.add(const Duration(days: 365)));
+      if (!mounted || id != _holidayId) return;
+      setState(() => _holidays = days);
+    } catch (_) {
+      if (!mounted || id != _holidayId) return;
+      setState(() => _holidayOn = false);
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('쉬는 날 정보를 불러오지 못했어요')));
+    }
+  }
+
+  void _toggleHoliday(bool on) {
+    if (on) {
+      _loadHolidays();
+    } else {
+      _holidayId++;
+      setState(() => _holidayOn = false);
+    }
+  }
+
+  bool _onHoliday(ProgramItem p) {
+    final s = p.startsOn ?? p.endsOn, e = p.endsOn ?? p.startsOn;
+    if (s == null || e == null) return false;
+    final from = DateTime(s.year, s.month, s.day), to = DateTime(e.year, e.month, e.day);
+    return _holidays!.any((h) => !h.isBefore(from) && !h.isAfter(to));
   }
 
   Future<void> _pickDates(_Dates d) async {
@@ -143,17 +188,24 @@ class _ProgramsTabState extends State<ProgramsTab> {
             () => _pickDates(_Dates.custom),
           ),
           FilterChip(label: const Text('관심만'), selected: _favOnly, onSelected: (v) => setState(() => _favOnly = v)),
+          if (_holidayChild != null)
+            Padding(
+              padding: const EdgeInsets.only(left: 8),
+              child: FilterChip(label: const Text('우리 학교 쉬는 날'), selected: _holidayOn, onSelected: _toggleHoliday),
+            ),
         ]),
       ],
     );
   }
 
   Widget _body() {
-    if (_loading) return const Center(child: CircularProgressIndicator());
+    if (_loading || (_holidayOn && _holidays == null)) return const Center(child: CircularProgressIndicator());
     if (_error) {
       return _message('프로그램을 불러오지 못했어요', OutlinedButton(onPressed: _load, child: const Text('다시 시도')));
     }
-    final list = _favOnly ? _programs!.where((p) => _favorites.contains(p.id)).toList() : _programs!;
+    if (_holidayOn && _holidays!.isEmpty) return _message('쉬는 날 정보가 아직 없어요', null);
+    var list = _favOnly ? _programs!.where((p) => _favorites.contains(p.id)).toList() : _programs!;
+    if (_holidayOn) list = list.where(_onHoliday).toList();
     if (list.isEmpty) {
       if (_favOnly) return _message('관심 표시한 프로그램이 없어요', null);
       final child = _child;

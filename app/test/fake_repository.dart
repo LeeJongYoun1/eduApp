@@ -28,6 +28,8 @@ class FakeRepository implements EduRepository {
   Set<int> favorites;
   Map<int, List<SchoolTextbook>> textbooks = {}; // 자녀 id → 과목 목록
   Map<int, Completer<void>> holdTextbooks = {}; // 자녀 id → 완료될 때까지 schoolTextbooks 응답을 붙잡는다 (경합 테스트용)
+  Set<DateTime> holidaySet = {}; // 날짜만(시각 없음) 쉬는 날
+  Map<int, Completer<void>> holdHolidays = {}; // 학교 id → 완료될 때까지 holidays 응답을 붙잡는다 (경합 테스트용)
   Object? failWith;
   bool autoConfirm; // true면 가입 즉시 로그인 상태 (Supabase 메일 확인 꺼짐)
   final List<String> calls = [];
@@ -80,6 +82,13 @@ class FakeRepository implements EduRepository {
   Future<List<SchoolTextbook>> schoolTextbooks(int childId) async {
     final rows = await _call<List<SchoolTextbook>>('schoolTextbooks($childId)', () => List.of(textbooks[childId] ?? []));
     await holdTextbooks[childId]?.future;
+    return rows;
+  }
+  @override
+  Future<Set<DateTime>> holidays(int schoolId, DateTime from, DateTime to) async {
+    final rows = await _call<Set<DateTime>>('holidays($schoolId,$from,$to)',
+        () => holidaySet.where((d) => !d.isBefore(from) && !d.isAfter(to)).toSet());
+    await holdHolidays[schoolId]?.future;
     return rows;
   }
   @override

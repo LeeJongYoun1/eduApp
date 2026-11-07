@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:eduapp/data/models.dart';
 import 'package:eduapp/screens/program_detail_screen.dart';
 import 'package:eduapp/screens/programs_tab.dart';
@@ -130,5 +132,108 @@ void main() {
     await t.pumpAndSettle();
     expect(repo.calls.last, 'programs(null,null,null)');
     expect(find.text('하나'), findsOneWidget);
+  });
+
+  group('school holiday filter', () {
+    ProgramItem on(int id, String title, DateTime? start, DateTime? end) => ProgramItem(
+        id: id, title: title, institutionName: '기관', url: 'https://x/$id', gradeMin: 3, gradeMax: 6, startsOn: start, endsOn: end);
+    final nov21 = DateTime(2026, 11, 21);
+
+    Future<void> chipOn(WidgetTester t) async {
+      await t.tap(find.text('우리 학교 쉬는 날'));
+      await t.pumpAndSettle();
+    }
+
+    testWidgets('holiday filter keeps only programs on holidays', (t) async {
+      final repo = FakeRepository(signedIn: true, children: [seojun], programs: [
+        on(1, '쉬는날체험', nov21, nov21),
+        on(2, '평일체험', DateTime(2026, 11, 24), DateTime(2026, 11, 24)),
+        on(3, '날짜없음', null, null),
+      ])
+        ..holidaySet = {nov21};
+      await open(t, repo);
+      expect(find.text('평일체험'), findsOneWidget);
+      await chipOn(t);
+      expect(repo.calls, contains('holidays(9,${DateTime(2026, 11, 6)},${DateTime(2027, 11, 6)})'));
+      expect(find.text('쉬는날체험'), findsOneWidget);
+      expect(find.text('평일체험'), findsNothing);
+      expect(find.text('날짜없음'), findsNothing);
+      await chipOn(t);
+      expect(find.text('평일체험'), findsOneWidget);
+    });
+
+    testWidgets('multi day program overlapping holiday is kept', (t) async {
+      final repo = FakeRepository(signedIn: true, children: [seojun], programs: [
+        on(1, '걸침', DateTime(2026, 11, 20), DateTime(2026, 11, 23)),
+        on(2, '이후만', DateTime(2026, 11, 22), DateTime(2026, 11, 23)),
+        on(3, '시작일만', nov21, null),
+        on(4, '시작일만아님', DateTime(2026, 11, 22), null),
+        on(5, '종료일만', null, nov21),
+      ])
+        ..holidaySet = {nov21};
+      await open(t, repo);
+      await chipOn(t);
+      expect(find.text('걸침'), findsOneWidget);
+      expect(find.text('이후만'), findsNothing);
+      expect(find.text('시작일만'), findsOneWidget);
+      expect(find.text('시작일만아님'), findsNothing);
+      expect(find.text('종료일만'), findsOneWidget);
+    });
+
+    testWidgets('no holidays shows notice', (t) async {
+      final repo = FakeRepository(signedIn: true, children: [seojun], programs: [on(1, '하나', nov21, nov21)]);
+      await open(t, repo);
+      await chipOn(t);
+      expect(find.text('쉬는 날 정보가 아직 없어요'), findsOneWidget);
+      expect(find.text('하나'), findsNothing);
+    });
+
+    testWidgets('holiday load error does not break list', (t) async {
+      final repo = FakeRepository(signedIn: true, children: [seojun], programs: [on(1, '하나', nov21, nov21)])
+        ..holidaySet = {nov21};
+      await open(t, repo);
+      repo.failWith = Exception('net');
+      // failWith는 다음 호출 한 번에 던져지므로 programs/children 이후인 이 시점에 holidays가 받는다
+      await chipOn(t);
+      expect(find.text('쉬는 날 정보를 불러오지 못했어요'), findsOneWidget);
+      expect(find.text('하나'), findsOneWidget);
+      expect(t.widget<FilterChip>(find.widgetWithText(FilterChip, '우리 학교 쉬는 날')).selected, isFalse);
+    });
+
+    testWidgets('chip hidden without child', (t) async {
+      await open(t, FakeRepository(signedIn: true));
+      expect(find.text('우리 학교 쉬는 날'), findsNothing);
+      expect(find.text('관심만'), findsOneWidget);
+    });
+
+    testWidgets('changing child refetches and ignores stale holiday response', (t) async {
+      const hajun = Child(id: 2, nickname: '하준', grade: 2, school: School(id: 10, name: '정자초', sido: '경기'));
+      final nov25 = DateTime(2026, 11, 25);
+      final repo = FakeRepository(signedIn: true, children: [seojun, hajun], programs: [
+        on(1, '이십일일', nov21, nov21),
+        on(2, '이십오일', nov25, nov25),
+      ])
+        ..holidaySet = {nov21}
+        ..holdHolidays[9] = Completer<void>();
+      await open(t, repo);
+      await t.tap(find.text('우리 학교 쉬는 날'));
+      await t.pump();
+      repo.holidaySet = {nov25};
+      await t.tap(find.text('하준 2학년'));
+      await t.pumpAndSettle();
+      expect(repo.calls.where((c) => c.startsWith('holidays(10,')), hasLength(1));
+      expect(find.text('이십오일'), findsOneWidget);
+      repo.holdHolidays[9]!.complete(); // 늦게 도착한 첫 자녀의 응답
+      await t.pumpAndSettle();
+      expect(find.text('이십오일'), findsOneWidget);
+      expect(find.text('이십일일'), findsNothing);
+    });
+
+    testWidgets('no overflow at textScale 2.0 with holiday chip', (t) async {
+      final repo = FakeRepository(signedIn: true, children: [seojun], programs: [prog(1)]);
+      await open(t, repo, scale: 2.0);
+      expect(find.text('우리 학교 쉬는 날', skipOffstage: false), findsOneWidget);
+      expect(t.takeException(), isNull);
+    });
   });
 }
